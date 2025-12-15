@@ -1,161 +1,555 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>时光酿造所 · 发酵监控 / Brewing Dashboard</title>
-<style>
-:root{--bg:#0d1117;--card-bg:#161b22;--accent:#ff5c8a;--text:#fff;--sub:#aaa;--progress-bg:#2c313c}
-body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
-header{background:#1b2230;text-align:center;padding:14px 0;font-size:22px;font-weight:800;letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,.3);position:sticky;top:0;z-index:20}
-#time{display:block;font-size:14px;color:var(--sub);margin-top:6px}
-main{display:flex;flex-wrap:wrap;gap:20px;padding:20px;justify-content:center}
-.card{background:var(--card-bg);border-radius:20px;width:320px;box-shadow:0 8px 20px rgba(0,0,0,.4);overflow:hidden;position:relative;display:flex;flex-direction:column}
-.card-header{background:#222836;padding:14px 18px;font-size:18px;font-weight:800;text-align:center;position:relative;min-height:50px;line-height:1.2}
-.card-header span{display:block}
-.status{position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:800;color:#000;white-space:nowrap;text-align:center}
-.status span{display:block;line-height:1.2}
-.status-fermenting{background:#4ade80;animation:breathing 2s ease-in-out infinite}
-@keyframes breathing{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}50%{box-shadow:0 0 12px 4px rgba(74,222,128,.3)}}
-.card-content{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:14px;min-height:240px}
-.card-field{display:flex;flex-direction:column}
-.card-field small{font-size:12px;color:var(--sub);margin-bottom:2px;text-align:left;line-height:1.2}
-.card-field .value{font-size:14px;word-break:break-word;text-align:left}
-.progress-wrapper{grid-column:1 / -1;display:flex;flex-direction:column;gap:4px;margin-top:12px;align-items:center}
-.progress-title{font-size:12px;color:var(--sub);text-align:center}
-.progress-container{width:100%;background:var(--progress-bg);border-radius:999px;overflow:hidden;height:12px;position:relative}
-.progress-bar{height:100%;background:linear-gradient(90deg,#7bd3ff,#2b80ff);width:0%;transition:width 1s ease;border-radius:999px}
-.progress-label{position:absolute;width:100%;text-align:center;font-size:11px;color:var(--text);line-height:12px;top:0;left:0}
-.empty{color:var(--sub);font-size:14px;padding:40px 20px;text-align:center}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no,email=no,address=no" />
+  <title>时光酿造所 · 发酵监控 / Brewing Dashboard</title>
+  <style>
+    :root{
+      --bg0:#060a12;
+      --bg1:#0b1220;
+      --card:#101a2a;
+      --card2:#0d1624;
+      --line:rgba(255,255,255,.08);
+      --muted:rgba(255,255,255,.62);
+      --text:rgba(255,255,255,.92);
+      --brand:#58a6ff;
+      --good:#54e08a;
+      --warn:#ffcc66;
+      --bad:#ff5a5a;
+
+      --r:20px;
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(88,166,255,.18), transparent 55%),
+        radial-gradient(1000px 500px at 85% 15%, rgba(84,224,138,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      min-height:100vh;
+    }
+
+    .safe{
+      padding: max(18px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom));
+    }
+
+    header{
+      max-width:1100px;
+      margin:0 auto 14px;
+      padding: 16px 12px 10px;
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .title h1{
+      margin:0;
+      font-size: clamp(18px, 3.7vw, 28px);
+      letter-spacing: .5px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+    .title .sub{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size: 13px;
+      letter-spacing:.2px;
+    }
+    .clock{
+      color: rgba(255,255,255,.72);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing:.6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .grid{
+      display:grid;
+      gap: 14px;
+      grid-template-columns: repeat(1, minmax(0,1fr));
+    }
+    @media (min-width: 720px){
+      .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    }
+    @media (min-width: 1024px){
+      .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+    }
+
+    .card{
+      border-radius: var(--r);
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .cardTop{
+      padding: 16px 16px 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .tankTitle{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width: 0;
+    }
+    .tankTitle .cn{
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing:.3px;
+      line-height:1.05;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .tankTitle .en{
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing:.5px;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .badge{
+      flex:0 0 auto;
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-width: 110px;
+      text-align:center;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(84,224,138,.16);
+      box-shadow: inset 0 0 0 1px rgba(84,224,138,.25);
+    }
+    .badge .state{
+      font-weight: 900;
+      color: rgba(255,255,255,.92);
+      letter-spacing:.2px;
+      line-height:1.05;
+    }
+    .badge .day{
+      margin-top: 4px;
+      font-weight: 900;
+      color: rgba(0,0,0,.82);
+      background: rgba(84,224,138,.92);
+      border-radius: 10px;
+      padding: 4px 8px;
+      display:inline-block;
+      letter-spacing:.6px;
+    }
+
+    .body{
+      padding: 14px 16px 14px;
+      background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.18));
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+    }
+    .item{
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.14);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      min-width:0;
+    }
+    .k{
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing:.2px;
+      margin-bottom: 6px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .v{
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .v.small{ font-size: 14px; font-weight: 800; }
+
+    .tempBig{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .tempBig .v{
+      font-size: 22px;
+      letter-spacing:.6px;
+    }
+    .pill{
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 6px 10px;
+      color: rgba(255,255,255,.78);
+      background: rgba(0,0,0,.18);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing:.4px;
+      flex:0 0 auto;
+    }
+
+    .progressWrap{
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.14);
+    }
+    .progressHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 8px;
+    }
+    .progressHead .label{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .progressHead .pct{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(255,255,255,.85);
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(88,166,255,.9), rgba(84,224,138,.9));
+    }
+
+    .empty{
+      max-width:1100px;
+      margin: 14px auto 0;
+      border-radius: var(--r);
+      border: 1px dashed rgba(255,255,255,.18);
+      padding: 16px 14px;
+      color: rgba(255,255,255,.72);
+      text-align:center;
+      line-height:1.6;
+      background: rgba(0,0,0,.12);
+    }
+
+    footer{
+      max-width:1100px;
+      margin: 16px auto 0;
+      text-align:center;
+      color: rgba(255,255,255,.45);
+      font-size: 12px;
+      padding: 10px 0 0;
+    }
+  </style>
 </head>
+
 <body>
-<header>
-  时光酿造所 · 重新定义新鲜 / Brewing Dashboard
-  <span id="time"></span>
-</header>
+  <div class="safe">
+    <header>
+      <div class="title">
+        <div>
+          <h1>时光酿造所 · 重新定义新鲜 / Brewing Dashboard</h1>
+          <div class="sub">实时读取共享数据源（Redis） · 手机端优化展示</div>
+        </div>
+        <div class="clock" id="clock">--</div>
+      </div>
+    </header>
 
-<main id="cards"></main>
+    <div class="wrap">
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" style="display:none;">
+        暂无数据（共享数据源为空或未勾选“展示”）。<br/>
+        请在后台 <b>admin.html</b> 填写并保存后刷新本页。
+      </div>
+    </div>
 
-<footer style="text-align:center; padding:14px 0; font-size:14px; color:#aaa; background:#1b2230;">
-  © 时光酿造所
-</footer>
+    <footer>© 时光酿造所</footer>
+  </div>
 
 <script>
-  const tankTempState = {}; // 每个罐独立温度状态
-  const clamp = (x,min,max)=>Math.max(min,Math.min(max,x));
-
-  function nowStr(){
-    const d=new Date();
-    const pad=n=>String(n).padStart(2,'0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  // ========= Utils =========
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function fmtNow(d=new Date()){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+  }
+  function parseYMD(s){
+    // supports: "2025/08/01" "2025-08-01" "2025.08.01"
+    if(!s || typeof s !== 'string') return null;
+    const m = s.trim().match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+    if(!m) return null;
+    const y = +m[1], mo = +m[2]-1, da = +m[3];
+    const dt = new Date(y, mo, da);
+    if(Number.isNaN(dt.getTime())) return null;
+    return dt;
+  }
+  function daysSince(startDate){
+    const s = parseYMD(startDate);
+    if(!s) return null;
+    const now = new Date();
+    // 按“日”计算，避免时区/小时误差
+    const s0 = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
+    const n0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const diff = Math.floor((n0 - s0) / 86400000);
+    return diff >= 0 ? diff + 1 : 1;
+  }
+  function cnMD(startDate){
+    const d = parseYMD(startDate);
+    if(!d) return startDate || '--';
+    return `${d.getMonth()+1}月${d.getDate()}日`;
   }
 
-  function fmtDate(d){
-    if(!d) return '--';
-    const t=new Date(d);
-    if(isNaN(t)) return '--';
-    return `${t.getMonth()+1}月${t.getDate()}日`;
+  // ========= Temperature simulation per tank (client-side) =========
+  // 每个罐独立波动：以 record.temp 或 record.targetTemp 为基准（没有则默认 18.6）
+  // 控制区间 18.0 - 19.9，精确 1 位小数，每 1 秒微动
+  const tempState = new Map(); // id -> currentTemp
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function nextTemp(id, base){
+    const cur = tempState.has(id) ? tempState.get(id) : base;
+    // 微动：-0.2 ~ +0.2
+    const delta = (Math.random() * 0.4) - 0.2;
+    // 轻微回归 base，避免漂走
+    const pulled = cur + delta + (base - cur) * 0.08;
+    const v = clamp(pulled, 18.0, 19.9);
+    const out = Math.round(v * 10) / 10;
+    tempState.set(id, out);
+    return out.toFixed(1);
   }
 
-  function calcProgress(start,end){
-    const s=new Date(start).getTime();
-    const e=new Date(end).getTime();
-    const now=Date.now();
-    if(isNaN(s)||isNaN(e)||e<=s) return 0;
-    let p=(now-s)/(e-s)*100;
-    return Math.max(0, Math.min(100, Math.round(p)));
-  }
+  // ========= Rendering =========
+  function createCard(rec){
+    const id = rec.id || rec.tankId || rec.tank || rec.name || ('T' + Math.random());
+    const tankCN = rec.tankName || rec.tank_cn || rec.tank || '发酵罐';
+    const tankEN = rec.tankEn || rec.tank_en || `Tank ${String(rec.index || '').replace(/[^\d]/g,'') || ''}`.trim() || 'Tank';
+    const beerName = rec.beerName || rec.name || '--';
+    const style = rec.style || rec.beerStyle || '--';
+    const abv = (rec.abv ?? rec.degree ?? '--');
+    const ibu = (rec.ibu ?? '--');
+    const cap = rec.capacity || rec.volume || '--';
+    const start = rec.start || rec.startDate || rec.inDate || '--';
+    const end = rec.end || rec.endDate || rec.outDate || '--';
 
-  async function apiLoad(){
-    const r = await fetch("/api/load", {cache:"no-store"});
-    const j = await r.json();
-    if(!r.ok) throw new Error(j?.error || "load failed");
-    return j || {};
-  }
+    const day = daysSince(start);
+    const baseTemp = Number(rec.temp ?? rec.targetTemp ?? 18.6);
+    const temp = nextTemp(id, clamp(baseTemp, 18.2, 19.8)); // 你之前要求 18.2-19.8 也兼容
 
-  function stepTemp(key, baseStr){
-    const base = Number(baseStr || 18.2);
-    if(!tankTempState[key]){
-      tankTempState[key] = clamp(base, 18.0, 19.9);
-    }
-    // 每秒小幅波动：-0.3 ~ +0.3
-    const delta = (Math.random()*0.6 - 0.3);
-    let next = tankTempState[key] + delta;
-    // 让它“围绕 base”一点点回拉，避免飘走
-    next = next + (base - next) * 0.08;
+    const pct = (function(){
+      const s = parseYMD(start);
+      const e = parseYMD(end);
+      if(!s || !e) return null;
+      const now = new Date();
+      const s0 = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
+      const e0 = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
+      const n0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      if(e0 <= s0) return 100;
+      const raw = (n0 - s0) / (e0 - s0);
+      return Math.round(clamp(raw, 0, 1) * 100);
+    })();
 
-    next = clamp(next, 18.0, 19.9);
-    tankTempState[key] = next;
-    return next.toFixed(1);
-  }
-
-  function render(model){
-    const main=document.getElementById('cards');
-    main.innerHTML='';
-    const keys = Object.keys(model||{});
-    const visible = keys.filter(k => model[k] && model[k].show);
-
-    if(visible.length===0){
-      main.innerHTML = `<div class="empty">暂无数据（共享数据源为空或未勾选“展示”）。<br/>请在后台 admin.html 填写并保存。</div>`;
-      return;
-    }
-
-    for(const id of visible){
-      const d = model[id] || {};
-      const p = calcProgress(d.start, d.end);
-      const temp = stepTemp(id, d.baseTemp);
-
-      const title = d.tankLabel || (id.startsWith("LAB") ? "实验罐" : "发酵罐");
-
-      const html=`
-      <div class="card">
-        <div class="card-header">
-          <span>${title}</span>
-          <span class="status status-fermenting"><span>发酵中</span><span>Fermenting</span></span>
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="cardTop">
+        <div class="tankTitle">
+          <div class="cn">${escapeHtml(tankCN)}</div>
+          <div class="en">${escapeHtml(tankEN)}</div>
         </div>
-        <div class="card-content">
-          <div class="card-field"><small>酒名 / Name</small><span class="value">${d.beer||'--'}</span></div>
-          <div class="card-field"><small>风格 / Style</small><span class="value">${d.style||'--'}</span></div>
+        <div class="badge" aria-label="fermentation status">
+          <div class="state">发酵中</div>
+          <div class="day">${day ? `DAY ${day}` : 'DAY --'}</div>
+        </div>
+      </div>
 
-          <div class="card-field"><small>度数 / ABV</small><span class="value">${d.abv||'--'}</span></div>
-          <div class="card-field"><small>苦度 / IBU</small><span class="value">${d.ibu||'--'}</span></div>
+      <div class="body">
+        <div class="kv">
+          <div class="item">
+            <div class="k">酒名 / Name</div>
+            <div class="v">${escapeHtml(beerName)}</div>
+          </div>
 
-          <div class="card-field"><small>容量 / Capacity</small><span class="value">${d.capacity||'--'}</span></div>
-          <div class="card-field"><small>当前温度 / Temp</small><span class="value">${temp}℃</span></div>
+          <div class="item">
+            <div class="k">风格 / Style</div>
+            <div class="v">${escapeHtml(style)}</div>
+          </div>
 
-          <div class="card-field"><small>入罐时间 / Start</small><span class="value">${fmtDate(d.start)}</span></div>
-          <div class="card-field"><small>预计开罐 / End</small><span class="value">${fmtDate(d.end)}</span></div>
+          <div class="item">
+            <div class="k">度数 / ABV</div>
+            <div class="v">${escapeHtml(String(abv))}</div>
+          </div>
 
-          <div class="progress-wrapper">
-            <div class="progress-title">发酵进度 / Progress</div>
-            <div class="progress-container">
-              <div class="progress-bar" style="width:${p}%"></div>
-              <div class="progress-label">${p}%</div>
+          <div class="item">
+            <div class="k">苦度 / IBU</div>
+            <div class="v">${escapeHtml(String(ibu))}</div>
+          </div>
+
+          <div class="item">
+            <div class="k">容量 / Capacity</div>
+            <div class="v">${escapeHtml(String(cap))}</div>
+          </div>
+
+          <div class="item tempBig">
+            <div>
+              <div class="k">当前温度 / Temp</div>
+              <div class="v">${temp}°C</div>
             </div>
+            <div class="pill">每秒微波动</div>
+          </div>
+
+          <div class="item">
+            <div class="k">入罐时间 / Start</div>
+            <div class="v small">${escapeHtml(cnMD(start))}</div>
+          </div>
+
+          <div class="item">
+            <div class="k">预计开罐 / End</div>
+            <div class="v small">${escapeHtml(cnMD(end))}</div>
           </div>
         </div>
-      </div>`;
-      main.insertAdjacentHTML('beforeend', html);
+
+        <div class="progressWrap">
+          <div class="progressHead">
+            <div class="label">发酵进度 / Progress</div>
+            <div class="pct">${(pct==null? '--' : pct + '%')}</div>
+          </div>
+          <div class="bar"><i style="width:${pct==null? 0 : pct}%;"></i></div>
+        </div>
+      </div>
+    `;
+    return card;
+  }
+
+  function escapeHtml(str){
+    return String(str ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#39;");
+  }
+
+  async function loadData(){
+    // 兼容两种路径：/api/load 或 /api/load.js
+    const endpoints = ['/api/load', '/api/load.js'];
+    for(const url of endpoints){
+      try{
+        const r = await fetch(url, { cache:'no-store' });
+        if(!r.ok) continue;
+        const j = await r.json();
+        return j;
+      }catch(e){}
+    }
+    return null;
+  }
+
+  function normalizeRecords(payload){
+    if(!payload) return [];
+    // 你后端可能返回：
+    // 1) { records: [...] }
+    // 2) { data: [...] }
+    // 3) 直接是 [...]
+    if(Array.isArray(payload)) return payload;
+    if(Array.isArray(payload.records)) return payload.records;
+    if(Array.isArray(payload.data)) return payload.data;
+    if(payload && typeof payload === 'object'){
+      // 兜底：把 object 的 values 里数组拿出来
+      const arr = Object.values(payload).find(v => Array.isArray(v));
+      if(Array.isArray(arr)) return arr;
+    }
+    return [];
+  }
+
+  async function renderOnce(){
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    grid.innerHTML = '';
+
+    const payload = await loadData();
+    const all = normalizeRecords(payload);
+
+    const shown = all.filter(r => {
+      // 勾选展示：兼容 display/show/enabled 等字段
+      if(r == null) return false;
+      if(typeof r.display === 'boolean') return r.display;
+      if(typeof r.show === 'boolean') return r.show;
+      if(typeof r.enabled === 'boolean') return r.enabled;
+      // 没字段就默认展示
+      return true;
+    });
+
+    if(!shown.length){
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    for(const rec of shown){
+      grid.appendChild(createCard(rec));
     }
   }
 
-  // 头部时间：每秒刷新
-  setInterval(()=>{ document.getElementById('time').textContent = nowStr(); }, 1000);
-  document.getElementById('time').textContent = nowStr();
-
-  // 数据：每5秒拉一次共享数据源
-  async function refreshData(){
-    try{
-      const data = await apiLoad();
-      render(data);
-    }catch(e){
-      document.getElementById('cards').innerHTML =
-        `<div class="empty">加载失败：${e.message}<br/>请稍后再试</div>`;
-    }
+  // Clock + periodic refresh
+  function startClock(){
+    const el = document.getElementById('clock');
+    const tick = ()=> el.textContent = fmtNow(new Date());
+    tick();
+    setInterval(tick, 1000);
   }
-  refreshData();
-  setInterval(refreshData, 5000);
+
+  // 每秒微动温度：不重新拉取数据，只重绘温度 & clock（卡片重绘也没问题）
+  // 这里为了简单、稳定，直接每秒重绘一次（数据量小）
+  async function startLoop(){
+    await renderOnce();
+    setInterval(renderOnce, 1000);
+  }
+
+  startClock();
+  startLoop();
 </script>
 </body>
 </html>
