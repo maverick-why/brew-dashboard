@@ -1,382 +1,462 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>后台管理 · 时光酿造所</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>时光酿造所 · 后台管理</title>
   <style>
     :root{
       --bg:#0b1220;
-      --panel:#0f172a;
-      --card:#111827;
-      --line:#1f2a44;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --blue:#3b82f6;
+      --card:#101a2b;
+      --line:rgba(255,255,255,.10);
+      --text:#eaf0ff;
+      --sub:rgba(234,240,255,.70);
+      --blue:#3a86ff;
       --green:#22c55e;
       --red:#ef4444;
-      --input:#0b1020;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
-      --radius:14px;
+      --pink:#ff5c8a;
+      --r:18px;
     }
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
+      background: radial-gradient(900px 600px at 10% 10%, rgba(79,140,255,.12), transparent 60%),
+                  radial-gradient(900px 600px at 90% 30%, rgba(0,255,180,.10), transparent 60%),
+                  linear-gradient(180deg, #0c1426, #070b12);
+      color:var(--text);
+    }
     header{
-      background:linear-gradient(180deg,#0f172a,#0b1220);
-      padding:18px 22px;
-      position:sticky;top:0;z-index:10;
-      box-shadow:0 2px 18px rgba(0,0,0,.35);
+      position:sticky; top:0; z-index:10;
+      padding:16px 16px 12px;
+      background: linear-gradient(180deg, rgba(10,16,28,.86), rgba(10,16,28,.62));
+      border-bottom:1px solid var(--line);
+      backdrop-filter: blur(10px);
     }
-    header h1{margin:0;font-size:22px;letter-spacing:.5px}
-    header .sub{margin-top:6px;color:var(--muted);font-size:13px}
-    .wrap{padding:18px 22px;}
+    .h-title{font-weight:900; font-size:20px; letter-spacing:.3px;}
+    .h-sub{margin-top:6px; color:var(--sub); font-size:12px;}
+    main{max-width:1400px; margin:0 auto; padding:16px;}
+    .panel{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      padding:14px;
+      overflow:auto;
+    }
     .bar{
-      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      padding:12px;border-radius:var(--radius);
-      box-shadow:var(--shadow);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
     }
+    .leftBtns, .rightInfo{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
     button{
-      border:0;border-radius:12px;padding:10px 14px;
-      cursor:pointer;font-weight:700;color:white;
-      transition:transform .08s ease,opacity .15s ease;
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:900;
+      color:#0b0f18;
+      cursor:pointer;
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
     }
-    button:active{transform:translateY(1px)}
-    .btn-blue{background:var(--blue)}
-    .btn-green{background:var(--green)}
-    .btn-red{background:var(--red)}
+    .btn-blue{background:var(--blue); color:#fff;}
+    .btn-green{background:var(--green); color:#08110d;}
+    .btn-red{background:var(--red); color:#120606;}
     .btn-ghost{
-      background:transparent;color:var(--text);
-      border:1px solid rgba(255,255,255,.14);
-    }
-    .status{
-      margin-left:auto;
-      font-size:13px;color:var(--muted);
-      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+      background:rgba(255,255,255,.06);
+      color:rgba(234,240,255,.92);
+      border:1px solid var(--line);
+      box-shadow:none;
     }
     .pill{
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05);
-      color:var(--muted);
-      max-width:620px;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
-    .pill.ok{color:#86efac;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
-    .pill.bad{color:#fca5a5;border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
-    .table-wrap{
-      margin-top:14px;
-      border-radius:var(--radius);
-      overflow:auto;
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
+      border-radius:999px;
+      padding:8px 12px;
+      border:1px solid var(--line);
       background:rgba(255,255,255,.03);
+      color:rgba(234,240,255,.78);
+      font-size:12px;
+      font-weight:800;
     }
-    table{width:1400px;border-collapse:separate;border-spacing:0}
-    thead th{
-      position:sticky;top:0;z-index:5;
-      background:rgba(17,24,39,.95);
+    .pill b{color:#fff}
+    table{width:100%; border-collapse:collapse; min-width:1100px;}
+    th,td{
       border-bottom:1px solid rgba(255,255,255,.08);
-      padding:12px 10px;
-      font-size:14px;
-      text-align:center;
-    }
-    tbody td{
       padding:10px 8px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      text-align:center;
-      background:rgba(0,0,0,.06);
+      text-align:left;
+      vertical-align:middle;
+      font-size:13px;
     }
-    tbody tr:hover td{background:rgba(59,130,246,.06)}
-    input[type="text"], input[type="number"], input[type="date"]{
+    th{color:rgba(234,240,255,.75); font-size:12px; letter-spacing:.3px;}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    input[type="text"], input[type="date"], select{
       width:100%;
-      box-sizing:border-box;
-      padding:10px 10px;
-      border-radius:12px;
+      padding:9px 10px;
+      border-radius:10px;
       border:1px solid rgba(255,255,255,.10);
-      background:var(--input);
-      color:var(--text);
+      background:rgba(10,16,28,.55);
+      color:rgba(234,240,255,.92);
       outline:none;
     }
-    input[type="checkbox"]{transform:scale(1.1)}
-    .idcell{color:#93c5fd;font-weight:800}
-    .small{font-size:12px;color:var(--muted)}
-    footer{padding:16px 22px;color:var(--muted);font-size:12px}
+    input[type="checkbox"]{
+      transform: scale(1.1);
+      accent-color: var(--blue);
+    }
+    .id{
+      font-weight:900;
+      color:rgba(123,211,255,.95);
+      letter-spacing:.3px;
+    }
+
+    /* login modal */
+    .modal{
+      position:fixed; inset:0; z-index:999;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(6px);
+    }
+    .modalCard{
+      width:min(520px, 92vw);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      padding:16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.6);
+    }
+    .modalCard h2{margin:0 0 6px; font-size:18px;}
+    .modalCard p{margin:0 0 12px; color:var(--sub); font-size:13px; line-height:1.5;}
+    .modalRow{display:flex; gap:10px;}
+    .modalRow input{
+      flex:1;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(10,16,28,.75);
+      color:#fff;
+      outline:none;
+      font-weight:800;
+      letter-spacing:.4px;
+    }
+    .err{margin-top:10px; color:#ffb4c7; font-weight:800; font-size:13px; display:none;}
+    @media (max-width:680px){
+      table{min-width:980px;}
+      header{padding:14px;}
+    }
   </style>
 </head>
 <body>
-
 <header>
-  <h1>后台管理 · 时光酿造所</h1>
-  <div class="sub">保存会写入共享数据源（Redis），所有用户端同步可见。</div>
+  <div class="h-title">后台管理 · 时光酿造所</div>
+  <div class="h-sub">保存会写入共享数据源（Redis），前台 display.html 会自动刷新展示。</div>
 </header>
 
-<div class="wrap">
-  <div class="bar">
-    <button class="btn-blue" onclick="loadFromShared()">从共享数据源加载</button>
-    <button class="btn-green" onclick="saveToShared()">保存到共享数据源</button>
-    <button class="btn-ghost" onclick="addTank()">新增发酵罐</button>
-    <button class="btn-red" onclick="removeSelected()">删除选中</button>
-
-    <div class="status">
-      <div class="pill" id="apiHint">API: /api/load & /api/save</div>
-      <div class="pill" id="msg">请先加载或编辑后保存</div>
+<main>
+  <div class="panel">
+    <div class="bar">
+      <div class="leftBtns">
+        <button class="btn-ghost" id="btnLoad">从共享数据源加载</button>
+        <button class="btn-green" id="btnSave">保存到共享数据源</button>
+        <button class="btn-blue" id="btnAdd">新增发酵罐</button>
+        <button class="btn-red" id="btnDel">删除选中</button>
+      </div>
+      <div class="rightInfo">
+        <div class="pill">API: <b>/api/load</b> & <b>/api/save</b></div>
+        <div class="pill">登录：<b id="loginState">未登录</b></div>
+      </div>
     </div>
-  </div>
 
-  <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th style="width:70px;">选择</th>
-          <th style="width:90px;">ID</th>
-          <th style="width:150px;">罐名</th>
-          <th style="width:120px;">产量(容量)</th>
-          <th style="width:220px;">酒名 / Name</th>
-          <th style="width:160px;">风格 / Style</th>
+          <th style="width:60px;">选中</th>
+          <th style="width:70px;">ID</th>
+          <th style="width:80px;">展示</th>
+          <th>酒名 / Name</th>
+          <th>风格 / Style</th>
           <th style="width:110px;">ABV</th>
           <th style="width:110px;">IBU</th>
-          <th style="width:160px;">入罐时间 / Start</th>
-          <th style="width:160px;">预计开罐 / End</th>
-          <th style="width:120px;">显示(前端)</th>
+          <th style="width:110px;">容量</th>
+          <th style="width:140px;">当前温度</th>
+          <th style="width:140px;">入罐时间</th>
+          <th style="width:140px;">预计开罐</th>
+          <th style="width:130px;">状态</th>
+          <th style="width:110px;">限量版</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
+</main>
 
-  <div class="small" style="margin-top:10px;">
-    提示：display.html 只会展示 “显示(前端)=勾选” 的发酵罐。Start/End 会决定进度条与“发酵中/即将开罐”状态。
+<!-- 登录遮罩 -->
+<div class="modal" id="loginModal">
+  <div class="modalCard">
+    <h2>管理员登录</h2>
+    <p>请输入管理密码（用于写入 /api/save）。密码只保存在本次浏览器会话中。</p>
+    <div class="modalRow">
+      <input id="passInput" type="password" placeholder="Admin password" autocomplete="current-password" />
+      <button class="btn-green" id="btnLogin">进入后台</button>
+    </div>
+    <div class="err" id="loginErr">密码错误或无权限（Unauthorized）</div>
   </div>
 </div>
 
-<footer>© 时光酿造所 · Dashboard Admin</footer>
-
 <script>
-/** =========================
- *  登录：打开页面就输入密码
- *  （仅用于写入 /api/save）
- * ========================= */
-let ADMIN_PW = '';
-(function requireLogin(){
-  const pw = prompt('请输入后台管理密码');
-  if (!pw) {
-    alert('未输入密码，禁止进入后台。');
-    location.href = '/display.html';
-    return;
-  }
-  ADMIN_PW = pw;
-})();
+const LOAD_URL = "/api/load";
+const SAVE_URL = "/api/save";
+const PASS_KEY = "dbbrew_admin_pass_session";
+const LOCAL_CACHE_KEY = "brew_dash_records_v1_cache";
 
-/** =========================
- *  数据结构（与 display.html 兼容）
- *  {
- *    F1: { show:true, beer:'', style:'', abv:'', ibu:'', capacity:'150L', start:'2025-08-01', end:'2025-08-25' },
- *    ...
- *  }
- * ========================= */
-let DATA = {};
+let state = {}; // { F1: {show, beer, style, ...}, ... }
 
-const $tbody = document.getElementById('tbody');
-const $msg = document.getElementById('msg');
-
-function setMsg(text, type='') {
-  $msg.textContent = text;
-  $msg.classList.remove('ok','bad');
-  if(type==='ok') $msg.classList.add('ok');
-  if(type==='bad') $msg.classList.add('bad');
+function getPass(){
+  return sessionStorage.getItem(PASS_KEY) || "";
+}
+function setPass(p){
+  sessionStorage.setItem(PASS_KEY, p);
+}
+function setLoginState(ok){
+  document.getElementById("loginState").textContent = ok ? "已登录" : "未登录";
 }
 
-/** 生成默认示例（当共享数据源为空时用） */
-function buildSample(){
+function defaultRow(){
   return {
-    F1: { show:true,  name:'1号发酵罐', capacity:'150L', beer:'港岛妹妹', style:'HAZY IPA', abv:'6', ibu:'30', start:'2025-08-01', end:'2025-08-25' },
-    F2: { show:true,  name:'2号发酵罐', capacity:'150L', beer:'重庆森林罐头', style:'STOUT',    abv:'9', ibu:'45', start:'2025-08-02', end:'2025-08-27' },
-    F3: { show:true,  name:'3号发酵罐', capacity:'150L', beer:'丰收',       style:'Ale',      abv:'5', ibu:'20', start:'2025-08-04', end:'2025-09-04' },
-    F4: { show:true,  name:'4号发酵罐', capacity:'150L', beer:'海岸线',     style:'West Coast IPA', abv:'6.5', ibu:'55', start:'2025-08-07', end:'2025-09-11' },
-    F5: { show:false, name:'5号发酵罐', capacity:'150L', beer:'（待排产）', style:'--', abv:'--', ibu:'--', start:'', end:'' }
+    show: true,
+    beer: "",
+    style: "",
+    abv: "",
+    ibu: "",
+    capacity: "150L",
+    temp: "",
+    start: "",
+    end: "",
+    status: "auto",   // auto | fermenting | ready
+    limited: false
   };
-}
-
-/** 确保字段完整 */
-function normalizeTank(t, fallbackName){
-  return {
-    show: !!t.show,
-    name: t.name || fallbackName || '',
-    capacity: t.capacity || '150L',
-    beer: t.beer || '',
-    style: t.style || '',
-    abv: t.abv ?? '',
-    ibu: t.ibu ?? '',
-    start: t.start || '',
-    end: t.end || ''
-  };
-}
-
-/** 渲染表格 */
-function render(){
-  const keys = Object.keys(DATA).sort((a,b)=>{
-    const na = parseInt(a.replace(/\D/g,'')) || 0;
-    const nb = parseInt(b.replace(/\D/g,'')) || 0;
-    return na-nb;
-  });
-
-  $tbody.innerHTML = '';
-  keys.forEach(id=>{
-    const t = normalizeTank(DATA[id], idToName(id));
-    DATA[id] = t;
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="checkbox" class="sel" data-id="${id}"></td>
-      <td class="idcell">${id}</td>
-
-      <td><input type="text" value="${escapeHtml(t.name)}" data-k="${id}" data-f="name"></td>
-      <td><input type="text" value="${escapeHtml(t.capacity)}" data-k="${id}" data-f="capacity"></td>
-      <td><input type="text" value="${escapeHtml(t.beer)}" data-k="${id}" data-f="beer"></td>
-      <td><input type="text" value="${escapeHtml(t.style)}" data-k="${id}" data-f="style"></td>
-      <td><input type="text" value="${escapeHtml(String(t.abv))}" data-k="${id}" data-f="abv"></td>
-      <td><input type="text" value="${escapeHtml(String(t.ibu))}" data-k="${id}" data-f="ibu"></td>
-
-      <td><input type="date" value="${escapeHtml(t.start)}" data-k="${id}" data-f="start"></td>
-      <td><input type="date" value="${escapeHtml(t.end)}" data-k="${id}" data-f="end"></td>
-
-      <td><input type="checkbox" ${t.show ? 'checked':''} data-k="${id}" data-f="show"></td>
-    `;
-    $tbody.appendChild(tr);
-  });
-
-  // 监听输入变化
-  $tbody.querySelectorAll('input').forEach(inp=>{
-    inp.addEventListener('change', (e)=>{
-      const el = e.target;
-      const id = el.getAttribute('data-k');
-      const f  = el.getAttribute('data-f');
-      if(!id || !f) return;
-
-      if(f === 'show'){
-        DATA[id][f] = el.checked;
-      }else{
-        DATA[id][f] = el.value;
-      }
-      setMsg('已修改（未保存）');
-    });
-  });
-}
-
-function idToName(id){
-  if(/^F\d+$/.test(id)){
-    const n = id.replace('F','');
-    return `${n}号发酵罐`;
-  }
-  return id;
 }
 
 function nextId(){
-  const nums = Object.keys(DATA)
-    .map(k => parseInt(k.replace(/\D/g,'')) )
-    .filter(n => !isNaN(n));
-  const max = nums.length ? Math.max(...nums) : 0;
-  return `F${max+1}`;
+  // 生成 F1..F99 中未占用的最小值
+  for(let i=1;i<=99;i++){
+    const id = "F"+i;
+    if(!state[id]) return id;
+  }
+  return "F"+(Object.keys(state).length+1);
 }
 
-/** 新增发酵罐 */
+function renderTable(){
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  const ids = Object.keys(state).sort((a,b)=>{
+    const ma = /^F(\d+)$/i.exec(a);
+    const mb = /^F(\d+)$/i.exec(b);
+    if(ma && mb) return Number(ma[1])-Number(mb[1]);
+    if(ma) return -1;
+    if(mb) return 1;
+    return a.localeCompare(b);
+  });
+
+  for(const id of ids){
+    const r = state[id] || defaultRow();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="checkbox" class="sel" data-id="${id}"></td>
+      <td class="id">${id}</td>
+      <td><input type="checkbox" class="inp" data-id="${id}" data-k="show" ${r.show ? "checked":""}></td>
+
+      <td><input type="text" class="inp" data-id="${id}" data-k="beer" value="${escapeAttr(r.beer)}"></td>
+      <td><input type="text" class="inp" data-id="${id}" data-k="style" value="${escapeAttr(r.style)}"></td>
+      <td><input type="text" class="inp" data-id="${id}" data-k="abv" value="${escapeAttr(r.abv)}"></td>
+      <td><input type="text" class="inp" data-id="${id}" data-k="ibu" value="${escapeAttr(r.ibu)}"></td>
+      <td><input type="text" class="inp" data-id="${id}" data-k="capacity" value="${escapeAttr(r.capacity)}"></td>
+      <td><input type="text" class="inp" data-id="${id}" data-k="temp" value="${escapeAttr(r.temp)}" placeholder="18.2°C"></td>
+
+      <td><input type="date" class="inp" data-id="${id}" data-k="start" value="${escapeAttr(r.start)}"></td>
+      <td><input type="date" class="inp" data-id="${id}" data-k="end" value="${escapeAttr(r.end)}"></td>
+
+      <td>
+        <select class="inp" data-id="${id}" data-k="status">
+          <option value="auto" ${r.status==="auto"?"selected":""}>auto</option>
+          <option value="fermenting" ${r.status==="fermenting"?"selected":""}>fermenting</option>
+          <option value="ready" ${r.status==="ready"?"selected":""}>ready</option>
+        </select>
+      </td>
+
+      <td style="text-align:center;">
+        <input type="checkbox" class="inp" data-id="${id}" data-k="limited" ${r.limited ? "checked":""}>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // bind change
+  tbody.querySelectorAll(".inp").forEach(el=>{
+    el.addEventListener("change", ()=>{
+      const id = el.dataset.id;
+      const k = el.dataset.k;
+      if(!state[id]) state[id] = defaultRow();
+      if(el.type === "checkbox") state[id][k] = el.checked;
+      else state[id][k] = el.value;
+      cacheLocal();
+    });
+  });
+}
+
+function escapeAttr(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+function cacheLocal(){
+  localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(state));
+}
+
+function loadLocalCache(){
+  try{
+    const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if(obj && typeof obj === "object") return obj;
+  }catch(e){}
+  return null;
+}
+
+async function apiLoad(){
+  const res = await fetch(LOAD_URL, { cache:"no-store" });
+  const data = await res.json();
+  state = (data && typeof data === "object") ? data : {};
+  cacheLocal();
+  renderTable();
+}
+
+async function apiSave(){
+  const pass = getPass();
+  if(!pass){
+    openLogin();
+    throw new Error("missing pass");
+  }
+  const res = await fetch(SAVE_URL, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json; charset=utf-8",
+      "x-admin-pass": pass
+    },
+    body: JSON.stringify(state || {})
+  });
+  const out = await res.json().catch(()=> ({}));
+  if(!res.ok || out.ok !== true){
+    throw new Error(out.error || "Unauthorized");
+  }
+  return out;
+}
+
 function addTank(){
   const id = nextId();
-  DATA[id] = normalizeTank({
-    show: true,
-    name: idToName(id),
-    capacity: '150L',
-    beer: '',
-    style: '',
-    abv: '',
-    ibu: '',
-    start: '',
-    end: ''
-  }, idToName(id));
-  render();
-  setMsg(`已新增 ${id}（未保存）`);
+  state[id] = defaultRow();
+  renderTable();
+  cacheLocal();
 }
 
-/** 删除选中 */
-function removeSelected(){
-  const sels = Array.from(document.querySelectorAll('.sel:checked')).map(x=>x.dataset.id);
-  if(!sels.length){
-    alert('请先勾选要删除的行');
-    return;
-  }
-  if(!confirm(`确定删除：${sels.join(', ')} ?`)) return;
-  sels.forEach(id=>delete DATA[id]);
-  render();
-  setMsg('已删除（未保存）');
+function deleteSelected(){
+  document.querySelectorAll(".sel:checked").forEach(chk=>{
+    const id = chk.dataset.id;
+    delete state[id];
+  });
+  renderTable();
+  cacheLocal();
 }
 
-/** 从共享数据源加载 */
-async function loadFromShared(){
-  setMsg('加载中...');
+function openLogin(){
+  document.getElementById("loginErr").style.display = "none";
+  document.getElementById("loginModal").style.display = "flex";
+  setLoginState(false);
+  setTimeout(()=> document.getElementById("passInput").focus(), 50);
+}
+
+function closeLogin(){
+  document.getElementById("loginModal").style.display = "none";
+  setLoginState(true);
+}
+
+async function testLogin(pass){
+  // 用一次空保存测试权限（不写入就没法验证；这里我们用当前 state 保存）
+  const res = await fetch(SAVE_URL, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json; charset=utf-8",
+      "x-admin-pass": pass
+    },
+    body: JSON.stringify(state || {})
+  });
+  const out = await res.json().catch(()=> ({}));
+  if(!res.ok || out.ok !== true) throw new Error(out.error || "Unauthorized");
+  return true;
+}
+
+// buttons
+document.getElementById("btnLoad").addEventListener("click", async ()=>{
+  try{ await apiLoad(); alert("已从共享数据源加载"); }
+  catch(e){ alert("加载失败：" + (e.message||e)); }
+});
+
+document.getElementById("btnSave").addEventListener("click", async ()=>{
+  try{ await apiSave(); alert("保存成功（已写入共享数据源）"); }
+  catch(e){ alert("保存失败：" + (e.message||e)); }
+});
+
+document.getElementById("btnAdd").addEventListener("click", addTank);
+document.getElementById("btnDel").addEventListener("click", deleteSelected);
+
+// login
+document.getElementById("btnLogin").addEventListener("click", async ()=>{
+  const pass = document.getElementById("passInput").value.trim();
+  if(!pass) return;
   try{
-    const res = await fetch('/api/load', { cache:'no-store' });
-    const json = await res.json();
-
-    if(!json || Object.keys(json).length === 0){
-      // 共享数据源为空：给一个完整示例，方便你直接改，然后保存
-      DATA = buildSample();
-      render();
-      setMsg('共享数据源为空：已载入完整示例（请修改后保存）', 'bad');
-      return;
-    }
-
-    DATA = json;
-    // 兼容旧数据缺字段
-    Object.keys(DATA).forEach(id=>{
-      DATA[id] = normalizeTank(DATA[id], idToName(id));
-    });
-    render();
-    setMsg('已从共享数据源加载 ✅', 'ok');
-  }catch(err){
-    console.error(err);
-    setMsg('加载失败：请检查 /api/load 是否可访问', 'bad');
+    await testLogin(pass);
+    setPass(pass);
+    closeLogin();
+  }catch(e){
+    document.getElementById("loginErr").style.display = "block";
   }
-}
+});
+document.getElementById("passInput").addEventListener("keydown",(e)=>{
+  if(e.key==="Enter") document.getElementById("btnLogin").click();
+});
 
-/** 保存到共享数据源 */
-async function saveToShared(){
-  setMsg('保存中...');
-  try{
-    const res = await fetch('/api/save', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-admin-password': ADMIN_PW
-      },
-      body: JSON.stringify(DATA)
-    });
+// init
+(async function init(){
+  // 先用本地缓存兜底渲染（更快），再从远端覆盖
+  const cached = loadLocalCache();
+  if(cached) state = cached;
 
-    if(!res.ok){
-      setMsg('❌ 密码错误或无权限（Unauthorized）', 'bad');
-      return;
+  if(!state || typeof state !== "object" || Object.keys(state).length===0){
+    // 给一个基础结构
+    state = {};
+    for(let i=1;i<=5;i++){
+      state["F"+i] = defaultRow();
+      state["F"+i].capacity = "150L";
     }
-    const out = await res.json().catch(()=>({ok:true}));
-    setMsg('✅ 已写入共享数据源（Redis），用户端将同步可见', 'ok');
-  }catch(err){
-    console.error(err);
-    setMsg('保存失败：网络/部署异常', 'bad');
+    state["F1"].show = true;
   }
-}
 
-/** HTML 转义 */
-function escapeHtml(s){
-  return String(s ?? '')
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
-    .replaceAll("'",'&#039;');
-}
+  renderTable();
 
-// 首次打开：自动先加载一次（让你一进来就看到完整表）
-loadFromShared();
+  // 若已有 pass，就不弹窗；否则先弹窗
+  if(getPass()){
+    setLoginState(true);
+    document.getElementById("loginModal").style.display = "none";
+  }else{
+    openLogin();
+  }
+
+  // 尝试加载远端（不强制）
+  try{ await apiLoad(); }catch(e){}
+})();
 </script>
-
 </body>
 </html>
