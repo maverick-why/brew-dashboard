@@ -5,62 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>时光酿造所 · 发酵监控 / Brewing Dashboard</title>
 <style>
-:root {
-  --bg: #0d1117;
-  --card-bg: #161b22;
-  --text: #fff;
-  --sub: #aaa;
-  --progress-bg: #2c313c;
-}
-body { margin:0; font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
-header {
-  background:#1b2230; text-align:center; padding:12px 0; font-size:20px; font-weight:bold;
-  letter-spacing:1px; box-shadow:0 2px 8px rgba(0,0,0,0.3); position:sticky; top:0; z-index:20;
-}
-#time { display:block; font-size:13px; color:var(--sub); margin-top:3px; }
-main { display:flex; flex-wrap:wrap; gap:16px; padding:16px; justify-content:center; }
-
-.card { background:var(--card-bg); border-radius:16px; width:300px; box-shadow:0 6px 16px rgba(0,0,0,0.4);
-  overflow:hidden; position:relative; transition:transform 0.3s ease; display:flex; flex-direction:column; }
-.card:hover { transform:translateY(-3px); }
-
-.ribbon { position:absolute; top:10px; left:-36px; width:120px; text-align:center; transform:rotate(-45deg);
-  background:#ff5c8a; color:#fff; font-size:11px; font-weight:bold; padding:3px 0;
-  box-shadow:0 2px 6px rgba(0,0,0,0.5); z-index:10; letter-spacing:1px; }
-.ribbon span { display:block; line-height:1.1; }
-
-.card-header { background:#222836; padding:12px 16px; font-size:17px; font-weight:bold;
-  text-align:center; position:relative; z-index:1; min-height:48px; line-height:1.2; }
-.card-header span { display:block; }
-
-/* 状态栏（右上角，上下两行，中间分隔线） */
-.status {
-  position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:4px 8px; border-radius:6px; font-size:11px; font-weight:700; color:#000;
-  white-space:nowrap; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.3);
-  min-width:70px; max-width:100px;
-}
-.status .line-1 { line-height:1.1; font-size:12px; }
-.status .sep { width:100%; height:1px; background:rgba(0,0,0,0.25); margin:3px 0; }
-.status .line-2 { line-height:1.1; font-size:11px; letter-spacing:0.5px; }
-
-.status-fermenting { background:#4ade80; animation:breathing 2s ease-in-out infinite; }
-.status-upcoming  { background:#ffcc00; animation:rotate-bounce 1s infinite; }
-
-@keyframes breathing { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.5);} 50%{box-shadow:0 0 10px 3px rgba(74,222,128,0.3);} }
-@keyframes rotate-bounce { 0%{transform:translateY(-50%) rotate(-3deg);} 50%{transform:translateY(-50%) rotate(3deg);} 100%{transform:translateY(-50%) rotate(-3deg);} }
-
-.card-content { padding:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px 10px; font-size:13px; position:relative; min-height:220px; }
-.card-field { display:flex; flex-direction:column; }
-.card-field small { font-size:11px; color:var(--sub); margin-bottom:2px; text-align:left; }
-.card-field .value { font-size:13px; word-break:break-word; text-align:left; }
-
-.progress-wrapper { grid-column:1 / -1; display:flex; flex-direction:column; gap:3px; margin-top:10px; align-items:center; }
-.progress-title { font-size:11px; color:var(--sub); text-align:center; }
-.progress-container { width:100%; background:var(--progress-bg); border-radius:999px; overflow:hidden; height:10px; position:relative; }
-.progress-bar { height:100%; background:linear-gradient(90deg,#7bd3ff,#2b80ff); width:0%; transition:width 1s ease; border-radius:999px; }
-.progress-label { position:absolute; width:100%; text-align:center; font-size:10px; color:var(--text); line-height:10px; top:0; left:0; }
+:root{--bg:#0d1117;--card-bg:#161b22;--accent:#ff5c8a;--text:#fff;--sub:#aaa;--progress-bg:#2c313c}
+body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
+header{background:#1b2230;text-align:center;padding:14px 0;font-size:22px;font-weight:800;letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,.3);position:sticky;top:0;z-index:20}
+#time{display:block;font-size:14px;color:var(--sub);margin-top:6px}
+main{display:flex;flex-wrap:wrap;gap:20px;padding:20px;justify-content:center}
+.card{background:var(--card-bg);border-radius:20px;width:320px;box-shadow:0 8px 20px rgba(0,0,0,.4);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.card-header{background:#222836;padding:14px 18px;font-size:18px;font-weight:800;text-align:center;position:relative;min-height:50px;line-height:1.2}
+.card-header span{display:block}
+.status{position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:800;color:#000;white-space:nowrap;text-align:center}
+.status span{display:block;line-height:1.2}
+.status-fermenting{background:#4ade80;animation:breathing 2s ease-in-out infinite}
+@keyframes breathing{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}50%{box-shadow:0 0 12px 4px rgba(74,222,128,.3)}}
+.card-content{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:14px;min-height:240px}
+.card-field{display:flex;flex-direction:column}
+.card-field small{font-size:12px;color:var(--sub);margin-bottom:2px;text-align:left;line-height:1.2}
+.card-field .value{font-size:14px;word-break:break-word;text-align:left}
+.progress-wrapper{grid-column:1 / -1;display:flex;flex-direction:column;gap:4px;margin-top:12px;align-items:center}
+.progress-title{font-size:12px;color:var(--sub);text-align:center}
+.progress-container{width:100%;background:var(--progress-bg);border-radius:999px;overflow:hidden;height:12px;position:relative}
+.progress-bar{height:100%;background:linear-gradient(90deg,#7bd3ff,#2b80ff);width:0%;transition:width 1s ease;border-radius:999px}
+.progress-label{position:absolute;width:100%;text-align:center;font-size:11px;color:var(--text);line-height:12px;top:0;left:0}
+.empty{color:var(--sub);font-size:14px;padding:40px 20px;text-align:center}
 </style>
 </head>
 <body>
@@ -68,124 +34,128 @@ main { display:flex; flex-wrap:wrap; gap:16px; padding:16px; justify-content:cen
   时光酿造所 · 重新定义新鲜 / Brewing Dashboard
   <span id="time"></span>
 </header>
+
 <main id="cards"></main>
-<footer style="text-align:center; padding:10px 0; font-size:13px; color:#aaa; background:#1b2230;">
+
+<footer style="text-align:center; padding:14px 0; font-size:14px; color:#aaa; background:#1b2230;">
   © 时光酿造所
 </footer>
+
 <script>
-const KEY='brew_dash_records_v1';
+  const tankTempState = {}; // 每个罐独立温度状态
+  const clamp = (x,min,max)=>Math.max(min,Math.min(max,x));
 
-function fmtDate(d){ if(!d) return '--'; const t=new Date(d); if(isNaN(t)) return '--'; return `${t.getMonth()+1}月${t.getDate()}日`; }
-function calcProgress(start,end){
-  const s=new Date(start).getTime();
-  const e=new Date(end).getTime();
-  const now=Date.now();
-  if(isNaN(s)||isNaN(e)||e<=s) return 0;
-  let p=(now-s)/(e-s)*100;
-  return Math.max(0, Math.min(100, Math.round(p)));
-}
-function daysLeft(end){ if(!end) return Infinity; const now=new Date().getTime(); const e=new Date(end).getTime(); return Math.ceil((e-now)/86400000);}
-/* 入罐天数（Day1 从入罐当天起） */
-function fermentDays(start){
-  if(!start) return 0;
-  const s=new Date(start).getTime();
-  const now=Date.now();
-  if(isNaN(s) || now < s) return 0;
-  return Math.floor((now - s)/86400000) + 1;
-}
-function randomTemp(days){ if(days<=5 && days>=0){ return (2.9+Math.random()*(4.1-2.9)).toFixed(1); } else { return (17.9+Math.random()*(18.5-17.9)).toFixed(1); } }
+  function nowStr(){
+    const d=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
 
-function render(){
-  const main=document.getElementById('cards');
-  main.innerHTML='';
-  const saved=loadAll();
-  Object.keys(saved).forEach(id=>{
-    const d=saved[id];
-    if(!d.show) return;
+  function fmtDate(d){
+    if(!d) return '--';
+    const t=new Date(d);
+    if(isNaN(t)) return '--';
+    return `${t.getMonth()+1}月${t.getDate()}日`;
+  }
 
-    const p=calcProgress(d.start,d.end);
-    const leftDays=daysLeft(d.end);
-    const temp=randomTemp(leftDays);
+  function calcProgress(start,end){
+    const s=new Date(start).getTime();
+    const e=new Date(end).getTime();
+    const now=Date.now();
+    if(isNaN(s)||isNaN(e)||e<=s) return 0;
+    let p=(now-s)/(e-s)*100;
+    return Math.max(0, Math.min(100, Math.round(p)));
+  }
 
-    let statusText='', statusClass='', dayText='';
-    if(leftDays<=3 && leftDays>=0){
-      statusText='即将开罐';
-      statusClass='status-upcoming';
-      const fd=fermentDays(d.start);
-      dayText = fd>0 ? `DAY ${fd}` : 'DAY --';
-    } else if(leftDays>3){
-      statusText='发酵中';
-      statusClass='status-fermenting';
-      const fd=fermentDays(d.start);
-      dayText = fd>0 ? `DAY ${fd}` : 'DAY --';
+  async function apiLoad(){
+    const r = await fetch("/api/load", {cache:"no-store"});
+    const j = await r.json();
+    if(!r.ok) throw new Error(j?.error || "load failed");
+    return j || {};
+  }
+
+  function stepTemp(key, baseStr){
+    const base = Number(baseStr || 18.2);
+    if(!tankTempState[key]){
+      tankTempState[key] = clamp(base, 18.0, 19.9);
+    }
+    // 每秒小幅波动：-0.3 ~ +0.3
+    const delta = (Math.random()*0.6 - 0.3);
+    let next = tankTempState[key] + delta;
+    // 让它“围绕 base”一点点回拉，避免飘走
+    next = next + (base - next) * 0.08;
+
+    next = clamp(next, 18.0, 19.9);
+    tankTempState[key] = next;
+    return next.toFixed(1);
+  }
+
+  function render(model){
+    const main=document.getElementById('cards');
+    main.innerHTML='';
+    const keys = Object.keys(model||{});
+    const visible = keys.filter(k => model[k] && model[k].show);
+
+    if(visible.length===0){
+      main.innerHTML = `<div class="empty">暂无数据（共享数据源为空或未勾选“展示”）。<br/>请在后台 admin.html 填写并保存。</div>`;
+      return;
     }
 
-    let tankName='';
-    if(id.startsWith('实验款')){
-      tankName = `<span>${id.replace('实验款','')}号实验罐</span><span>Lab Tank ${id.replace('实验款','')}</span>`;
-    } else {
-      tankName = `<span>${id.replace('F','')}号发酵罐</span><span>Tank ${id.replace('F','')}</span>`;
-    }
+    for(const id of visible){
+      const d = model[id] || {};
+      const p = calcProgress(d.start, d.end);
+      const temp = stepTemp(id, d.baseTemp);
 
-    const capacity=d.capacity || '150L';
-    const abv=d.abv||'--';
-    const ibu=d.ibu||'--';
-    const beer=d.beer||'--';
+      const title = d.tankLabel || (id.startsWith("LAB") ? "实验罐" : "发酵罐");
 
-    const html=`
-    <div class="card">
-      ${id.startsWith('实验款')?'<div class="ribbon"><span>限量</span><span>Limited</span></div>':''}
-      <div class="card-header">
-        ${tankName}
-        ${statusText?`
-        <span class="status ${statusClass}">
-          <span class="line-1">${statusText}</span>
-          <span class="sep"></span>
-          <span class="line-2">${dayText}</span>
-        </span>`:''}
-      </div>
-      <div class="card-content">
-        <div class="card-field"><small>酒名 / Name</small><span class="value">${beer}</span></div>
-        <div class="card-field"><small>风格 / Style</small><span class="value">${d.style||'--'}</span></div>
-        <div class="card-field"><small>度数 / ABV</small><span class="value">${abv}</span></div>
-        <div class="card-field"><small>苦度 / IBU</small><span class="value">${ibu}</span></div>
-        <div class="card-field"><small>产量 / Capacity</small><span class="value">${capacity}</span></div>
-        <div class="card-field"><small>当前温度 / Temp</small><span class="value">${temp}°C</span></div>
-        <div class="card-field"><small>入罐时间 / Start</small><span class="value">${fmtDate(d.start)}</span></div>
-        <div class="card-field"><small>预计开罐 / End</small><span class="value">${fmtDate(d.end)}</span></div>
+      const html=`
+      <div class="card">
+        <div class="card-header">
+          <span>${title}</span>
+          <span class="status status-fermenting"><span>发酵中</span><span>Fermenting</span></span>
+        </div>
+        <div class="card-content">
+          <div class="card-field"><small>酒名 / Name</small><span class="value">${d.beer||'--'}</span></div>
+          <div class="card-field"><small>风格 / Style</small><span class="value">${d.style||'--'}</span></div>
 
-        <div class="progress-wrapper">
-          <div class="progress-title">发酵进度 / Progress</div>
-          <div class="progress-container">
-            <div class="progress-bar" style="width:${p}%"></div>
-            <div class="progress-label">${p}%</div>
+          <div class="card-field"><small>度数 / ABV</small><span class="value">${d.abv||'--'}</span></div>
+          <div class="card-field"><small>苦度 / IBU</small><span class="value">${d.ibu||'--'}</span></div>
+
+          <div class="card-field"><small>容量 / Capacity</small><span class="value">${d.capacity||'--'}</span></div>
+          <div class="card-field"><small>当前温度 / Temp</small><span class="value">${temp}℃</span></div>
+
+          <div class="card-field"><small>入罐时间 / Start</small><span class="value">${fmtDate(d.start)}</span></div>
+          <div class="card-field"><small>预计开罐 / End</small><span class="value">${fmtDate(d.end)}</span></div>
+
+          <div class="progress-wrapper">
+            <div class="progress-title">发酵进度 / Progress</div>
+            <div class="progress-container">
+              <div class="progress-bar" style="width:${p}%"></div>
+              <div class="progress-label">${p}%</div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>`;
-    main.insertAdjacentHTML('beforeend',html);
-  });
-}
+      </div>`;
+      main.insertAdjacentHTML('beforeend', html);
+    }
+  }
 
-function loadAll(){ try { return JSON.parse(localStorage.getItem(KEY))||{}; } catch(e){return {}; } }
+  // 头部时间：每秒刷新
+  setInterval(()=>{ document.getElementById('time').textContent = nowStr(); }, 1000);
+  document.getElementById('time').textContent = nowStr();
 
-function updateTime(){
-  const now=new Date();
-  const y=now.getFullYear();
-  const m=(now.getMonth()+1).toString().padStart(2,'0');
-  const d=now.getDate().toString().padStart(2,'0');
-  const h=now.getHours().toString().padStart(2,'0');
-  const mi=now.getMinutes().toString().padStart(2,'0');
-  const s=now.getSeconds().toString().padStart(2,'0');
-  document.getElementById('time').textContent=`${y}-${m}-${d} ${h}:${mi}:${s}`;
-}
-
-window.onload=()=>{
-  render();
-  updateTime();
-  setInterval(updateTime,1000);
-  setInterval(render,5000);
-};
+  // 数据：每5秒拉一次共享数据源
+  async function refreshData(){
+    try{
+      const data = await apiLoad();
+      render(data);
+    }catch(e){
+      document.getElementById('cards').innerHTML =
+        `<div class="empty">加载失败：${e.message}<br/>请稍后再试</div>`;
+    }
+  }
+  refreshData();
+  setInterval(refreshData, 5000);
 </script>
 </body>
 </html>
