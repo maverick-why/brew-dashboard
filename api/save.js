@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
       return res.status(405).end(JSON.stringify({ ok: false, error: "Method Not Allowed" }));
     }
 
-    const pass = req.headers["x-admin-pass"];
+    const pass = req.headers["x-admin-pass"] || req.headers["x-admin-password"];
     if (!pass || pass !== process.env.ADMIN_WRITE_PASSWORD) {
       return res.status(401).end(JSON.stringify({ ok: false, error: "Unauthorized" }));
     }
