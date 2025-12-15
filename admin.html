@@ -1,247 +1,172 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
   <title>后台管理 · 时光酿造所</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root{--bg:#0d1117;--panel:#161b22;--head:#1b2230;--text:#fff;--sub:#a7b0bd;--line:rgba(255,255,255,.12);--btn:#2b80ff}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    header{background:var(--head);padding:14px 18px;font-size:20px;font-weight:800;letter-spacing:.5px;position:sticky;top:0;z-index:5}
-    header small{display:block;color:var(--sub);font-weight:500;margin-top:4px}
-    .wrap{padding:18px}
-    .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-    button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
-    .btn{background:var(--btn);color:#fff}
-    .btn2{background:rgba(255,255,255,.08);color:#fff}
-    .hint{color:var(--sub);font-size:13px}
-    .ok{color:#4ade80;font-weight:700}
-    .err{color:#ff6b6b;font-weight:700}
-    table{width:100%;border-collapse:separate;border-spacing:0;overflow:auto;background:var(--panel);border-radius:14px}
-    th,td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px;vertical-align:middle}
-    th{background:rgba(255,255,255,.04);text-align:center}
-    tr:last-child td{border-bottom:0}
-    th:last-child,td:last-child{border-right:0}
-    input,select{width:100%;box-sizing:border-box;background:#0b1220;color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px}
-    .cbox{display:flex;justify-content:center}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #0b1220;
+      color: #fff;
+    }
+    header {
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      background: #111827;
+    }
+    .container {
+      padding: 20px;
+    }
+    button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .primary {
+      background: #3b82f6;
+      color: #fff;
+    }
+    .danger {
+      background: #ef4444;
+      color: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #1f2937;
+      padding: 8px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 6px;
+      border-radius: 6px;
+      border: none;
+      background: #020617;
+      color: #fff;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <header>
-    后台管理 · 时光酿造所
-    <small>保存会写入共享数据源（Redis），所有用户端同步可见</small>
-  </header>
 
-  <div class="wrap">
-    <div class="bar">
-      <button class="btn2" id="btnLoad">从共享数据源加载</button>
-      <button class="btn2" id="btnSeed">填入示例数据（DBBREW）</button>
-      <button class="btn" id="btnSave">保存到共享数据源</button>
-      <span class="hint">API：<span class="mono">/api/load</span> & <span class="mono">/api/save</span></span>
-      <span id="msg" class="hint"></span>
-    </div>
+<header>后台管理 · 时光酿造所</header>
 
-    <div style="overflow:auto;border-radius:14px">
-      <table id="tbl">
-        <thead>
-          <tr>
-            <th style="min-width:70px">展示</th>
-            <th style="min-width:110px">罐名</th>
-            <th style="min-width:90px">容量</th>
-            <th style="min-width:160px">酒名 / Name</th>
-            <th style="min-width:140px">风格 / Style</th>
-            <th style="min-width:120px">度数 / ABV</th>
-            <th style="min-width:120px">苦度 / IBU</th>
-            <th style="min-width:120px">产量 / Capacity</th>
-            <th style="min-width:120px">当前温度</th>
-            <th style="min-width:130px">入罐时间</th>
-            <th style="min-width:130px">预计开罐</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
+<div class="container">
+  <div id="status" style="margin-bottom:10px;color:#f87171"></div>
 
-    <p class="hint" style="margin-top:12px">
-      ✅ 温度字段是“基础温度”，用户端会在此基础上每秒轻微波动（18.0–19.9），每个罐独立。<br/>
-      ✅ 如果你之前看到“打开就有内容”，那是旧版 localStorage 残留；这个新版不再用 localStorage。
-    </p>
-  </div>
+  <button class="primary" onclick="loadFromRedis()">从共享数据源加载</button>
+  <button class="primary" onclick="saveToRedis()">保存到共享数据源</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>显示</th>
+        <th>罐名</th>
+        <th>容量</th>
+        <th>酒名</th>
+        <th>风格</th>
+        <th>ABV</th>
+        <th>IBU</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
 
 <script>
-  const $ = (id)=>document.getElementById(id);
-  const msg = (type, text)=>{
-    const el=$("msg"); el.className = type==="ok" ? "ok" : type==="err" ? "err" : "hint";
-    el.textContent = text || "";
-    if(text) setTimeout(()=>{ el.textContent=""; el.className="hint"; }, 6000);
-  };
+/* ========================
+   登录校验
+======================== */
 
-  // 罐ID：F1..F6 + LAB1
-  const DEFAULT_KEYS = ["F1","F2","F3","F4","F5","F6","LAB1"];
+const adminPassword = prompt('请输入后台管理密码');
 
-  function emptyModel(){
-    const base = {};
-    for(const k of DEFAULT_KEYS){
-      base[k]={
-        show: true,
-        tankLabel: k==="LAB1" ? "1号实验罐" : `${k.replace("F","")}号发酵罐`,
-        capacity: k==="LAB1" ? "75L" : "150L",
-        beer: "",
-        style: "",
-        abv: "",
-        ibu: "",
-        batchCapacity: k==="LAB1" ? "75L" : "150L",
-        baseTemp: "18.2",
-        start: "",
-        end: ""
-      };
-    }
-    return base;
-  }
+if (!adminPassword) {
+  alert('未输入密码，禁止访问');
+  location.href = '/';
+}
 
-  function seedDBBREW(){
-    const d = emptyModel();
-    d.F1.beer="港岛妹妹"; d.F1.style="HAZY IPA"; d.F1.abv="6"; d.F1.ibu="30"; d.F1.baseTemp="18.2";
-    d.F2.beer="重庆森林罐头"; d.F2.style="STOUT"; d.F2.abv="9"; d.F2.ibu="45"; d.F2.baseTemp="18.6";
-    d.F3.beer="丰收"; d.F3.style="Ale"; d.F3.abv="5"; d.F3.ibu="20"; d.F3.baseTemp="19.1";
-    d.F4.beer="海岸线"; d.F4.style="West Coast IPA"; d.F4.abv="6.5"; d.F4.ibu="55"; d.F4.baseTemp="18.4";
-    d.F5.beer="大白湾"; d.F5.style="Session IPA"; d.F5.abv="4.5"; d.F5.ibu="35"; d.F5.baseTemp="19.6";
-    d.F6.beer="老虎头落日"; d.F6.style="Lager"; d.F6.abv="4.8"; d.F6.ibu="18"; d.F6.baseTemp="18.9";
-    d.LAB1.beer="周年特定"; d.LAB1.style="IPA"; d.LAB1.abv=""; d.LAB1.ibu=""; d.LAB1.baseTemp="18.3";
-    return d;
-  }
+/* ========================
+   示例 & 状态
+======================== */
 
-  function rowTemplate(key, v){
-    return `
-      <tr data-key="${key}">
-        <td class="cbox"><input type="checkbox" data-f="show" ${v.show? "checked": ""}></td>
-        <td><input data-f="tankLabel" value="${esc(v.tankLabel||"")}" /></td>
-        <td><input data-f="capacity" value="${esc(v.capacity||"")}" /></td>
-        <td><input data-f="beer" value="${esc(v.beer||"")}" /></td>
-        <td><input data-f="style" value="${esc(v.style||"")}" /></td>
-        <td><input data-f="abv" value="${esc(v.abv||"")}" /></td>
-        <td><input data-f="ibu" value="${esc(v.ibu||"")}" /></td>
-        <td><input data-f="batchCapacity" value="${esc(v.batchCapacity||"")}" /></td>
-        <td><input data-f="baseTemp" value="${esc(v.baseTemp||"18.2")}" /></td>
-        <td><input data-f="start" value="${esc(v.start||"")}" placeholder="YYYY-MM-DD" /></td>
-        <td><input data-f="end" value="${esc(v.end||"")}" placeholder="YYYY-MM-DD" /></td>
-      </tr>
+let data = {
+  tank1: { show: true, name: '1号发酵罐', capacity: '150L', beer: '港岛妹妹', style: 'HAZY IPA', abv: '6', ibu: '30' },
+  tank2: { show: true, name: '2号发酵罐', capacity: '150L', beer: '重庆森林罐头', style: 'STOUT', abv: '9', ibu: '45' },
+  tank3: { show: true, name: '3号发酵罐', capacity: '150L', beer: '丰收', style: 'Ale', abv: '5', ibu: '20' }
+};
+
+const statusEl = document.getElementById('status');
+
+/* ========================
+   渲染表格
+======================== */
+
+function render() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  Object.keys(data).forEach(key => {
+    const t = data[key];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" ${t.show ? 'checked' : ''} onchange="data['${key}'].show=this.checked"></td>
+      <td><input value="${t.name}" onchange="data['${key}'].name=this.value"></td>
+      <td><input value="${t.capacity}" onchange="data['${key}'].capacity=this.value"></td>
+      <td><input value="${t.beer}" onchange="data['${key}'].beer=this.value"></td>
+      <td><input value="${t.style}" onchange="data['${key}'].style=this.value"></td>
+      <td><input value="${t.abv}" onchange="data['${key}'].abv=this.value"></td>
+      <td><input value="${t.ibu}" onchange="data['${key}'].ibu=this.value"></td>
     `;
+    tbody.appendChild(tr);
+  });
+}
+
+render();
+
+/* ========================
+   API 调用
+======================== */
+
+async function loadFromRedis() {
+  statusEl.textContent = '';
+  const res = await fetch('/api/load');
+  const json = await res.json();
+  if (Object.keys(json).length === 0) {
+    statusEl.textContent = '共享数据源为空';
+    return;
+  }
+  data = json;
+  render();
+}
+
+async function saveToRedis() {
+  statusEl.textContent = '';
+  const res = await fetch('/api/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-password': adminPassword
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!res.ok) {
+    statusEl.textContent = '❌ 密码错误或无权限（Unauthorized）';
+    return;
   }
 
-  function esc(s){return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");}
-
-  function render(model){
-    const tb=$("tbody");
-    tb.innerHTML = "";
-    for(const k of DEFAULT_KEYS){
-      tb.insertAdjacentHTML("beforeend", rowTemplate(k, model[k]||{}));
-    }
-  }
-
-  function collect(){
-    const out = {};
-    for(const tr of document.querySelectorAll("#tbody tr")){
-      const key = tr.getAttribute("data-key");
-      const obj = {};
-      for(const el of tr.querySelectorAll("[data-f]")){
-        const f = el.getAttribute("data-f");
-        obj[f] = el.type==="checkbox" ? el.checked : el.value.trim();
-      }
-      // 统一字段名：display.html 要用 baseTemp
-      out[key]={
-        show: !!obj.show,
-        tankLabel: obj.tankLabel,
-        capacity: obj.capacity,
-        beer: obj.beer,
-        style: obj.style,
-        abv: obj.abv,
-        ibu: obj.ibu,
-        batchCapacity: obj.batchCapacity,
-        baseTemp: obj.baseTemp || "18.2",
-        start: obj.start,
-        end: obj.end
-      };
-    }
-    return out;
-  }
-
-  async function apiLoad(){
-    const r = await fetch("/api/load", {cache:"no-store"});
-    const j = await r.json();
-    if(!r.ok) throw new Error(j?.error || "load failed");
-    return j || {};
-  }
-
-  async function apiSave(data){
-    // 密码：第一次保存提示，后续会记住（本次浏览器会话）
-    let pwd = sessionStorage.getItem("ADMIN_PWD") || "";
-    if(!pwd){
-      pwd = prompt("请输入后台保存密码：");
-      if(!pwd) throw new Error("已取消（未输入密码）");
-      sessionStorage.setItem("ADMIN_PWD", pwd);
-    }
-
-    const r = await fetch("/api/save", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "X-Admin-Password": pwd
-      },
-      body: JSON.stringify(data)
-    });
-    const j = await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(j?.error || `save failed (${r.status})`);
-    return j;
-  }
-
-  $("btnLoad").onclick = async ()=>{
-    try{
-      const j = await apiLoad();
-      if(Object.keys(j||{}).length===0){
-        render(emptyModel());
-        msg("ok","共享数据源为空，已加载空模板。你可以点“填入示例数据”，再保存。");
-      }else{
-        // 确保有默认key
-        const base = emptyModel();
-        for(const k of Object.keys(j)) base[k]=Object.assign(base[k]||{}, j[k]||{});
-        render(base);
-        msg("ok","已从共享数据源加载 ✅");
-      }
-    }catch(e){ msg("err", e.message); }
-  };
-
-  $("btnSeed").onclick = ()=>{
-    render(seedDBBREW());
-    msg("ok","已填入示例数据（DBBREW）✅ 现在点“保存到共享数据源”即可");
-  };
-
-  $("btnSave").onclick = async ()=>{
-    try{
-      const data = collect();
-      await apiSave(data);
-      msg("ok","已保存到共享数据源 ✅");
-    }catch(e){ msg("err", e.message); }
-  };
-
-  // 页面打开自动加载共享数据源
-  (async()=>{
-    try{
-      const j = await apiLoad();
-      if(Object.keys(j||{}).length===0){
-        render(emptyModel());
-        msg("hint","共享数据源为空。可点“填入示例数据”再保存。");
-      }else{
-        const base = emptyModel();
-        for(const k of Object.keys(j)) base[k]=Object.assign(base[k]||{}, j[k]||{});
-        render(base);
-      }
-    }catch(e){
-      render(emptyModel());
-      msg("err","加载共享数据源失败："+e.message);
-    }
-  })();
+  statusEl.style.color = '#34d399';
+  statusEl.textContent = '✅ 已成功写入共享数据源（Redis）';
+}
 </script>
+
 </body>
 </html>
