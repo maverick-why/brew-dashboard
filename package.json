@@ -1,0 +1,7 @@
+{
+  "name": "brew-dashboard",
+  "private": true,
+  "dependencies": {
+    "ioredis": "^5.4.1"
+  }
+}
