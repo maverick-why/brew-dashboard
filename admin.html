@@ -2,170 +2,380 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>后台管理 · 时光酿造所</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-      background: #0b1220;
-      color: #fff;
+    :root{
+      --bg:#0b1220;
+      --panel:#0f172a;
+      --card:#111827;
+      --line:#1f2a44;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --blue:#3b82f6;
+      --green:#22c55e;
+      --red:#ef4444;
+      --input:#0b1020;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:14px;
     }
-    header {
-      padding: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      background: #111827;
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;}
+    header{
+      background:linear-gradient(180deg,#0f172a,#0b1220);
+      padding:18px 22px;
+      position:sticky;top:0;z-index:10;
+      box-shadow:0 2px 18px rgba(0,0,0,.35);
     }
-    .container {
-      padding: 20px;
+    header h1{margin:0;font-size:22px;letter-spacing:.5px}
+    header .sub{margin-top:6px;color:var(--muted);font-size:13px}
+    .wrap{padding:18px 22px;}
+    .bar{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      padding:12px;border-radius:var(--radius);
+      box-shadow:var(--shadow);
     }
-    button {
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
+    button{
+      border:0;border-radius:12px;padding:10px 14px;
+      cursor:pointer;font-weight:700;color:white;
+      transition:transform .08s ease,opacity .15s ease;
     }
-    .primary {
-      background: #3b82f6;
-      color: #fff;
+    button:active{transform:translateY(1px)}
+    .btn-blue{background:var(--blue)}
+    .btn-green{background:var(--green)}
+    .btn-red{background:var(--red)}
+    .btn-ghost{
+      background:transparent;color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
     }
-    .danger {
-      background: #ef4444;
-      color: #fff;
+    .status{
+      margin-left:auto;
+      font-size:13px;color:var(--muted);
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+    .pill{
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      max-width:620px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
-    th, td {
-      border: 1px solid #1f2937;
-      padding: 8px;
-      text-align: center;
+    .pill.ok{color:#86efac;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
+    .pill.bad{color:#fca5a5;border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
+    .table-wrap{
+      margin-top:14px;
+      border-radius:var(--radius);
+      overflow:auto;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      background:rgba(255,255,255,.03);
     }
-    input {
-      width: 100%;
-      padding: 6px;
-      border-radius: 6px;
-      border: none;
-      background: #020617;
-      color: #fff;
-      text-align: center;
+    table{width:1400px;border-collapse:separate;border-spacing:0}
+    thead th{
+      position:sticky;top:0;z-index:5;
+      background:rgba(17,24,39,.95);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      padding:12px 10px;
+      font-size:14px;
+      text-align:center;
     }
+    tbody td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      text-align:center;
+      background:rgba(0,0,0,.06);
+    }
+    tbody tr:hover td{background:rgba(59,130,246,.06)}
+    input[type="text"], input[type="number"], input[type="date"]{
+      width:100%;
+      box-sizing:border-box;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:var(--input);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="checkbox"]{transform:scale(1.1)}
+    .idcell{color:#93c5fd;font-weight:800}
+    .small{font-size:12px;color:var(--muted)}
+    footer{padding:16px 22px;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
 
-<header>后台管理 · 时光酿造所</header>
+<header>
+  <h1>后台管理 · 时光酿造所</h1>
+  <div class="sub">保存会写入共享数据源（Redis），所有用户端同步可见。</div>
+</header>
 
-<div class="container">
-  <div id="status" style="margin-bottom:10px;color:#f87171"></div>
+<div class="wrap">
+  <div class="bar">
+    <button class="btn-blue" onclick="loadFromShared()">从共享数据源加载</button>
+    <button class="btn-green" onclick="saveToShared()">保存到共享数据源</button>
+    <button class="btn-ghost" onclick="addTank()">新增发酵罐</button>
+    <button class="btn-red" onclick="removeSelected()">删除选中</button>
 
-  <button class="primary" onclick="loadFromRedis()">从共享数据源加载</button>
-  <button class="primary" onclick="saveToRedis()">保存到共享数据源</button>
+    <div class="status">
+      <div class="pill" id="apiHint">API: /api/load & /api/save</div>
+      <div class="pill" id="msg">请先加载或编辑后保存</div>
+    </div>
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>显示</th>
-        <th>罐名</th>
-        <th>容量</th>
-        <th>酒名</th>
-        <th>风格</th>
-        <th>ABV</th>
-        <th>IBU</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:70px;">选择</th>
+          <th style="width:90px;">ID</th>
+          <th style="width:150px;">罐名</th>
+          <th style="width:120px;">产量(容量)</th>
+          <th style="width:220px;">酒名 / Name</th>
+          <th style="width:160px;">风格 / Style</th>
+          <th style="width:110px;">ABV</th>
+          <th style="width:110px;">IBU</th>
+          <th style="width:160px;">入罐时间 / Start</th>
+          <th style="width:160px;">预计开罐 / End</th>
+          <th style="width:120px;">显示(前端)</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="small" style="margin-top:10px;">
+    提示：display.html 只会展示 “显示(前端)=勾选” 的发酵罐。Start/End 会决定进度条与“发酵中/即将开罐”状态。
+  </div>
 </div>
 
+<footer>© 时光酿造所 · Dashboard Admin</footer>
+
 <script>
-/* ========================
-   登录校验
-======================== */
+/** =========================
+ *  登录：打开页面就输入密码
+ *  （仅用于写入 /api/save）
+ * ========================= */
+let ADMIN_PW = '';
+(function requireLogin(){
+  const pw = prompt('请输入后台管理密码');
+  if (!pw) {
+    alert('未输入密码，禁止进入后台。');
+    location.href = '/display.html';
+    return;
+  }
+  ADMIN_PW = pw;
+})();
 
-const adminPassword = prompt('请输入后台管理密码');
+/** =========================
+ *  数据结构（与 display.html 兼容）
+ *  {
+ *    F1: { show:true, beer:'', style:'', abv:'', ibu:'', capacity:'150L', start:'2025-08-01', end:'2025-08-25' },
+ *    ...
+ *  }
+ * ========================= */
+let DATA = {};
 
-if (!adminPassword) {
-  alert('未输入密码，禁止访问');
-  location.href = '/';
+const $tbody = document.getElementById('tbody');
+const $msg = document.getElementById('msg');
+
+function setMsg(text, type='') {
+  $msg.textContent = text;
+  $msg.classList.remove('ok','bad');
+  if(type==='ok') $msg.classList.add('ok');
+  if(type==='bad') $msg.classList.add('bad');
 }
 
-/* ========================
-   示例 & 状态
-======================== */
+/** 生成默认示例（当共享数据源为空时用） */
+function buildSample(){
+  return {
+    F1: { show:true,  name:'1号发酵罐', capacity:'150L', beer:'港岛妹妹', style:'HAZY IPA', abv:'6', ibu:'30', start:'2025-08-01', end:'2025-08-25' },
+    F2: { show:true,  name:'2号发酵罐', capacity:'150L', beer:'重庆森林罐头', style:'STOUT',    abv:'9', ibu:'45', start:'2025-08-02', end:'2025-08-27' },
+    F3: { show:true,  name:'3号发酵罐', capacity:'150L', beer:'丰收',       style:'Ale',      abv:'5', ibu:'20', start:'2025-08-04', end:'2025-09-04' },
+    F4: { show:true,  name:'4号发酵罐', capacity:'150L', beer:'海岸线',     style:'West Coast IPA', abv:'6.5', ibu:'55', start:'2025-08-07', end:'2025-09-11' },
+    F5: { show:false, name:'5号发酵罐', capacity:'150L', beer:'（待排产）', style:'--', abv:'--', ibu:'--', start:'', end:'' }
+  };
+}
 
-let data = {
-  tank1: { show: true, name: '1号发酵罐', capacity: '150L', beer: '港岛妹妹', style: 'HAZY IPA', abv: '6', ibu: '30' },
-  tank2: { show: true, name: '2号发酵罐', capacity: '150L', beer: '重庆森林罐头', style: 'STOUT', abv: '9', ibu: '45' },
-  tank3: { show: true, name: '3号发酵罐', capacity: '150L', beer: '丰收', style: 'Ale', abv: '5', ibu: '20' }
-};
+/** 确保字段完整 */
+function normalizeTank(t, fallbackName){
+  return {
+    show: !!t.show,
+    name: t.name || fallbackName || '',
+    capacity: t.capacity || '150L',
+    beer: t.beer || '',
+    style: t.style || '',
+    abv: t.abv ?? '',
+    ibu: t.ibu ?? '',
+    start: t.start || '',
+    end: t.end || ''
+  };
+}
 
-const statusEl = document.getElementById('status');
+/** 渲染表格 */
+function render(){
+  const keys = Object.keys(DATA).sort((a,b)=>{
+    const na = parseInt(a.replace(/\D/g,'')) || 0;
+    const nb = parseInt(b.replace(/\D/g,'')) || 0;
+    return na-nb;
+  });
 
-/* ========================
-   渲染表格
-======================== */
+  $tbody.innerHTML = '';
+  keys.forEach(id=>{
+    const t = normalizeTank(DATA[id], idToName(id));
+    DATA[id] = t;
 
-function render() {
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '';
-  Object.keys(data).forEach(key => {
-    const t = data[key];
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="checkbox" ${t.show ? 'checked' : ''} onchange="data['${key}'].show=this.checked"></td>
-      <td><input value="${t.name}" onchange="data['${key}'].name=this.value"></td>
-      <td><input value="${t.capacity}" onchange="data['${key}'].capacity=this.value"></td>
-      <td><input value="${t.beer}" onchange="data['${key}'].beer=this.value"></td>
-      <td><input value="${t.style}" onchange="data['${key}'].style=this.value"></td>
-      <td><input value="${t.abv}" onchange="data['${key}'].abv=this.value"></td>
-      <td><input value="${t.ibu}" onchange="data['${key}'].ibu=this.value"></td>
+      <td><input type="checkbox" class="sel" data-id="${id}"></td>
+      <td class="idcell">${id}</td>
+
+      <td><input type="text" value="${escapeHtml(t.name)}" data-k="${id}" data-f="name"></td>
+      <td><input type="text" value="${escapeHtml(t.capacity)}" data-k="${id}" data-f="capacity"></td>
+      <td><input type="text" value="${escapeHtml(t.beer)}" data-k="${id}" data-f="beer"></td>
+      <td><input type="text" value="${escapeHtml(t.style)}" data-k="${id}" data-f="style"></td>
+      <td><input type="text" value="${escapeHtml(String(t.abv))}" data-k="${id}" data-f="abv"></td>
+      <td><input type="text" value="${escapeHtml(String(t.ibu))}" data-k="${id}" data-f="ibu"></td>
+
+      <td><input type="date" value="${escapeHtml(t.start)}" data-k="${id}" data-f="start"></td>
+      <td><input type="date" value="${escapeHtml(t.end)}" data-k="${id}" data-f="end"></td>
+
+      <td><input type="checkbox" ${t.show ? 'checked':''} data-k="${id}" data-f="show"></td>
     `;
-    tbody.appendChild(tr);
+    $tbody.appendChild(tr);
+  });
+
+  // 监听输入变化
+  $tbody.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('change', (e)=>{
+      const el = e.target;
+      const id = el.getAttribute('data-k');
+      const f  = el.getAttribute('data-f');
+      if(!id || !f) return;
+
+      if(f === 'show'){
+        DATA[id][f] = el.checked;
+      }else{
+        DATA[id][f] = el.value;
+      }
+      setMsg('已修改（未保存）');
+    });
   });
 }
 
-render();
-
-/* ========================
-   API 调用
-======================== */
-
-async function loadFromRedis() {
-  statusEl.textContent = '';
-  const res = await fetch('/api/load');
-  const json = await res.json();
-  if (Object.keys(json).length === 0) {
-    statusEl.textContent = '共享数据源为空';
-    return;
+function idToName(id){
+  if(/^F\d+$/.test(id)){
+    const n = id.replace('F','');
+    return `${n}号发酵罐`;
   }
-  data = json;
+  return id;
+}
+
+function nextId(){
+  const nums = Object.keys(DATA)
+    .map(k => parseInt(k.replace(/\D/g,'')) )
+    .filter(n => !isNaN(n));
+  const max = nums.length ? Math.max(...nums) : 0;
+  return `F${max+1}`;
+}
+
+/** 新增发酵罐 */
+function addTank(){
+  const id = nextId();
+  DATA[id] = normalizeTank({
+    show: true,
+    name: idToName(id),
+    capacity: '150L',
+    beer: '',
+    style: '',
+    abv: '',
+    ibu: '',
+    start: '',
+    end: ''
+  }, idToName(id));
   render();
+  setMsg(`已新增 ${id}（未保存）`);
 }
 
-async function saveToRedis() {
-  statusEl.textContent = '';
-  const res = await fetch('/api/save', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-admin-password': adminPassword
-    },
-    body: JSON.stringify(data)
-  });
-
-  if (!res.ok) {
-    statusEl.textContent = '❌ 密码错误或无权限（Unauthorized）';
+/** 删除选中 */
+function removeSelected(){
+  const sels = Array.from(document.querySelectorAll('.sel:checked')).map(x=>x.dataset.id);
+  if(!sels.length){
+    alert('请先勾选要删除的行');
     return;
   }
-
-  statusEl.style.color = '#34d399';
-  statusEl.textContent = '✅ 已成功写入共享数据源（Redis）';
+  if(!confirm(`确定删除：${sels.join(', ')} ?`)) return;
+  sels.forEach(id=>delete DATA[id]);
+  render();
+  setMsg('已删除（未保存）');
 }
+
+/** 从共享数据源加载 */
+async function loadFromShared(){
+  setMsg('加载中...');
+  try{
+    const res = await fetch('/api/load', { cache:'no-store' });
+    const json = await res.json();
+
+    if(!json || Object.keys(json).length === 0){
+      // 共享数据源为空：给一个完整示例，方便你直接改，然后保存
+      DATA = buildSample();
+      render();
+      setMsg('共享数据源为空：已载入完整示例（请修改后保存）', 'bad');
+      return;
+    }
+
+    DATA = json;
+    // 兼容旧数据缺字段
+    Object.keys(DATA).forEach(id=>{
+      DATA[id] = normalizeTank(DATA[id], idToName(id));
+    });
+    render();
+    setMsg('已从共享数据源加载 ✅', 'ok');
+  }catch(err){
+    console.error(err);
+    setMsg('加载失败：请检查 /api/load 是否可访问', 'bad');
+  }
+}
+
+/** 保存到共享数据源 */
+async function saveToShared(){
+  setMsg('保存中...');
+  try{
+    const res = await fetch('/api/save', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-admin-password': ADMIN_PW
+      },
+      body: JSON.stringify(DATA)
+    });
+
+    if(!res.ok){
+      setMsg('❌ 密码错误或无权限（Unauthorized）', 'bad');
+      return;
+    }
+    const out = await res.json().catch(()=>({ok:true}));
+    setMsg('✅ 已写入共享数据源（Redis），用户端将同步可见', 'ok');
+  }catch(err){
+    console.error(err);
+    setMsg('保存失败：网络/部署异常', 'bad');
+  }
+}
+
+/** HTML 转义 */
+function escapeHtml(s){
+  return String(s ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+// 首次打开：自动先加载一次（让你一进来就看到完整表）
+loadFromShared();
 </script>
 
 </body>
