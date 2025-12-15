@@ -1,417 +1,500 @@
-<!doctype html>
-<html lang="zh-Hans">
+<!DOCTYPE html>
+<html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DBBREW · Brewing Dashboard</title>
-  <meta name="theme-color" content="#0b1220" />
-  <style>
-    :root{
-      --bg0:#05070c;
-      --bg1:#07101d;
-      --card:#0f1a2a;
-      --card2:#0b1423;
-      --line:rgba(255,255,255,.10);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.62);
-      --muted2:rgba(255,255,255,.45);
-      --accent:#3b82f6;
-      --ok:#22c55e;
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --r:18px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "PingFang SC","Microsoft YaHei", sans-serif;
-      background:
-        radial-gradient(900px 500px at 20% 0%, rgba(59,130,246,.18), transparent 60%),
-        radial-gradient(900px 500px at 90% 10%, rgba(34,197,94,.14), transparent 55%),
-        radial-gradient(900px 700px at 60% 120%, rgba(99,102,241,.10), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg0) 55%, #000);
-      padding: 14px 12px 28px;
-    }
-    a{color:inherit}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>时光酿造所 · 发酵监控 / Brewing Dashboard</title>
+<style>
+:root{
+  --bg0:#070b12;
+  --bg1:#0b1220;
+  --card:#111a2a;
+  --card2:#0f1726;
+  --line:rgba(255,255,255,.08);
+  --text:#eaf0ff;
+  --sub:rgba(234,240,255,.68);
 
-    .topbar{
-      position:sticky; top:0; z-index:10;
-      padding: 12px 12px 14px;
-      border:1px solid var(--line);
-      border-radius: calc(var(--r) + 4px);
-      background: linear-gradient(180deg, rgba(15,26,42,.92), rgba(7,16,29,.70));
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-    }
-    .brand{
-      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
-    }
-    .brand h1{
-      margin:0;
-      font-size: 20px;
-      line-height: 1.15;
-      letter-spacing: .2px;
-      font-weight: 850;
-    }
-    .brand h1 span{
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0;
-    }
-    .clock{
-      font-variant-numeric: tabular-nums;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 8px 10px;
-      border:1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(0,0,0,.18);
-      white-space:nowrap;
-    }
-    .subline{
-      margin-top: 10px;
-      color: var(--muted2);
-      font-size: 12px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .hint{
-      display:flex; gap:8px; align-items:center;
-    }
-    .dot{
-      width:7px;height:7px;border-radius:50%;
-      background: var(--ok);
-      box-shadow: 0 0 18px rgba(34,197,94,.35);
-      flex:0 0 auto;
-    }
+  --green:#4ade80;
+  --yellow:#ffcc00;
+  --pink:#ff5c8a;
+  --blue1:#7bd3ff;
+  --blue2:#2b80ff;
 
-    #cards{
-      margin-top: 14px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 860px){
-      body{padding:16px 18px 36px;}
-      .brand h1{font-size: 26px;}
-      #cards{grid-template-columns: repeat(2, minmax(0, 1fr)); gap:14px;}
-    }
-    @media (min-width: 1180px){
-      #cards{grid-template-columns: repeat(3, minmax(0, 1fr));}
-    }
+  --r:22px;
+  --shadow: 0 18px 45px rgba(0,0,0,.55);
+}
 
-    .card{
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      overflow:hidden;
-      background: linear-gradient(180deg, rgba(15,26,42,.92), rgba(11,20,35,.80));
-      box-shadow: var(--shadow);
-    }
-    .card-hd{
-      padding: 14px 14px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
-    }
-    .tank-title{
-      min-width:0;
-    }
-    .tank-title .cn{
-      font-size: 18px;
-      font-weight: 850;
-      line-height: 1.1;
-      letter-spacing:.2px;
-      margin:0;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .tank-title .en{
-      margin-top: 4px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: .2px;
-    }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(79,140,255,.12), transparent 60%),
+    radial-gradient(900px 600px at 80% 30%, rgba(0,255,180,.10), transparent 60%),
+    radial-gradient(900px 600px at 50% 90%, rgba(255,92,138,.10), transparent 60%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
 
-    .badge{
-      flex:0 0 auto;
-      border-radius: 14px;
-      border: 1px solid rgba(34,197,94,.55);
-      background: linear-gradient(180deg, rgba(34,197,94,.24), rgba(34,197,94,.12));
-      padding: 8px 10px;
-      text-align:center;
-      min-width: 108px;
-      box-shadow: 0 0 26px rgba(34,197,94,.10);
-    }
-    .badge .t1{font-size: 12px; font-weight: 800; line-height:1.1;}
-    .badge .t2{
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: .6px;
-      margin-top: 3px;
-      border-top:1px solid rgba(0,0,0,.22);
-      padding-top: 4px;
-      color: rgba(0,0,0,.80);
-      background: rgba(255,255,255,.55);
-      border-radius: 10px;
-    }
+header{
+  position:sticky; top:0; z-index:20;
+  padding:18px 18px 14px;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(10,16,28,.86), rgba(10,16,28,.62));
+  border-bottom:1px solid var(--line);
+}
 
-    .card-bd{
-      padding: 14px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 12px;
-    }
-    .field{
-      padding: 10px 10px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      background: rgba(0,0,0,.16);
-    }
-    .field small{
-      display:block;
-      color: var(--muted2);
-      font-size: 11px;
-      letter-spacing: .2px;
-      margin-bottom: 6px;
-    }
-    .field .val{
-      font-size: 16px;
-      font-weight: 850;
-      line-height: 1.2;
-      letter-spacing: .2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .field .val.mono{font-variant-numeric: tabular-nums;}
+.h-row{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+}
 
-    .progress{
-      padding: 0 14px 14px;
-    }
-    .bar{
-      position:relative;
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      overflow:hidden;
-    }
-    .bar > i{
-      display:block;
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(59,130,246,.90), rgba(99,102,241,.95));
-    }
-    .bar > span{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      font-size: 10px;
-      color: rgba(255,255,255,.92);
-      text-shadow: 0 1px 10px rgba(0,0,0,.65);
-      font-variant-numeric: tabular-nums;
-    }
+.h-title{
+  font-weight:900;
+  letter-spacing:.5px;
+  line-height:1.08;
+  font-size: clamp(20px, 3.6vw, 34px);
+}
+.h-sub{
+  margin-top:6px;
+  color:var(--sub);
+  font-size:12px;
+  letter-spacing:.2px;
+}
+.h-time{
+  white-space:nowrap;
+  font-variant-numeric: tabular-nums;
+  color:rgba(234,240,255,.78);
+  font-weight:700;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+}
 
-    .empty{
-      border: 1px dashed rgba(255,255,255,.18);
-      border-radius: calc(var(--r) + 6px);
-      padding: 26px 16px;
-      color: var(--muted);
-      text-align:center;
-      background: rgba(0,0,0,.12);
-    }
-    .empty b{color: var(--text)}
-    footer{
-      text-align:center;
-      color: rgba(255,255,255,.35);
-      margin-top: 18px;
-      font-size: 12px;
-      padding-bottom: 8px;
-    }
-  </style>
+main{
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 18px 14px 28px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(240px, 1fr));
+  gap:18px;
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  border-radius: var(--r);
+  background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--card);
+  box-shadow: var(--shadow);
+  border:1px solid rgba(255,255,255,.08);
+  min-height: 360px;
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-60px -80px auto auto;
+  width:220px; height:220px;
+  background: radial-gradient(circle at 30% 30%, rgba(123,211,255,.25), transparent 62%);
+  transform: rotate(15deg);
+  pointer-events:none;
+}
+
+.cardHead{
+  position:relative;
+  padding:16px 16px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+  border-bottom:1px solid var(--line);
+}
+
+.titles{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.tankTitle{
+  font-weight:900;
+  line-height:1.1;
+  letter-spacing:.4px;
+}
+.tankTitle .cn{font-size:22px}
+.tankTitle .en{font-size:18px; color:rgba(234,240,255,.85)}
+
+.badge{
+  min-width:120px;
+  text-align:center;
+  border-radius:12px;
+  padding:8px 10px 7px;
+  font-weight:900;
+  color:#0b0f18;
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  border:1px solid rgba(0,0,0,.15);
+}
+.badge .b1{font-size:16px; line-height:1.05}
+.badge .b2{
+  margin-top:4px;
+  font-size:16px;
+  line-height:1;
+  letter-spacing:.8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.badge.fermenting{
+  background: linear-gradient(180deg, rgba(74,222,128,1), rgba(74,222,128,.85));
+  animation: breathing 2.1s ease-in-out infinite;
+}
+.badge.ready{
+  background: linear-gradient(180deg, rgba(255,204,0,1), rgba(255,204,0,.85));
+  animation: wobble 1.0s ease-in-out infinite;
+}
+
+@keyframes breathing{
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.30), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
+  50%     { box-shadow: 0 0 0 10px rgba(74,222,128,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
+}
+@keyframes wobble{
+  0%   { transform: rotate(-3deg) translateY(0); }
+  50%  { transform: rotate(3deg) translateY(-1px); }
+  100% { transform: rotate(-3deg) translateY(0); }
+}
+
+.ribbon{
+  position:absolute;
+  top:14px;
+  right:-42px;
+  width:150px;
+  transform: rotate(45deg);
+  background: linear-gradient(180deg, rgba(255,92,138,1), rgba(255,92,138,.86));
+  color:#fff;
+  font-weight:900;
+  text-align:center;
+  padding:6px 0;
+  letter-spacing:.6px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.45);
+  z-index:5;
+}
+.ribbon span{display:block; line-height:1.05; font-size:12px}
+
+.cardBody{
+  padding:14px 16px 12px;
+}
+
+.meta{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px 14px;
+}
+
+.field small{
+  display:block;
+  color:var(--sub);
+  font-size:12px;
+  margin-bottom:4px;
+}
+.field .v{
+  font-weight:800;
+  letter-spacing:.2px;
+  word-break: break-word;
+}
+
+.progressWrap{
+  margin-top:14px;
+}
+.progressTitle{
+  color:var(--sub);
+  font-size:12px;
+  text-align:center;
+  margin-bottom:6px;
+}
+.progressBar{
+  position:relative;
+  height:14px;
+  border-radius:999px;
+  background: rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.progressBar > i{
+  display:block;
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--blue1), var(--blue2));
+  border-radius:999px;
+  transition: width .8s ease;
+}
+.progressBar > b{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:900;
+  color:rgba(255,255,255,.92);
+  text-shadow: 0 1px 8px rgba(0,0,0,.45);
+}
+
+.empty{
+  max-width: 1200px;
+  margin: 22px auto 0;
+  padding: 18px 16px;
+  border-radius: var(--r);
+  border:1px dashed rgba(255,255,255,.18);
+  background: rgba(255,255,255,.03);
+  color:rgba(234,240,255,.75);
+  text-align:center;
+}
+
+footer{
+  padding: 18px 0 26px;
+  text-align:center;
+  color:rgba(234,240,255,.55);
+  font-size:13px;
+}
+
+@media (max-width: 1180px){
+  .grid{ grid-template-columns: repeat(3, minmax(240px, 1fr)); }
+}
+@media (max-width: 880px){
+  .grid{ grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+}
+@media (max-width: 560px){
+  header{ padding:14px 14px 12px; }
+  .h-row{ align-items:flex-start; }
+  .h-time{ padding:8px 10px; font-size:12px; }
+  .grid{ grid-template-columns: 1fr; gap:14px; }
+  .card{ min-height: 340px; }
+  .tankTitle .cn{font-size:20px}
+  .tankTitle .en{font-size:16px}
+  .badge{ min-width:110px; padding:7px 8px 6px; border-radius:12px; }
+  .badge .b1{font-size:14px}
+  .badge .b2{font-size:14px}
+}
+</style>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <h1>时光酿造所 · 重新定义新鲜 <span>/ Brewing Dashboard</span></h1>
-      <div id="time" class="clock">--</div>
+<header>
+  <div class="h-row">
+    <div>
+      <div class="h-title">时光酿造所 · 发酵监控 / Brewing Dashboard</div>
+      <div class="h-sub">实时读取共享数据源（Redis） · 手机端优化展示</div>
     </div>
-    <div class="subline">
-      <div class="hint"><span class="dot"></span><span>实时读取共享数据源（Redis）</span></div>
-      <div class="hint"><span style="opacity:.6">提示：</span><span>下拉刷新 / 自动刷新</span></div>
-    </div>
-  </header>
+    <div class="h-time" id="time">--</div>
+  </div>
+</header>
 
-  <main id="cards"></main>
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">
+    暂无数据（共享数据源为空或未勾选“展示”）。<br/>
+    请在后台 <b>admin.html</b> 填写并保存后刷新本页。
+  </div>
+</main>
 
-  <footer>© 时光酿造所</footer>
+<footer>© 时光酿造所 · dbbrewbeer</footer>
 
-  <script>
-    const API_LOAD = "/api/load";
-    const SECOND = 1000;
-    const KEY_ORDER = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10"];
+<script>
+const LOAD_URL = "/api/load";
+const POLL_MS  = 15000;
 
-    function pad2(n){ return String(n).padStart(2,"0"); }
-    function nowText(){
-      const d = new Date();
-      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
-    }
-    function setClock(){
-      const el = document.getElementById("time");
-      if(el) el.textContent = nowText();
-    }
-    setClock();
-    setInterval(setClock, 1*SECOND);
+function pad2(n){ return String(n).padStart(2,"0"); }
+function nowText(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
 
-    function fmtMD(iso){
-      if(!iso) return "—";
-      const d = new Date(iso);
-      if(isNaN(d.getTime())) return "—";
-      return `${d.getMonth()+1}月${d.getDate()}日`;
-    }
+function formatMD(dateStr){
+  if(!dateStr) return "--";
+  const d = new Date(dateStr);
+  if(isNaN(d)) return "--";
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
 
-    function calcProgress(start,end){
-      const s = new Date(start).getTime();
-      const e = new Date(end).getTime();
-      const now = Date.now();
-      if(isNaN(s) || isNaN(e) || e <= s) return 0;
-      const p = (now - s) / (e - s) * 100;
-      return Math.max(0, Math.min(100, Math.round(p)));
-    }
+function daysSince(startStr){
+  if(!startStr) return null;
+  const s = new Date(startStr);
+  if(isNaN(s)) return null;
+  const ms = Date.now() - s.getTime();
+  if(ms < 0) return 0;
+  return Math.floor(ms / 86400000) + 1; // DAY 1 起算
+}
 
-    // 入罐天数：Day 1 从入罐当天起
-    function fermentDays(start){
-      if(!start) return 0;
-      const s = new Date(start).getTime();
-      const now = Date.now();
-      if(isNaN(s) || now < s) return 0;
-      return Math.floor((now - s) / 86400000) + 1;
-    }
+function calcProgress(startStr, endStr){
+  const s = new Date(startStr).getTime();
+  const e = new Date(endStr).getTime();
+  const n = Date.now();
+  if(isNaN(s) || isNaN(e) || e<=s) return 0;
+  let p = ((n - s) / (e - s)) * 100;
+  p = Math.max(0, Math.min(100, p));
+  return Math.round(p);
+}
 
-    // 稳定的“当前温度”：18.0~19.9 之间轻微波动（无后端温度传感器时用）
-    function stableTemp(seed){
-      const t = Date.now() / 600000; // 10min
-      let h = 0;
-      const str = String(seed || "x");
-      for(let i=0;i<str.length;i++) h = (h*31 + str.charCodeAt(i)) % 997;
-      const wave = Math.sin(t + h) * 0.45 + Math.sin(t*0.7 + h*0.3) * 0.22;
-      const base = 18.6 + (h % 7) * 0.05;
-      let v = base + wave;
-      v = Math.max(18.0, Math.min(19.9, v));
-      return v.toFixed(1) + "°C";
-    }
+// status: auto | fermenting | ready
+function resolveStatus(row){
+  const st = (row.status || "auto").toLowerCase();
+  if(st === "fermenting" || st === "ready") return st;
 
-    function pick(records){
-      if(!records || typeof records !== "object") return [];
-      const keys = Object.keys(records);
-      const ordered = KEY_ORDER.filter(k => keys.includes(k)).concat(keys.filter(k => !KEY_ORDER.includes(k)));
-      const list = [];
-      for(const k of ordered){
-        const r = records[k] || {};
-        list.push({ id:k, ...r });
-      }
-      return list;
-    }
+  // auto：按 end 判断
+  const end = new Date(row.end);
+  if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
+  return "fermenting";
+}
 
-    function render(records){
-      const root = document.getElementById("cards");
-      root.innerHTML = "";
-      const list = pick(records).filter(x => x && x.show);
+function statusText(status){
+  return status === "ready"
+    ? { cn:"即将开罐", en:"Ready" }
+    : { cn:"发酵中", en:"Fermenting" };
+}
 
-      if(list.length === 0){
-        const div = document.createElement("div");
-        div.className = "empty";
-        div.innerHTML = `
-          <div style="font-size:16px; font-weight:800; margin-bottom:8px;">暂无数据</div>
-          <div>共享数据源为空或未勾选 <b>“展示”</b>。</div>
-          <div style="margin-top:8px;">请在后台 <b>admin.html</b> 勾选并 <b>保存到共享数据源</b> 后刷新本页。</div>
-        `;
-        root.appendChild(div);
-        return;
-      }
+function safe(v, fallback="--"){
+  if(v === undefined || v === null || v === "") return fallback;
+  return String(v);
+}
 
-      for(const r of list){
-        const day = fermentDays(r.start);
-        const prog = calcProgress(r.start, r.end);
-        const temp = (r.temp && String(r.temp).trim()) ? String(r.temp).trim() : stableTemp(r.id);
+function tankTitleFromId(id){
+  // F1..F99 => N号发酵罐；其它 => 自定义
+  const m = /^F(\d+)$/i.exec(id || "");
+  if(m) return { cn:`${Number(m[1])}号发酵罐`, en:`Tank ${Number(m[1])}` };
+  return { cn: id || "发酵罐", en: "Tank" };
+}
 
-        const el = document.createElement("section");
-        el.className = "card";
-        el.innerHTML = `
-          <div class="card-hd">
-            <div class="tank-title">
-              <div class="cn">${escapeHtml(r.name || "发酵罐")}</div>
-              <div class="en">Tank ${escapeHtml(String(r.id || ""))}</div>
-            </div>
-            <div class="badge" aria-label="status">
-              <div class="t1">发酵中</div>
-              <div class="t2">DAY ${day || 0}</div>
-            </div>
+function render(dataObj){
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("empty");
+  grid.innerHTML = "";
+
+  const entries = Object.entries(dataObj || {})
+    .map(([id, row]) => ({ id, ...(row||{}) }))
+    .filter(x => x.show === true);
+
+  if(entries.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  // 按罐号排序：F1, F2...，其它放后面
+  entries.sort((a,b)=>{
+    const ma = /^F(\d+)$/i.exec(a.id||"");
+    const mb = /^F(\d+)$/i.exec(b.id||"");
+    if(ma && mb) return Number(ma[1]) - Number(mb[1]);
+    if(ma) return -1;
+    if(mb) return 1;
+    return (a.id||"").localeCompare(b.id||"");
+  });
+
+  for(const item of entries){
+    const id = item.id;
+    const title = tankTitleFromId(id);
+    const status = resolveStatus(item);
+    const stText = statusText(status);
+    const day = daysSince(item.start);
+    const progress = calcProgress(item.start, item.end);
+
+    const limited = item.limited === true;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const badgeClass = status === "ready" ? "ready" : "fermenting";
+    const dayText = (day === null) ? "" : `DAY ${day}`;
+
+    card.innerHTML = `
+      ${limited ? `<div class="ribbon"><span>限量款</span><span>Limited</span></div>` : ""}
+
+      <div class="cardHead">
+        <div class="titles">
+          <div class="tankTitle">
+            <div class="cn">${title.cn}</div>
+            <div class="en">${title.en}</div>
           </div>
 
-          <div class="card-bd">
-            <div class="field"><small>酒名 / Name</small><div class="val">${escapeHtml(r.beer || "—")}</div></div>
-            <div class="field"><small>风格 / Style</small><div class="val">${escapeHtml(r.style || "—")}</div></div>
+          <div class="badge ${badgeClass}">
+            <div class="b1">${stText.cn}</div>
+            <div class="b2">${dayText}</div>
+          </div>
+        </div>
+      </div>
 
-            <div class="field"><small>度数 / ABV</small><div class="val mono">${escapeHtml(r.abv || "—")}</div></div>
-            <div class="field"><small>苦度 / IBU</small><div class="val mono">${escapeHtml(r.ibu || "—")}</div></div>
-
-            <div class="field"><small>容量 / Capacity</small><div class="val mono">${escapeHtml(r.capacity || "—")}</div></div>
-            <div class="field"><small>当前温度 / Temp</small><div class="val mono">${escapeHtml(temp)}</div></div>
-
-            <div class="field"><small>入罐时间 / Start</small><div class="val mono">${escapeHtml(fmtMD(r.start))}</div></div>
-            <div class="field"><small>预计开罐 / End</small><div class="val mono">${escapeHtml(fmtMD(r.end))}</div></div>
+      <div class="cardBody">
+        <div class="meta">
+          <div class="field">
+            <small>酒名 / Name</small>
+            <div class="v">${safe(item.beer)}</div>
+          </div>
+          <div class="field">
+            <small>风格 / Style</small>
+            <div class="v">${safe(item.style)}</div>
           </div>
 
-          <div class="progress">
-            <div class="bar">
-              <i style="width:${prog}%;"></i>
-              <span>发酵进度 / Progress ${prog}%</span>
-            </div>
+          <div class="field">
+            <small>度数 / ABV</small>
+            <div class="v">${safe(item.abv)}</div>
           </div>
-        `;
-        root.appendChild(el);
-      }
-    }
+          <div class="field">
+            <small>苦度 / IBU</small>
+            <div class="v">${safe(item.ibu)}</div>
+          </div>
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
-    }
+          <div class="field">
+            <small>产量 / Capacity</small>
+            <div class="v">${safe(item.capacity)}</div>
+          </div>
+          <div class="field">
+            <small>当前温度 / Temp</small>
+            <div class="v">${safe(item.temp)}</div>
+          </div>
 
-    async function load(){
-      try{
-        const url = API_LOAD + "?t=" + Date.now();
-        const res = await fetch(url, { cache:"no-store" });
-        const data = await res.json().catch(()=> ({}));
-        // 兼容：既可能直接返回 records，也可能是 {ok:true, data:{...}} 这种结构
-        const records = (data && data.data && typeof data.data === "object") ? data.data : data;
-        render(records);
-      }catch(e){
-        const root = document.getElementById("cards");
-        root.innerHTML = `<div class="empty"><b>加载失败</b><div style="margin-top:8px;color:rgba(255,255,255,.55);">${escapeHtml(e?.message || String(e))}</div></div>`;
-      }
-    }
+          <div class="field">
+            <small>入罐时间 / Start</small>
+            <div class="v">${formatMD(item.start)}</div>
+          </div>
+          <div class="field">
+            <small>预计开罐 / End</small>
+            <div class="v">${formatMD(item.end)}</div>
+          </div>
+        </div>
 
-    load();
-    // 自动刷新：30 秒
-    setInterval(load, 30*SECOND);
+        <div class="progressWrap">
+          <div class="progressTitle">发酵进度 / Progress</div>
+          <div class="progressBar">
+            <i style="width:${progress}%"></i>
+            <b>${progress}%</b>
+          </div>
+        </div>
+      </div>
+    `;
 
-    // iOS/微信：回到前台时刷新一次
-    document.addEventListener("visibilitychange", () => {
-      if(!document.hidden) load();
-    }, { passive:true });
-  </script>
+    grid.appendChild(card);
+  }
+}
+
+async function load(){
+  try{
+    const res = await fetch(LOAD_URL, { cache:"no-store" });
+    const data = await res.json();
+    render(data || {});
+  }catch(e){
+    render({});
+  }
+}
+
+function tick(){
+  document.getElementById("time").textContent = nowText();
+}
+
+tick();
+setInterval(tick, 1000);
+load();
+setInterval(load, POLL_MS);
+</script>
 </body>
 </html>
