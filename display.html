@@ -27,6 +27,14 @@
   --shadow: 0 14px 34px rgba(0,0,0,.55);
 }
 
+/* logo 区域 */
+.logo{
+  height:48px;     /* 可以按需要再调高低 */
+  width:auto;
+  border-radius:8px;
+}
+
+/* 原来就有的通用样式 */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -40,6 +48,7 @@ body{
     linear-gradient(180deg, var(--bg1), var(--bg0));
 }
 
+/* 头部：LOGO 和时间都居中 */
 header{
   position:sticky; top:0; z-index:20;
   padding:14px 14px 12px;
@@ -49,35 +58,27 @@ header{
   border-bottom:1px solid var(--line);
 }
 
-.hrow{
+.header-inner{
   display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
 }
-.htitle{
-  font-weight:950;
-  letter-spacing:.4px;
-  line-height:1.1;
-  font-size: clamp(18px, 3.3vw, 28px);
-}
-.hsub{
-  margin-top:6px;
-  color:var(--sub);
-  font-size:12px;
-  letter-spacing:.2px;
-}
-.htime{
+
+.h-time{
   white-space:nowrap;
   font-variant-numeric: tabular-nums;
   color:rgba(234,240,255,.78);
   font-weight:800;
-  padding:8px 10px;
+  padding:6px 12px;
   border:1px solid var(--line);
   border-radius:999px;
   background:rgba(255,255,255,.03);
   font-size:12px;
 }
+
+/* 下面开始是卡片 / 列表等原有样式，保持不变 */
 
 main{
   max-width: 1100px;
@@ -313,13 +314,10 @@ footer{
 
 <body>
 <header>
-  <div class="h-row">
-    <div class="logoBox">
-      <img src="/assets/logo.png" alt="logo" class="logo">
-    </div>
-    <div>
-      <div class="h-title">时光酿造所 · 发酵监控 / Brewing Dashboard</div>
-    </div>
+  <div class="header-inner">
+    <!-- LOGO 居中显示 -->
+    <img src="/logo.png" alt="时光酿造所 Logo" class="logo" />
+    <!-- 当前时间显示在 LOGO 下方 -->
     <div class="h-time" id="time">--</div>
   </div>
 </header>
