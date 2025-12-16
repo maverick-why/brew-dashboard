@@ -3,14 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>时光酿造所 · 发酵监控 / Brewing Dashboard</title>
+<title>时光酿造所·发酵监控/Brewing Dashboard</title>
 
 <style>
 :root{
   --bg0:#070b12;
   --bg1:#0b1220;
   --card:#0f1726;
-  --card2:#111a2a;
   --line:rgba(255,255,255,.08);
   --text:#eaf0ff;
   --sub:rgba(234,240,255,.66);
@@ -19,14 +18,11 @@
   --yellow:#ffcc00;
   --pink:#ff5c8a;
 
-  --bar0:#1b2a44;
   --bar1:#7bd3ff;
   --bar2:#2b80ff;
 
   --r:22px;
   --shadow: 0 18px 48px rgba(0,0,0,.62);
-
-  --safePad: 0px; /* iOS safe area */
 }
 
 *{box-sizing:border-box}
@@ -51,26 +47,9 @@ header{
   background: linear-gradient(180deg, rgba(10,16,28,.88), rgba(10,16,28,.62));
   border-bottom:1px solid var(--line);
 }
-
-.h-row{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:14px;
-}
-
-.h-title{
-  font-weight:900;
-  letter-spacing:.3px;
-  line-height:1.08;
-  font-size: clamp(20px, 3.8vw, 34px);
-}
-.h-sub{
-  margin-top:6px;
-  color:var(--sub);
-  font-size:12px;
-  letter-spacing:.2px;
-}
+.h-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:14px; }
+.h-title{ font-weight:900; letter-spacing:.3px; line-height:1.08; font-size: clamp(20px, 3.8vw, 34px); }
+.h-sub{ margin-top:6px; color:var(--sub); font-size:12px; letter-spacing:.2px; }
 .h-time{
   white-space:nowrap;
   font-variant-numeric: tabular-nums;
@@ -89,24 +68,12 @@ main{
   padding: 18px 14px 28px;
   padding-bottom: calc(28px + env(safe-area-inset-bottom));
 }
-
-/* 手机端：一列列表；桌面端：自适应网格 */
-.list{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:14px;
-}
+.list{ display:grid; grid-template-columns: 1fr; gap:14px; }
 @media (min-width: 860px){
-  .list{
-    grid-template-columns: repeat(2, minmax(360px, 1fr));
-    gap:16px;
-  }
+  .list{ grid-template-columns: repeat(2, minmax(360px, 1fr)); gap:16px; }
 }
 @media (min-width: 1180px){
-  .list{
-    grid-template-columns: repeat(3, minmax(340px, 1fr));
-    gap:18px;
-  }
+  .list{ grid-template-columns: repeat(3, minmax(340px, 1fr)); gap:18px; }
 }
 
 /* ===== Card ===== */
@@ -121,8 +88,6 @@ main{
   border:1px solid rgba(255,255,255,.10);
   box-shadow: var(--shadow);
 }
-
-/* 柔光点缀 */
 .card::before{
   content:"";
   position:absolute;
@@ -141,42 +106,36 @@ main{
   pointer-events:none;
 }
 
-/* ===== Card head (核心信息) ===== */
+/* ===== Head ===== */
 .cardHead{
   position:relative;
   padding:14px 14px 12px;
   border-bottom:1px solid var(--line);
   background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
 }
+.headRow{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
 
-.headRow{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-}
-
-/* 左侧：编号 + 酒名 + 类型（优先级最高） */
 .leftBlock{
   display:flex;
   gap:12px;
   min-width:0;
 }
+
+/* 数字更大 + 居中 */
 .tankNo{
-  width:34px;
-  flex:0 0 34px;
-  text-align:left;
-  font-weight:900;
-  font-size:28px;
+  width:44px;
+  flex:0 0 44px;
+  display:flex;
+  align-items:center;       /* 垂直居中 */
+  justify-content:center;   /* 水平居中 */
+  font-weight:950;
+  font-size:34px;           /* 更大 */
   line-height:1;
-  letter-spacing:.5px;
-  color:rgba(234,240,255,.70);
+  color:rgba(234,240,255,.72);
   text-shadow: 0 10px 26px rgba(0,0,0,.55);
-  margin-top:2px;
 }
-.primary{
-  min-width:0;
-}
+
+.primary{ min-width:0; }
 .beerName{
   font-weight:950;
   letter-spacing:.3px;
@@ -187,14 +146,10 @@ main{
   text-overflow:ellipsis;
 }
 .beerStyle{
-  margin-top:6px;
+  margin-top:8px;
   display:flex;
   align-items:center;
   gap:8px;
-  color:rgba(234,240,255,.82);
-  font-weight:850;
-  letter-spacing:.3px;
-  font-size:15px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -207,18 +162,12 @@ main{
   border:1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.04);
   border-radius:999px;
-  padding:5px 8px;
+  padding:6px 10px;
 }
 
-/* 右侧：状态灯（往左挪，避免和限量斜标冲突） */
-.rightBlock{
-  flex:0 0 auto;
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-end;
-}
+.rightBlock{ flex:0 0 auto; display:flex; align-items:flex-start; justify-content:flex-end; }
 
-/* 状态灯 */
+/* 状态灯：往左挪 + 限量时再让位 */
 .badge{
   min-width:132px;
   text-align:center;
@@ -229,12 +178,11 @@ main{
   box-shadow: 0 12px 26px rgba(0,0,0,.45);
   border:1px solid rgba(0,0,0,.18);
   transform-origin: center;
-  margin-right: 8px; /* 默认往左一点 */
+  margin-right: 8px;
 }
-.card.limited .badge{
-  margin-right: 54px; /* 有斜标时再往左，避免遮挡 */
-}
-.badge .b1{font-size:16px; line-height:1.05}
+.card.limited .badge{ margin-right: 54px; }
+
+.badge .b1{ font-size:16px; line-height:1.05; }
 .badge .b2{
   margin-top:6px;
   font-size:16px;
@@ -261,7 +209,7 @@ main{
   100% { transform: rotate(-3deg) translateY(0); }
 }
 
-/* 斜标：更靠角落，减少与状态灯重叠 */
+/* 斜标：更贴角落，减少压住灯 */
 .ribbon{
   position:absolute;
   top:10px;
@@ -278,22 +226,17 @@ main{
   z-index:6;
   pointer-events:none;
 }
-.ribbon span{display:block; line-height:1.05; font-size:12px}
+.ribbon span{ display:block; line-height:1.05; font-size:12px; }
 
-/* ===== Body (精简信息：紧凑、去掉杂乱中英重复) ===== */
-.cardBody{
-  padding: 12px 14px 12px;
-}
+/* ===== Body ===== */
+.cardBody{ padding: 12px 14px 12px; }
 
-/* 信息：两列紧凑 */
+/* 四宫格 => 两行（ABV/IBU + Capacity/Temp） */
 .meta{
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:10px 12px;
-  align-items:start;
 }
-
-/* 单条字段：上标签下值，但标签更短 */
 .field small{
   display:block;
   color:rgba(234,240,255,.55);
@@ -308,19 +251,33 @@ main{
   font-variant-numeric: tabular-nums;
 }
 
-/* 标签更短：只保留中文为主，英文省略（视觉更干净） */
-.k{ display:none; } /* 预留：你如果未来想开关英文标签，可以改成 block */
+/* ===== Progress row：Start | Bar | End ===== */
+.progressWrap{ margin-top:12px; }
 
-/* 进度条：更“仪表盘” */
-.progressWrap{
-  margin-top:12px;
+.progressRow{
+  display:grid;
+  grid-template-columns: 64px 1fr 64px;
+  gap:10px;
+  align-items:center;
 }
-.progressTitle{
-  color:rgba(234,240,255,.60);
-  font-size:11px;
-  text-align:center;
-  margin-bottom:6px;
+
+.sideDate{
+  color:rgba(234,240,255,.78);
+  font-weight:900;
+  font-size:12px;
+  text-align:left;
+  white-space:nowrap;
 }
+.sideDate.end{ text-align:right; }
+.sideDate small{
+  display:block;
+  color:rgba(234,240,255,.48);
+  font-weight:800;
+  font-size:10px;
+  letter-spacing:.3px;
+  margin-bottom:2px;
+}
+
 .progressBar{
   position:relative;
   height:16px;
@@ -369,18 +326,18 @@ footer{
   font-size:13px;
 }
 
-/* 手机端进一步紧凑 */
 @media (max-width: 560px){
   header{ padding:14px 14px 12px; padding-top: calc(14px + env(safe-area-inset-top)); }
   .h-row{ align-items:flex-start; }
   .h-time{ padding:8px 10px; font-size:12px; }
   main{ padding: 14px 12px 22px; padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
 
-  .tankNo{ width:30px; flex:0 0 30px; font-size:26px; }
+  .tankNo{ width:46px; flex:0 0 46px; font-size:36px; } /* 手机上再大一点 */
   .beerName{ font-size:20px; }
-  .beerStyle{ font-size:14px; }
-  .badge{ min-width:126px; padding:9px 9px 8px; border-radius:14px; margin-right: 6px; }
+  .badge{ min-width:126px; padding:9px 9px 8px; margin-right: 6px; }
   .card.limited .badge{ margin-right: 52px; }
+
+  .progressRow{ grid-template-columns: 60px 1fr 60px; }
 }
 </style>
 </head>
@@ -429,7 +386,7 @@ function daysSince(startStr){
   if(isNaN(s)) return null;
   const ms = Date.now() - s.getTime();
   if(ms < 0) return 0;
-  return Math.floor(ms / 86400000) + 1; // DAY 1 起算
+  return Math.floor(ms / 86400000) + 1;
 }
 
 function calcProgress(startStr, endStr){
@@ -442,12 +399,9 @@ function calcProgress(startStr, endStr){
   return Math.round(p);
 }
 
-// status: auto | fermenting | ready
 function resolveStatus(row){
   const st = (row.status || "auto").toLowerCase();
   if(st === "fermenting" || st === "ready") return st;
-
-  // auto：按 end 判断
   const end = new Date(row.end);
   if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
   return "fermenting";
@@ -455,8 +409,8 @@ function resolveStatus(row){
 
 function statusText(status){
   return status === "ready"
-    ? { cn:"即将开罐", en:"Ready" }
-    : { cn:"发酵中", en:"Fermenting" };
+    ? { cn:"即将开罐" }
+    : { cn:"发酵中" };
 }
 
 function safe(v, fallback="--"){
@@ -467,9 +421,18 @@ function safe(v, fallback="--"){
 function tankNoFromId(id){
   const m = /^F(\d+)$/i.exec(id || "");
   if(m) return Number(m[1]);
-  // 兜底：如果不是 F1/F2，则尝试从字符串里抽数字
   const n = String(id||"").match(/\d+/);
   return n ? Number(n[0]) : 0;
+}
+
+function formatABV(v){
+  const s = safe(v);
+  if(s === "--") return s;
+  // 如果已经带%就不重复加
+  if(String(s).includes("%")) return String(s);
+  // 纯数字 / 数字字符串 => 加%
+  if(!isNaN(Number(s))) return `${s}%`;
+  return String(s);
 }
 
 function render(dataObj){
@@ -487,7 +450,6 @@ function render(dataObj){
   }
   empty.style.display = "none";
 
-  // 按罐号排序：F1, F2...
   entries.sort((a,b)=>{
     const na = tankNoFromId(a.id);
     const nb = tankNoFromId(b.id);
@@ -507,11 +469,10 @@ function render(dataObj){
     const badgeClass = status === "ready" ? "ready" : "fermenting";
     const dayText = (day === null) ? "" : `DAY ${day}`;
 
-    // 核心：酒名 + 类型优先展示；罐号只做左侧编号
     const beerName = safe(item.beer, "（未命名）");
     const beerStyle = safe(item.style, "--");
 
-    const abv = safe(item.abv);
+    const abv = formatABV(item.abv);
     const ibu = safe(item.ibu);
     const cap = safe(item.capacity);
     const temp = safe(item.temp);
@@ -535,7 +496,6 @@ function render(dataObj){
               <div class="beerName">${beerName}</div>
               <div class="beerStyle">
                 <span class="pill">${beerStyle}</span>
-                <span style="opacity:.62; font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${status === "ready" ? "Ready to open" : "Fermenting"}</span>
               </div>
             </div>
           </div>
@@ -568,22 +528,24 @@ function render(dataObj){
             <small>温度</small>
             <div class="v">${temp}</div>
           </div>
-
-          <div class="field">
-            <small>入罐</small>
-            <div class="v">${start}</div>
-          </div>
-          <div class="field">
-            <small>开罐</small>
-            <div class="v">${end}</div>
-          </div>
         </div>
 
         <div class="progressWrap">
-          <div class="progressTitle">发酵进度</div>
-          <div class="progressBar">
-            <i style="width:${progress}%"></i>
-            <b>${progress}%</b>
+          <div class="progressRow">
+            <div class="sideDate">
+              <small>入罐</small>
+              ${start}
+            </div>
+
+            <div class="progressBar">
+              <i style="width:${progress}%"></i>
+              <b>${progress}%</b>
+            </div>
+
+            <div class="sideDate end">
+              <small>开罐</small>
+              ${end}
+            </div>
           </div>
         </div>
       </div>
@@ -595,7 +557,7 @@ function render(dataObj){
 
 async function load(){
   try{
-    const res = await fetch(LOAD_URL, { cache:"no-store" });
+    const res = await fetch("/api/load", { cache:"no-store" });
     const data = await res.json();
     render(data || {});
   }catch(e){
