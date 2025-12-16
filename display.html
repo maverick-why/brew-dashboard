@@ -98,7 +98,6 @@ main{
   .list{ grid-template-columns: repeat(3, minmax(340px, 1fr)); gap:16px; }
 }
 
-/* ===== Card (compact) ===== */
 .card{
   position:relative;
   overflow:hidden;
@@ -124,7 +123,7 @@ main{
 .ribbon{
   position:absolute;
   top:10px;
-  left:-38px;          /* left side */
+  left:-38px;
   width:120px;
   transform: rotate(-45deg);
   background: linear-gradient(180deg, rgba(255,92,138,1), rgba(255,92,138,.88));
@@ -167,7 +166,7 @@ main{
   align-items:center;
   justify-content:center;
   font-weight:950;
-  font-size:24px;     /* bigger */
+  font-size:24px;
   line-height:1;
   color:rgba(234,240,255,.90);
   background: rgba(255,255,255,.06);
@@ -238,7 +237,6 @@ main{
   padding: 8px 14px 10px;
 }
 
-/* One-line metrics */
 .metrics{
   display:flex;
   align-items:center;
@@ -249,16 +247,9 @@ main{
   color:rgba(234,240,255,.90);
   margin: 2px 0 8px;
 }
-.metrics span{
-  white-space:nowrap;
-  color:rgba(234,240,255,.88);
-}
-.metrics .dot{
-  color:rgba(234,240,255,.35);
-  font-weight:900;
-}
+.metrics span{ white-space:nowrap; color:rgba(234,240,255,.88); }
+.metrics .dot{ color:rgba(234,240,255,.35); font-weight:900; }
 
-/* Start | Bar | End (compact) */
 .progressRow{
   display:flex;
   align-items:center;
@@ -275,7 +266,7 @@ main{
 .progressBar{
   flex:1;
   position:relative;
-  height:10px; /* thinner */
+  height:10px;
   border-radius:999px;
   background: rgba(255,255,255,.08);
   overflow:hidden;
@@ -344,56 +335,26 @@ footer{
 <script>
 const LOAD_URL = "/api/load";
 const POLL_MS  = 15000;
-const READY_THRESHOLD = 95; // >=95% -> 黄灯
+
+const READY_THRESHOLD = 95;        // >=95% -> 黄灯
+const TEMP_MIN = 18.0;
+const TEMP_MAX = 19.9;
+const TEMP_TICK_MS = 5000;         // 每 5 秒刷新
+const TEMP_STEPS = [0.1, 0.2];     // 每次变化 0.1 或 0.2
+
+// 每个罐独立温度（仅前端显示）
+const tempState = new Map();       // id -> number
+let lastDataCache = {};            // 保存最新数据，用于温度 tick 时可重绘温度文本
 
 function pad2(n){ return String(n).padStart(2,"0"); }
 function nowText(){
   const d = new Date();
   return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
-function tick(){ document.getElementById("time").textContent = nowText(); }
+function tickClock(){ document.getElementById("time").textContent = nowText(); }
 
-function formatMDshort(dateStr){
-  if(!dateStr) return "--/--";
-  const d = new Date(dateStr);
-  if(isNaN(d)) return "--/--";
-  return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
-}
-
-function daysSince(startStr){
-  if(!startStr) return null;
-  const s = new Date(startStr);
-  if(isNaN(s)) return null;
-  const ms = Date.now() - s.getTime();
-  if(ms < 0) return 0;
-  return Math.floor(ms / 86400000) + 1; // DAY 1 起算
-}
-
-function calcProgress(startStr, endStr){
-  const s = new Date(startStr).getTime();
-  const e = new Date(endStr).getTime();
-  const n = Date.now();
-  if(isNaN(s) || isNaN(e) || e<=s) return 0;
-  let p = ((n - s) / (e - s)) * 100;
-  p = Math.max(0, Math.min(100, p));
-  return Math.round(p);
-}
-
-/** 状态自动化：
- * - 若 now >= end -> ready
- * - 若 progress >= 95 -> ready
- * - 否则 fermenting
- * - 支持 row.status 强制（ready/fermenting）
- */
-function resolveStatus(row, progress){
-  const st = (row.status || "auto").toLowerCase();
-  if(st === "fermenting" || st === "ready") return st;
-
-  const end = new Date(row.end);
-  if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
-  if(typeof progress === "number" && progress >= READY_THRESHOLD) return "ready";
-
-  return "fermenting";
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
 function safe(v, fallback="--"){
@@ -410,14 +371,81 @@ function toABV(v){
   return String(s);
 }
 
-function toTemp(v){
-  const s = safe(v);
-  if(s === "--") return "--℃";
-  const t = String(s).trim();
-  if(t.includes("°")) return t;
+function parseTempNumber(v){
+  if(v === undefined || v === null || v === "") return null;
+  const t = String(v).trim().replace("℃","").replace("°C","").replace("°","").trim();
   const n = Number(t);
-  if(!Number.isNaN(n)) return `${n.toFixed(1)}℃`;
-  return t;
+  if(Number.isNaN(n)) return null;
+  return n;
+}
+function clampTemp(x){
+  return Math.max(TEMP_MIN, Math.min(TEMP_MAX, x));
+}
+function fmtTemp(x){
+  return `${Number(x).toFixed(1)}℃`;
+}
+
+function ensureTemp(id, backendTemp){
+  if(tempState.has(id)) return tempState.get(id);
+  const n = parseTempNumber(backendTemp);
+  const init = clampTemp(n ?? TEMP_MIN);
+  tempState.set(id, init);
+  return init;
+}
+
+function bumpTemp(id){
+  const cur = tempState.get(id);
+  if(cur === undefined) return;
+
+  const step = TEMP_STEPS[Math.floor(Math.random()*TEMP_STEPS.length)];
+  const dir = Math.random() < 0.5 ? -1 : 1;
+  let next = cur + dir * step;
+
+  // 触边就反弹
+  if(next < TEMP_MIN) next = cur + step;
+  if(next > TEMP_MAX) next = cur - step;
+
+  next = clampTemp(next);
+  // 一位小数对齐
+  next = Math.round(next * 10) / 10;
+
+  tempState.set(id, next);
+}
+
+function formatMDshort(dateStr){
+  if(!dateStr) return "--/--";
+  const d = new Date(dateStr);
+  if(isNaN(d)) return "--/--";
+  return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
+}
+
+function daysSince(startStr){
+  if(!startStr) return null;
+  const s = new Date(startStr);
+  if(isNaN(s)) return null;
+  const ms = Date.now() - s.getTime();
+  if(ms < 0) return 0;
+  return Math.floor(ms / 86400000) + 1;
+}
+
+function calcProgress(startStr, endStr){
+  const s = new Date(startStr).getTime();
+  const e = new Date(endStr).getTime();
+  const n = Date.now();
+  if(isNaN(s) || isNaN(e) || e<=s) return 0;
+  let p = ((n - s) / (e - s)) * 100;
+  p = Math.max(0, Math.min(100, p));
+  return Math.round(p);
+}
+
+function resolveStatus(row, progress){
+  const st = (row.status || "auto").toLowerCase();
+  if(st === "fermenting" || st === "ready") return st;
+
+  const end = new Date(row.end);
+  if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
+  if(typeof progress === "number" && progress >= READY_THRESHOLD) return "ready";
+  return "fermenting";
 }
 
 function tankNoFromId(id){
@@ -428,6 +456,8 @@ function tankNoFromId(id){
 }
 
 function render(dataObj){
+  lastDataCache = dataObj || {};
+
   const list = document.getElementById("list");
   const empty = document.getElementById("empty");
   list.innerHTML = "";
@@ -452,6 +482,7 @@ function render(dataObj){
   });
 
   for(const item of entries){
+    const id = item.id;
     const progress = calcProgress(item.start, item.end);
     const status = resolveStatus(item, progress);
     const day = daysSince(item.start);
@@ -467,12 +498,14 @@ function render(dataObj){
     const abv = toABV(item.abv);
     const ibu = safe(item.ibu);
     const cap = safe(item.capacity);
-    const temp = toTemp(item.temp);
+
+    const tempNum = ensureTemp(id, item.temp);
+    const tempText = fmtTemp(tempNum);
 
     const start = formatMDshort(item.start);
     const end   = formatMDshort(item.end);
 
-    const no = tankNoFromId(item.id);
+    const no = tankNoFromId(id);
 
     const card = document.createElement("div");
     card.className = "card";
@@ -505,7 +538,7 @@ function render(dataObj){
           <span class="dot">·</span>
           <span>${escapeHtml(cap)}</span>
           <span class="dot">·</span>
-          <span>${escapeHtml(temp)}</span>
+          <span id="temp-${escapeHtml(id)}">${escapeHtml(tempText)}</span>
         </div>
 
         <div class="progressRow">
@@ -523,8 +556,24 @@ function render(dataObj){
   }
 }
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function tickTemps(){
+  // 只更新当前“show=true”的那些罐
+  const entries = Object.entries(lastDataCache || {})
+    .map(([id, row]) => ({ id, ...(row||{}) }))
+    .filter(x => x.show === true);
+
+  for(const item of entries){
+    const id = item.id;
+    // 确保有初始值
+    ensureTemp(id, item.temp);
+    // 变化
+    bumpTemp(id);
+
+    const el = document.getElementById(`temp-${id}`);
+    if(el){
+      el.textContent = fmtTemp(tempState.get(id));
+    }
+  }
 }
 
 async function load(){
@@ -537,10 +586,14 @@ async function load(){
   }
 }
 
-tick();
-setInterval(tick, 1000);
+tickClock();
+setInterval(tickClock, 1000);
+
 load();
 setInterval(load, POLL_MS);
+
+// 温度：每 5 秒微波动一次（不请求后端）
+setInterval(tickTemps, TEMP_TICK_MS);
 </script>
 </body>
 </html>
