@@ -1,324 +1,191 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
+<!doctype html>
+<html lang="zh-Hans">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>后台管理 · 时光酿造所</title>
-<style>
-:root{
-  --bg0:#070b12;
-  --bg1:#0b1220;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>后台管理 · 时光酿造所</title>
+  <style>
+    :root{
+      --bg0:#070b12; --bg1:#0b1220;
+      --card:#0f1726; --card2:#111a2a;
+      --line:rgba(255,255,255,.10);
+      --text:#eaf0ff; --sub:rgba(234,240,255,.65);
+      --green:#4ade80; --blue:#3b82f6; --red:#ef4444; --amber:#fbbf24;
+      --r:18px;
+      --shadow:0 18px 45px rgba(0,0,0,.55);
+      --inset: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC","Noto Sans SC", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(79,140,255,.12), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(0,255,180,.10), transparent 60%),
+        radial-gradient(900px 600px at 50% 90%, rgba(255,92,138,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+    }
 
-  --card:#0f1726;
-  --card2:#101b2d;
-  --line:rgba(255,255,255,.09);
+    header{
+      position:sticky; top:0; z-index:20;
+      padding:18px 18px 14px;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(10,16,28,.86), rgba(10,16,28,.62));
+      border-bottom:1px solid var(--line);
+    }
+    .h-row{display:flex; align-items:flex-end; justify-content:space-between; gap:14px}
+    .h-title{font-weight:900; letter-spacing:.5px; line-height:1.08; font-size: clamp(20px, 3.6vw, 34px)}
+    .h-sub{margin-top:6px; color:var(--sub); font-size:12px; letter-spacing:.2px}
+    .h-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      white-space:nowrap;
+      font-variant-numeric: tabular-nums;
+      color:rgba(234,240,255,.78);
+      font-weight:700;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+    }
+    .pill b{color:#fff}
+    .pill.ok{border-color:rgba(74,222,128,.28); background:rgba(74,222,128,.08)}
+    .pill.bad{border-color:rgba(239,68,68,.28); background:rgba(239,68,68,.08)}
 
-  --text:#eaf0ff;
-  --sub:rgba(234,240,255,.66);
+    main{max-width: 1500px; margin: 0 auto; padding: 18px 14px 28px}
 
-  --green:#4ade80;
-  --yellow:#ffcc00;
-  --red:#ff4d4f;
-  --blue:#2b80ff;
+    .panel{
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--card);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .toolbar{
+      padding:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+    }
+    .btns{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    button{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow: var(--inset);
+    }
+    button:hover{filter:brightness(1.06)}
+    button:active{transform: translateY(1px)}
+    .primary{background: rgba(74,222,128,.20); border-color: rgba(74,222,128,.35)}
+    .blue{background: rgba(59,130,246,.20); border-color: rgba(59,130,246,.35)}
+    .danger{background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.35)}
+    .muted{color:rgba(234,240,255,.70); font-weight:700; font-size:12px}
 
-  --r:18px;
-  --shadow: 0 18px 45px rgba(0,0,0,.55);
-}
+    .tableWrap{overflow:auto}
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 1180px;
+    }
+    thead th{
+      position:sticky; top:0;
+      background: rgba(10,16,28,.92);
+      backdrop-filter: blur(8px);
+      z-index:5;
+      font-size:12px;
+      color:rgba(234,240,255,.78);
+      text-align:left;
+      padding:12px 10px;
+      border-bottom:1px solid var(--line);
+      letter-spacing:.2px;
+      font-weight:900;
+    }
+    tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      vertical-align:middle;
+    }
+    tbody tr:hover td{background: rgba(255,255,255,.02)}
+    .idCell{font-weight:900; color:#9fd1ff; letter-spacing:.3px}
+    .center{display:flex; align-items:center; gap:8px}
+    .chk{width:18px; height:18px}
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(1200px 700px at 18% 8%, rgba(79,140,255,.13), transparent 62%),
-    radial-gradient(900px 600px at 84% 28%, rgba(0,255,180,.11), transparent 62%),
-    radial-gradient(900px 600px at 52% 92%, rgba(255,92,138,.10), transparent 62%),
-    linear-gradient(180deg, var(--bg1), var(--bg0));
-}
+    input, select{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:12px;
+      outline:none;
+      box-shadow: var(--inset);
+      font-weight:750;
+      font-variant-numeric: tabular-nums;
+    }
+    input::placeholder{color:rgba(234,240,255,.35)}
+    input:focus, select:focus{border-color: rgba(123,211,255,.35); background: rgba(255,255,255,.06)}
 
-header{
-  position:sticky; top:0; z-index:20;
-  padding:16px 16px 12px;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(180deg, rgba(10,16,28,.90), rgba(10,16,28,.60));
-  border-bottom:1px solid var(--line);
-}
+    .wBeer{min-width: 220px}
+    .wStyle{min-width: 170px}
+    .wNum{min-width: 110px}
+    .wDate{min-width: 160px}
+    .wSel{min-width: 120px}
+    .wSmall{min-width: 90px}
 
-.hrow{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
-}
-.htitle{
-  font-weight:950;
-  letter-spacing:.5px;
-  line-height:1.08;
-  font-size: clamp(18px, 2.8vw, 28px);
-}
-.hsub{
-  margin-top:6px;
-  color:var(--sub);
-  font-size:12px;
-  letter-spacing:.2px;
-}
-.hright{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-.pill{
-  padding:8px 10px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:rgba(234,240,255,.78);
-  font-weight:800;
-  font-size:12px;
-  font-variant-numeric: tabular-nums;
-  white-space:nowrap;
-}
+    .rowActions{display:flex; gap:8px; justify-content:flex-start}
+    .mini{
+      padding:8px 10px;
+      border-radius:10px;
+      font-weight:900;
+      font-size:12px;
+    }
 
-main{
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 14px 14px 30px;
-}
+    .toast{
+      position:fixed;
+      left:50%; bottom:18px;
+      transform: translateX(-50%);
+      max-width: min(92vw, 720px);
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,16,28,.78);
+      backdrop-filter: blur(8px);
+      color:rgba(234,240,255,.85);
+      box-shadow: 0 14px 35px rgba(0,0,0,.5);
+      display:none;
+      z-index:50;
+      font-weight:800;
+    }
+    .toast.ok{border-color: rgba(74,222,128,.28)}
+    .toast.bad{border-color: rgba(239,68,68,.28)}
 
-.panel{
-  border:1px solid rgba(255,255,255,.10);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), var(--card);
-  box-shadow: var(--shadow);
-  overflow:hidden;
-}
-
-.toolbar{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  justify-content:space-between;
-  padding:12px 12px;
-  border-bottom:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
-  flex-wrap:wrap;
-}
-
-.tleft,.tright{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-
-.btn{
-  appearance:none;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.06);
-  color:rgba(234,240,255,.92);
-  padding:10px 12px;
-  border-radius: 12px;
-  font-weight:900;
-  letter-spacing:.2px;
-  cursor:pointer;
-  transition: transform .05s ease, background .15s ease, border-color .15s ease;
-}
-.btn:hover{ background: rgba(255,255,255,.09); }
-.btn:active{ transform: translateY(1px); }
-.btn.primary{ background: rgba(43,128,255,.22); border-color: rgba(43,128,255,.35); }
-.btn.primary:hover{ background: rgba(43,128,255,.28); }
-.btn.success{ background: rgba(74,222,128,.18); border-color: rgba(74,222,128,.32); }
-.btn.success:hover{ background: rgba(74,222,128,.24); }
-.btn.danger{ background: rgba(255,77,79,.16); border-color: rgba(255,77,79,.30); }
-.btn.danger:hover{ background: rgba(255,77,79,.22); }
-
-.note{
-  color:var(--sub);
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.2px;
-  margin-left:4px;
-}
-
-.tableWrap{ overflow:auto; }
-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  min-width: 1100px;
-}
-thead th{
-  position:sticky;
-  top:0;
-  z-index:5;
-  background: rgba(8,12,20,.88);
-  backdrop-filter: blur(6px);
-  border-bottom:1px solid var(--line);
-  color: rgba(234,240,255,.82);
-  font-size:12px;
-  font-weight:900;
-  text-align:left;
-  padding:10px 10px;
-  letter-spacing:.25px;
-}
-tbody td{
-  border-bottom:1px solid rgba(255,255,255,.06);
-  padding:10px 10px;
-  vertical-align:middle;
-}
-tbody tr:hover td{
-  background: rgba(255,255,255,.02);
-}
-
-.mini{
-  width: 44px;
-  text-align:center;
-}
-.idCell{
-  font-weight:950;
-  letter-spacing:.2px;
-  color: rgba(123,211,255,.95);
-  width: 70px;
-}
-
-.input, .select{
-  width:100%;
-  padding:9px 10px;
-  border-radius: 12px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.18);
-  color: rgba(234,240,255,.92);
-  outline:none;
-  font-weight:850;
-}
-.input::placeholder{ color: rgba(234,240,255,.32); font-weight:750; }
-.input:focus, .select:focus{
-  border-color: rgba(123,211,255,.30);
-  box-shadow: 0 0 0 3px rgba(123,211,255,.12);
-}
-
-.bad{
-  border-color: rgba(255,77,79,.55) !important;
-  box-shadow: 0 0 0 3px rgba(255,77,79,.14) !important;
-}
-
-.checkbox{
-  width:18px; height:18px;
-  accent-color: var(--blue);
-}
-
-.switch{
-  position:relative;
-  width:44px; height:26px;
-  border-radius:999px;
-  background: rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.12);
-  cursor:pointer;
-  flex:0 0 auto;
-}
-.switch i{
-  position:absolute;
-  top:3px; left:3px;
-  width:20px; height:20px;
-  border-radius:999px;
-  background: rgba(234,240,255,.86);
-  transition: left .18s ease, background .18s ease;
-  box-shadow: 0 6px 14px rgba(0,0,0,.35);
-}
-.switch.on{
-  background: rgba(255,92,138,.22);
-  border-color: rgba(255,92,138,.35);
-}
-.switch.on i{
-  left:21px;
-  background: rgba(255,92,138,.95);
-}
-
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  transform: translateX(-50%);
-  background: rgba(10,16,28,.92);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius: 14px;
-  padding: 12px 14px;
-  color: rgba(234,240,255,.92);
-  box-shadow: 0 18px 50px rgba(0,0,0,.60);
-  z-index: 200;
-  display:none;
-  max-width: min(520px, calc(100vw - 24px));
-  line-height:1.25;
-}
-.toast b{ font-weight:950; }
-.toast .sub{ color: rgba(234,240,255,.68); font-weight:750; font-size:12px; margin-top:4px; }
-
-.modalMask{
-  position:fixed; inset:0;
-  background: rgba(0,0,0,.58);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index: 300;
-  padding: 16px;
-}
-.modal{
-  width: min(520px, 100%);
-  border-radius: 18px;
-  border:1px solid rgba(255,255,255,.12);
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0)), rgba(10,16,28,.95);
-  box-shadow: 0 22px 70px rgba(0,0,0,.70);
-  overflow:hidden;
-}
-.modalHead{
-  padding:14px 14px 10px;
-  border-bottom:1px solid var(--line);
-}
-.modalTitle{
-  font-weight:950;
-  font-size:18px;
-  letter-spacing:.3px;
-}
-.modalDesc{
-  margin-top:6px;
-  color: rgba(234,240,255,.66);
-  font-size:12px;
-  font-weight:750;
-}
-.modalBody{ padding:14px; }
-.modalActions{
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
-  padding: 12px 14px;
-  border-top:1px solid var(--line);
-  background: rgba(255,255,255,.02);
-}
-
-.smallHelp{
-  color: rgba(234,240,255,.60);
-  font-size:12px;
-  font-weight:750;
-  margin-top:8px;
-}
-
-@media (max-width: 720px){
-  table{ min-width: 980px; }
-  header{ padding:14px 14px 12px; }
-  .toolbar{ padding:10px; }
-}
-</style>
+    @media (max-width: 560px){
+      header{padding:14px 14px 12px}
+      .pill{padding:8px 10px; font-size:12px}
+    }
+  </style>
 </head>
-
 <body>
+
 <header>
-  <div class="hrow">
+  <div class="h-row">
     <div>
-      <div class="htitle">后台管理 · 时光酿造所</div>
-      <div class="hsub">保存会写入共享数据源（Redis），前端 display.html 同步可见</div>
+      <div class="h-title">后台管理 · 时光酿造所</div>
+      <div class="h-sub">保存会写入共享数据源（Redis），前台 <b>display.html</b> 会自动刷新展示。</div>
     </div>
-    <div class="hright">
-      <div class="pill">API: <b>/api/load</b> & <b>/api/save</b></div>
-      <div class="pill" id="clock">--</div>
+    <div class="h-right">
+      <div class="pill" id="apiPill">API: <b>/api/load</b> &amp; <b>/api/save</b></div>
+      <div class="pill" id="authPill">登录：<b id="authText">未登录</b></div>
     </div>
   </div>
 </header>
@@ -326,35 +193,31 @@ tbody tr:hover td{
 <main>
   <div class="panel">
     <div class="toolbar">
-      <div class="tleft">
-        <button class="btn primary" id="btnLoad">从共享数据源加载</button>
-        <button class="btn success" id="btnSave">保存到共享数据源</button>
-        <span class="note" id="saveHint">（未保存）</span>
+      <div class="btns">
+        <button id="btnLoad">从共享数据源加载</button>
+        <button class="primary" id="btnSave">保存到共享数据源</button>
+        <button class="blue" id="btnAdd">新增发酵罐</button>
       </div>
-      <div class="tright">
-        <button class="btn" id="btnAdd">新增发酵罐</button>
-        <button class="btn danger" id="btnDelete">删除选中</button>
-        <button class="btn" id="btnRelogin">更换密码</button>
-      </div>
+      <div class="muted" id="hint">提示：勾选“展示”= 前台可见。限量版会在前台显示斜标 <b>Limited</b>。</div>
     </div>
 
     <div class="tableWrap">
       <table>
         <thead>
           <tr>
-            <th class="mini">选</th>
-            <th>ID</th>
-            <th style="min-width:140px;">罐名（展示用）</th>
-            <th style="min-width:140px;">酒名（优先展示）</th>
-            <th style="min-width:140px;">风格 / Style</th>
-            <th style="width:90px;">ABV</th>
-            <th style="width:90px;">IBU</th>
-            <th style="min-width:110px;">产量 / Capacity</th>
-            <th style="min-width:110px;">温度 / Temp</th>
-            <th style="min-width:140px;">入罐 Start</th>
-            <th style="min-width:140px;">开罐 End</th>
-            <th style="width:90px;">展示</th>
-            <th style="width:120px;">限量 Limited</th>
+            <th style="width:90px">ID</th>
+            <th style="width:84px">展示</th>
+            <th class="wBeer">酒名 / Name</th>
+            <th class="wStyle">风格 / Style</th>
+            <th class="wSmall">ABV</th>
+            <th class="wSmall">IBU</th>
+            <th class="wSmall">容量</th>
+            <th class="wSmall">温度</th>
+            <th class="wDate">入罐时间</th>
+            <th class="wDate">预计开罐</th>
+            <th class="wSel">状态</th>
+            <th style="width:90px">限量版</th>
+            <th style="width:110px">操作</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -365,379 +228,287 @@ tbody tr:hover td{
 
 <div class="toast" id="toast"></div>
 
-<!-- Login Modal -->
-<div class="modalMask" id="loginMask" style="display:none;">
-  <div class="modal">
-    <div class="modalHead">
-      <div class="modalTitle">管理员登录</div>
-      <div class="modalDesc">请输入写入密码（用于保存到 Redis）。密码只保存在当前浏览器会话（session）里。</div>
-    </div>
-    <div class="modalBody">
-      <input class="input" id="passInput" type="password" placeholder="ADMIN_WRITE_PASSWORD" autocomplete="current-password" />
-      <div class="smallHelp">提示：如果保存时报 <b>Unauthorized</b>，说明密码不对或部署环境变量未生效。</div>
-    </div>
-    <div class="modalActions">
-      <button class="btn" id="btnLoginCancel" title="不允许跳过">取消</button>
-      <button class="btn success" id="btnLoginOk">进入后台</button>
-    </div>
-  </div>
-</div>
-
 <script>
-const LOAD_URL = "/api/load";
-const SAVE_URL = "/api/save";
-const KEY_SESSION_PASS = "dbbrew_admin_pass_v1";
+  const LOAD_URL = "/api/load";
+  const SAVE_URL = "/api/save";
+  const KEY_PREFIX = "F";
 
-let state = {
-  dirty: false,
-  rows: [] // each row: {id, selected, show, limited, name, beer, style, abv, ibu, capacity, temp, start, end, status?}
-};
+  let ADMIN_PASS = "";
+  let state = {}; // { F1: {...}, F2: {...} }
 
-function pad2(n){ return String(n).padStart(2,"0"); }
-function nowText(){
-  const d = new Date();
-  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
-}
-function tick(){ document.getElementById("clock").textContent = nowText(); }
-tick(); setInterval(tick, 1000);
-
-function toast(title, sub="", ms=2600){
-  const el = document.getElementById("toast");
-  el.innerHTML = `<b>${escapeHtml(title)}</b>${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ""}`;
-  el.style.display = "block";
-  clearTimeout(toast._t);
-  toast._t = setTimeout(()=> el.style.display="none", ms);
-}
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-function setDirty(v){
-  state.dirty = v;
-  const hint = document.getElementById("saveHint");
-  hint.textContent = v ? "（未保存）" : "（已保存）";
-  hint.style.color = v ? "rgba(255,204,0,.92)" : "rgba(74,222,128,.88)";
-}
-
-function getPass(){
-  return sessionStorage.getItem(KEY_SESSION_PASS) || "";
-}
-function setPass(p){
-  sessionStorage.setItem(KEY_SESSION_PASS, p || "");
-}
-
-/** 强制登录：不允许空密码进入 */
-function showLogin(){
-  document.getElementById("loginMask").style.display = "flex";
-  const ipt = document.getElementById("passInput");
-  ipt.value = "";
-  setTimeout(()=>ipt.focus(), 30);
-}
-function hideLogin(){
-  document.getElementById("loginMask").style.display = "none";
-}
-
-/** 生成下一个可用 F# */
-function nextTankId(){
-  const used = new Set(state.rows.map(r=>String(r.id||"")));
-  for(let i=1;i<200;i++){
-    const id = "F"+i;
-    if(!used.has(id)) return id;
+  // ====== helpers
+  function toast(msg, ok=true){
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.className = "toast " + (ok ? "ok" : "bad");
+    el.style.display = "block";
+    clearTimeout(el._t);
+    el._t = setTimeout(()=> el.style.display="none", 2400);
   }
-  return "F"+(state.rows.length+1);
-}
 
-function normalizeDataObjToRows(obj){
-  const rows = [];
-  for(const [id, v] of Object.entries(obj || {})){
-    const row = v || {};
-    rows.push({
-      id,
-      selected:false,
-      show: row.show === true,
-      limited: row.limited === true,
-      name: row.name ?? "",
-      beer: row.beer ?? "",
-      style: row.style ?? "",
-      abv: row.abv ?? "",
-      ibu: row.ibu ?? "",
-      capacity: row.capacity ?? "",
-      temp: row.temp ?? "",
-      start: row.start ?? "",
-      end: row.end ?? "",
-      status: row.status ?? "auto"
-    });
+  function setAuthUI(ok){
+    const pill = document.getElementById("authPill");
+    const txt = document.getElementById("authText");
+    txt.textContent = ok ? "已登录" : "未登录";
+    pill.classList.toggle("ok", ok);
+    pill.classList.toggle("bad", !ok);
   }
-  // sort F1.. then others
-  rows.sort((a,b)=>{
-    const ma = /^F(\d+)$/i.exec(a.id||"");
-    const mb = /^F(\d+)$/i.exec(b.id||"");
-    if(ma && mb) return Number(ma[1]) - Number(mb[1]);
-    if(ma) return -1;
-    if(mb) return 1;
-    return (a.id||"").localeCompare(b.id||"");
-  });
-  return rows;
-}
 
-function rowsToDataObj(){
-  const obj = {};
-  for(const r of state.rows){
-    obj[r.id] = {
+  function safe(v, fallback=""){
+    if (v === undefined || v === null) return fallback;
+    return String(v);
+  }
+
+  function nextId(){
+    // 找到最大 Fxx + 1
+    const keys = Object.keys(state || {});
+    let max = 0;
+    for(const k of keys){
+      const m = /^F(\d+)$/i.exec(k);
+      if(m) max = Math.max(max, Number(m[1]));
+    }
+    return `${KEY_PREFIX}${max + 1}`;
+  }
+
+  function normalizeRow(row){
+    const r = row || {};
+    return {
       show: !!r.show,
-      limited: !!r.limited,
-      name: (r.name||"").trim(),
-      beer: (r.beer||"").trim(),
-      style: (r.style||"").trim(),
-      abv: (r.abv||"").trim(),
-      ibu: (r.ibu||"").trim(),
-      capacity: (r.capacity||"").trim(),
-      temp: (r.temp||"").trim(),
-      start: (r.start||"").trim(),
-      end: (r.end||"").trim(),
-      status: (r.status||"auto").trim()
+      beer: safe(r.beer, ""),
+      style: safe(r.style, ""),
+      abv: safe(r.abv, ""),
+      ibu: safe(r.ibu, ""),
+      capacity: safe(r.capacity, "150L"),
+      temp: safe(r.temp, ""),
+      start: safe(r.start, ""),
+      end: safe(r.end, ""),
+      status: safe(r.status, "auto"), // auto | fermenting | ready
+      limited: !!r.limited
     };
   }
-  return obj;
-}
 
-/** 校验：start/end 必填，且 end > start */
-function validate(){
-  let ok = true;
-
-  // 先清掉所有 bad 标记
-  document.querySelectorAll(".bad").forEach(el => el.classList.remove("bad"));
-
-  for(const r of state.rows){
-    const start = (r.start||"").trim();
-    const end = (r.end||"").trim();
-
-    const startEl = document.querySelector(`[data-id="${r.id}"][data-k="start"]`);
-    const endEl   = document.querySelector(`[data-id="${r.id}"][data-k="end"]`);
-
-    // 如果 show 才强校验（你也可以改成所有行都校验）
-    if(r.show){
-      if(!start){
-        ok = false; startEl && startEl.classList.add("bad");
-      }
-      if(!end){
-        ok = false; endEl && endEl.classList.add("bad");
-      }
-      const s = new Date(start).getTime();
-      const e = new Date(end).getTime();
-      if(start && end && (!isFinite(s) || !isFinite(e) || e <= s)){
-        ok = false;
-        startEl && startEl.classList.add("bad");
-        endEl && endEl.classList.add("bad");
-      }
-    }
-  }
-
-  if(!ok){
-    toast("校验失败：请检查 Start / End", "Show=勾选的行要求：Start/End 必填，且 End 必须晚于 Start。");
-  }
-  return ok;
-}
-
-function render(){
-  const tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
-
-  for(const r of state.rows){
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td class="mini">
-        <input type="checkbox" class="checkbox" data-id="${escapeHtml(r.id)}" data-k="selected" ${r.selected ? "checked":""}/>
-      </td>
-      <td class="idCell">${escapeHtml(r.id)}</td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="name" placeholder="例如：1号发酵罐" value="${escapeHtml(r.name)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="beer" placeholder="例如：港岛妹妹" value="${escapeHtml(r.beer)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="style" placeholder="例如：HAZY IPA" value="${escapeHtml(r.style)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="abv" placeholder="6 或 6%" value="${escapeHtml(r.abv)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="ibu" placeholder="30" value="${escapeHtml(r.ibu)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="capacity" placeholder="150L" value="${escapeHtml(r.capacity)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="temp" placeholder="18.2°C" value="${escapeHtml(r.temp)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="start" type="date" value="${escapeHtml(r.start)}"/></td>
-      <td><input class="input" data-id="${escapeHtml(r.id)}" data-k="end" type="date" value="${escapeHtml(r.end)}"/></td>
-      <td class="mini">
-        <input type="checkbox" class="checkbox" data-id="${escapeHtml(r.id)}" data-k="show" ${r.show ? "checked":""}/>
-      </td>
-      <td>
-        <div class="switch ${r.limited ? "on":""}" data-id="${escapeHtml(r.id)}" data-k="limited" role="switch" aria-checked="${r.limited}">
-          <i></i>
-        </div>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-  }
-
-  // bind events (delegate)
-  tbody.oninput = (e)=>{
-    const t = e.target;
-    const id = t && t.dataset && t.dataset.id;
-    const k  = t && t.dataset && t.dataset.k;
-    if(!id || !k) return;
-    const row = state.rows.find(x=>x.id===id);
-    if(!row) return;
-
-    if(k === "selected" || k === "show"){
-      row[k] = !!t.checked;
-    }else{
-      row[k] = t.value;
-    }
-    setDirty(true);
-  };
-
-  tbody.onclick = (e)=>{
-    const t = e.target;
-    // switch click
-    const sw = t.closest && t.closest(".switch");
-    if(sw && sw.dataset && sw.dataset.id){
-      const id = sw.dataset.id;
-      const row = state.rows.find(x=>x.id===id);
-      if(!row) return;
-      row.limited = !row.limited;
-      sw.classList.toggle("on", row.limited);
-      sw.setAttribute("aria-checked", String(row.limited));
-      setDirty(true);
-      return;
-    }
-  };
-}
-
-async function apiLoad(){
-  try{
-    const res = await fetch(LOAD_URL, { cache:"no-store" });
-    const data = await res.json();
-    state.rows = normalizeDataObjToRows(data || {});
-    render();
-    setDirty(false);
-    toast("加载成功", `共 ${state.rows.length} 条记录`);
-  }catch(e){
-    toast("加载失败", String(e && e.message ? e.message : e));
-  }
-}
-
-async function apiSave(){
-  if(!validate()) return;
-
-  const pass = getPass();
-  if(!pass){
-    toast("未登录", "请先输入管理员密码。");
-    showLogin();
-    return;
-  }
-
-  try{
-    const body = JSON.stringify(rowsToDataObj());
-    const res = await fetch(SAVE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "x-admin-pass": pass
-      },
-      body
+  function sortIds(ids){
+    return ids.sort((a,b)=>{
+      const ma = /^F(\d+)$/i.exec(a||"");
+      const mb = /^F(\d+)$/i.exec(b||"");
+      if(ma && mb) return Number(ma[1]) - Number(mb[1]);
+      if(ma) return -1;
+      if(mb) return 1;
+      return (a||"").localeCompare(b||"");
     });
+  }
 
-    const txt = await res.text();
-    let obj = null;
-    try{ obj = JSON.parse(txt || "{}"); }catch{ obj = { ok:false, error: txt }; }
+  // ====== render
+  function render(){
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
 
-    if(!res.ok || !obj || obj.ok !== true){
-      // Unauthorized -> 强制重新登录
-      if(res.status === 401){
-        toast("保存失败：Unauthorized", "密码不对 / 环境变量未生效。请重新输入密码。", 3600);
-        showLogin();
-      }else{
-        toast("保存失败", (obj && obj.error) ? obj.error : `HTTP ${res.status}`);
-      }
-      return;
+    const ids = sortIds(Object.keys(state || {}));
+    if(ids.length === 0){
+      // 默认给一行
+      state["F1"] = normalizeRow({show:true, capacity:"150L", status:"auto"});
+      return render();
     }
 
-    setDirty(false);
-    toast("保存成功", "已写入 Redis，共享展示端会自动刷新。");
-  }catch(e){
-    toast("保存失败", String(e && e.message ? e.message : e));
-  }
-}
+    for(const id of ids){
+      const row = normalizeRow(state[id]);
+      state[id] = row;
 
-function addRow(){
-  const id = nextTankId();
-  state.rows.push({
-    id,
-    selected:false,
-    show:true,
-    limited:false,
-    name: `${id.replace(/^F/i,"")}号发酵罐`,
-    beer:"",
-    style:"",
-    abv:"",
-    ibu:"",
-    capacity:"150L",
-    temp:"",
-    start:"",
-    end:"",
-    status:"auto"
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td class="idCell">${id}</td>
+
+        <td>
+          <div class="center">
+            <input class="chk" type="checkbox" data-id="${id}" data-k="show" ${row.show ? "checked":""}/>
+          </div>
+        </td>
+
+        <td><input class="wBeer"  type="text" placeholder="例如：港岛妹妹" data-id="${id}" data-k="beer"  value="${escapeHtml(row.beer)}"/></td>
+        <td><input class="wStyle" type="text" placeholder="例如：HAZY IPA" data-id="${id}" data-k="style" value="${escapeHtml(row.style)}"/></td>
+
+        <td><input class="wSmall" type="text" placeholder="6" data-id="${id}" data-k="abv" value="${escapeHtml(row.abv)}"/></td>
+        <td><input class="wSmall" type="text" placeholder="30" data-id="${id}" data-k="ibu" value="${escapeHtml(row.ibu)}"/></td>
+        <td><input class="wSmall" type="text" placeholder="150L" data-id="${id}" data-k="capacity" value="${escapeHtml(row.capacity)}"/></td>
+        <td><input class="wSmall" type="text" placeholder="18.2" data-id="${id}" data-k="temp" value="${escapeHtml(row.temp)}"/></td>
+
+        <td><input class="wDate" type="date" data-id="${id}" data-k="start" value="${toDateInput(row.start)}"/></td>
+        <td><input class="wDate" type="date" data-id="${id}" data-k="end"   value="${toDateInput(row.end)}"/></td>
+
+        <td>
+          <select class="wSel" data-id="${id}" data-k="status">
+            <option value="auto" ${row.status==="auto"?"selected":""}>auto</option>
+            <option value="fermenting" ${row.status==="fermenting"?"selected":""}>fermenting</option>
+            <option value="ready" ${row.status==="ready"?"selected":""}>ready</option>
+          </select>
+        </td>
+
+        <td>
+          <div class="center">
+            <input class="chk" type="checkbox" data-id="${id}" data-k="limited" ${row.limited ? "checked":""}/>
+          </div>
+        </td>
+
+        <td>
+          <div class="rowActions">
+            <button class="mini danger" data-act="del" data-id="${id}">删除</button>
+          </div>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    }
+  }
+
+  // ====== events
+  document.addEventListener("input", (e)=>{
+    const t = e.target;
+    if(!t || !t.dataset) return;
+    const id = t.dataset.id;
+    const k  = t.dataset.k;
+    if(!id || !k) return;
+    if(!state[id]) state[id] = normalizeRow({});
+    state[id][k] = t.value;
   });
-  // keep sort
-  state.rows.sort((a,b)=>{
-    const ma = /^F(\d+)$/i.exec(a.id||"");
-    const mb = /^F(\d+)$/i.exec(b.id||"");
-    if(ma && mb) return Number(ma[1]) - Number(mb[1]);
-    if(ma) return -1;
-    if(mb) return 1;
-    return (a.id||"").localeCompare(b.id||"");
+
+  document.addEventListener("change", (e)=>{
+    const t = e.target;
+    if(!t || !t.dataset) return;
+    const id = t.dataset.id;
+    const k  = t.dataset.k;
+    if(!id || !k) return;
+    if(!state[id]) state[id] = normalizeRow({});
+    if(t.type === "checkbox") state[id][k] = !!t.checked;
+    else state[id][k] = t.value;
   });
-  render();
-  setDirty(true);
-  toast("已新增发酵罐", id);
-}
 
-function deleteSelected(){
-  const before = state.rows.length;
-  state.rows = state.rows.filter(r => !r.selected);
-  const after = state.rows.length;
-  if(after === before){
-    toast("未选中任何行", "勾选左侧“选”后再删除。");
-    return;
+  document.addEventListener("click", (e)=>{
+    const btn = e.target.closest("button[data-act]");
+    if(!btn) return;
+    const act = btn.dataset.act;
+    const id  = btn.dataset.id;
+    if(act === "del"){
+      if(!id) return;
+      if(!confirm(`删除 ${id} ？`)) return;
+      delete state[id];
+      render();
+      toast(`已删除 ${id}`, true);
+    }
+  });
+
+  // ====== load/save
+  async function apiLoad(){
+    try{
+      const res = await fetch(LOAD_URL, { cache:"no-store" });
+      const data = await res.json();
+      state = data || {};
+      render();
+      toast("已从共享数据源加载", true);
+    }catch(err){
+      toast("加载失败：/api/load", false);
+    }
   }
-  render();
-  setDirty(true);
-  toast("已删除", `删除 ${before-after} 条`);
-}
 
-document.getElementById("btnLoad").onclick = apiLoad;
-document.getElementById("btnSave").onclick = apiSave;
-document.getElementById("btnAdd").onclick = addRow;
-document.getElementById("btnDelete").onclick = deleteSelected;
-document.getElementById("btnRelogin").onclick = ()=>{
-  setPass("");
-  showLogin();
-};
+  async function apiSave(){
+    try{
+      if(!ADMIN_PASS){
+        toast("未登录：请刷新页面重新输入密码", false);
+        return;
+      }
+      // 写回前做一次 normalize
+      const out = {};
+      for(const [id, row] of Object.entries(state || {})){
+        out[id] = normalizeRow(row);
+      }
 
-document.getElementById("btnLoginCancel").onclick = ()=>{
-  // 你要求“必须登录”，所以取消等于不让进
-  toast("需要登录才能进入", "请输入管理员密码。", 3200);
-};
-document.getElementById("btnLoginOk").onclick = ()=>{
-  const p = (document.getElementById("passInput").value || "").trim();
-  if(!p){
-    toast("密码不能为空", "请输入管理员密码。");
-    return;
+      const res = await fetch(SAVE_URL, {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "x-admin-pass": ADMIN_PASS
+        },
+        body: JSON.stringify(out)
+      });
+
+      const j = await res.json().catch(()=> ({}));
+      if(!res.ok || j.ok === false){
+        setAuthUI(false);
+        toast("保存失败：密码错误或无权限（Unauthorized）", false);
+        return;
+      }
+      setAuthUI(true);
+      toast("已保存到共享数据源", true);
+    }catch(err){
+      toast("保存失败：/api/save", false);
+    }
   }
-  setPass(p);
-  hideLogin();
-  toast("登录成功", "现在可以加载/编辑并保存。");
-};
 
-(function boot(){
-  // 强制登录：进入页面就要求输入密码
-  showLogin();
-  // 你也可以选择：登录后自动加载
-  // 这里不自动加载，避免你误会“没登录就有内容”
-})();
+  // ====== add
+  function addTank(){
+    const id = nextId();
+    state[id] = normalizeRow({
+      show:true,
+      beer:"",
+      style:"",
+      abv:"",
+      ibu:"",
+      capacity:"150L",
+      temp:"",
+      start:"",
+      end:"",
+      status:"auto",
+      limited:false
+    });
+    render();
+    toast(`已新增 ${id}`, true);
+    // 滚动到最底
+    const wrap = document.querySelector(".tableWrap");
+    if(wrap) wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  // ====== date helpers
+  function toDateInput(v){
+    if(!v) return "";
+    // 支持 "YYYY/MM/DD" 或 "YYYY-MM-DD"
+    const s = String(v).trim();
+    const m1 = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/.exec(s);
+    if(m1){
+      const y = m1[1];
+      const mo = String(m1[2]).padStart(2,"0");
+      const d  = String(m1[3]).padStart(2,"0");
+      return `${y}-${mo}-${d}`;
+    }
+    // 其它格式尝试 Date
+    const d = new Date(s);
+    if(isNaN(d)) return "";
+    const y = d.getFullYear();
+    const mo = String(d.getMonth()+1).padStart(2,"0");
+    const da = String(d.getDate()).padStart(2,"0");
+    return `${y}-${mo}-${da}`;
+  }
+
+  function escapeHtml(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ====== wire buttons
+  document.getElementById("btnLoad").addEventListener("click", apiLoad);
+  document.getElementById("btnSave").addEventListener("click", apiSave);
+  document.getElementById("btnAdd").addEventListener("click", addTank);
+
+  // ====== login on entry
+  (function init(){
+    ADMIN_PASS = prompt("请输入后台写入密码（用于保存）") || "";
+    setAuthUI(!!ADMIN_PASS);
+    // 页面进来先加载一次
+    apiLoad();
+  })();
 </script>
 </body>
 </html>
