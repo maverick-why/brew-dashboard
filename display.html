@@ -3,26 +3,28 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>时光酿造所 · 发酵监控 / Brewing Dashboard</title>
+<title>时光酿造所 · 发酵监控</title>
 
 <style>
 :root{
   --bg0:#070b12;
   --bg1:#0b1220;
+
   --card:#0f1726;
-  --line:rgba(255,255,255,.08);
+  --line:rgba(255,255,255,.09);
+
   --text:#eaf0ff;
-  --sub:rgba(234,240,255,.66);
+  --sub:rgba(234,240,255,.62);
 
   --green:#4ade80;
   --yellow:#ffcc00;
   --pink:#ff5c8a;
 
-  --bar1:#7bd3ff;
-  --bar2:#2b80ff;
+  --blue1:#7bd3ff;
+  --blue2:#2b80ff;
 
-  --r:22px;
-  --shadow: 0 18px 48px rgba(0,0,0,.62);
+  --r:18px;
+  --shadow: 0 14px 34px rgba(0,0,0,.55);
 }
 
 *{box-sizing:border-box}
@@ -32,162 +34,185 @@ body{
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
   color:var(--text);
   background:
-    radial-gradient(1100px 700px at 18% 10%, rgba(70,120,255,.16), transparent 60%),
-    radial-gradient(950px 650px at 86% 26%, rgba(0,255,180,.12), transparent 60%),
-    radial-gradient(900px 650px at 55% 92%, rgba(255,92,138,.12), transparent 60%),
+    radial-gradient(1100px 650px at 18% 10%, rgba(79,140,255,.13), transparent 62%),
+    radial-gradient(900px 600px at 84% 26%, rgba(0,255,180,.11), transparent 62%),
+    radial-gradient(900px 600px at 52% 92%, rgba(255,92,138,.10), transparent 62%),
     linear-gradient(180deg, var(--bg1), var(--bg0));
 }
 
-/* ===== Header ===== */
 header{
   position:sticky; top:0; z-index:20;
-  padding:18px 16px 14px;
-  padding-top: calc(18px + env(safe-area-inset-top));
-  backdrop-filter: blur(12px);
-  background: linear-gradient(180deg, rgba(10,16,28,.88), rgba(10,16,28,.62));
+  padding:14px 14px 12px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(10,16,28,.90), rgba(10,16,28,.62));
   border-bottom:1px solid var(--line);
 }
-.h-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:14px; }
-.h-title{ font-weight:900; letter-spacing:.3px; line-height:1.08; font-size: clamp(20px, 3.8vw, 34px); }
-.h-sub{ margin-top:6px; color:var(--sub); font-size:12px; letter-spacing:.2px; }
-.h-time{
+
+.hrow{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+}
+.htitle{
+  font-weight:950;
+  letter-spacing:.4px;
+  line-height:1.1;
+  font-size: clamp(18px, 3.3vw, 28px);
+}
+.hsub{
+  margin-top:6px;
+  color:var(--sub);
+  font-size:12px;
+  letter-spacing:.2px;
+}
+.htime{
   white-space:nowrap;
   font-variant-numeric: tabular-nums;
   color:rgba(234,240,255,.78);
   font-weight:800;
-  padding:10px 12px;
+  padding:8px 10px;
   border:1px solid var(--line);
   border-radius:999px;
-  background:rgba(255,255,255,.04);
+  background:rgba(255,255,255,.03);
+  font-size:12px;
 }
 
-/* ===== Layout ===== */
 main{
   max-width: 1100px;
   margin: 0 auto;
-  padding: 18px 14px 28px;
-  padding-bottom: calc(28px + env(safe-area-inset-bottom));
-}
-.list{ display:grid; grid-template-columns: 1fr; gap:14px; }
-@media (min-width: 860px){
-  .list{ grid-template-columns: repeat(2, minmax(360px, 1fr)); gap:16px; }
-}
-@media (min-width: 1180px){
-  .list{ grid-template-columns: repeat(3, minmax(340px, 1fr)); gap:18px; }
+  padding: 14px 12px 22px;
+  padding-bottom: calc(22px + env(safe-area-inset-bottom));
 }
 
-/* ===== Card ===== */
+.list{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+}
+@media (min-width: 860px){
+  .list{ grid-template-columns: repeat(2, minmax(360px, 1fr)); gap:14px; }
+}
+@media (min-width: 1180px){
+  .list{ grid-template-columns: repeat(3, minmax(340px, 1fr)); gap:16px; }
+}
+
+/* ===== Card (compact) ===== */
 .card{
   position:relative;
   overflow:hidden;
   border-radius: var(--r);
   background:
-    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0) 45%),
-    linear-gradient(135deg, rgba(123,211,255,.06), rgba(74,222,128,.05) 30%, rgba(255,92,138,.05) 70%, rgba(255,255,255,0) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0) 48%),
+    linear-gradient(135deg, rgba(123,211,255,.06), rgba(74,222,128,.04) 35%, rgba(255,92,138,.05) 75%, rgba(255,255,255,0) 100%),
     var(--card);
   border:1px solid rgba(255,255,255,.10);
   box-shadow: var(--shadow);
 }
+
 .card::before{
   content:"";
   position:absolute;
-  inset:-90px -120px auto auto;
-  width:260px; height:260px;
-  background: radial-gradient(circle at 30% 30%, rgba(123,211,255,.24), transparent 62%);
-  transform: rotate(15deg);
-  pointer-events:none;
-}
-.card::after{
-  content:"";
-  position:absolute;
-  inset:auto auto -120px -120px;
-  width:260px; height:260px;
-  background: radial-gradient(circle at 65% 35%, rgba(255,92,138,.14), transparent 64%);
+  inset:-80px -110px auto auto;
+  width:240px; height:240px;
+  background: radial-gradient(circle at 30% 30%, rgba(123,211,255,.20), transparent 62%);
+  transform: rotate(18deg);
   pointer-events:none;
 }
 
-/* ===== Head ===== */
+.ribbon{
+  position:absolute;
+  top:10px;
+  left:-38px;          /* left side */
+  width:120px;
+  transform: rotate(-45deg);
+  background: linear-gradient(180deg, rgba(255,92,138,1), rgba(255,92,138,.88));
+  color:#fff;
+  font-weight:950;
+  text-align:center;
+  padding:7px 0;
+  letter-spacing:.6px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.50);
+  z-index:6;
+  pointer-events:none;
+}
+.ribbon span{ display:block; font-size:12px; line-height:1; }
+
 .cardHead{
-  position:relative;
-  padding:14px 14px 12px;
-  border-bottom:1px solid var(--line);
+  padding:12px 14px 8px;
+  border-bottom:1px solid rgba(255,255,255,.07);
   background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
 }
-.headRow{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
 
-.leftBlock{
+.headRow{
   display:flex;
-  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.leftTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
   min-width:0;
 }
 
-/* 数字更大 + 居中 */
 .tankNo{
-  width:44px;
-  flex:0 0 44px;
+  width:38px;
+  height:38px;
+  border-radius:12px;
   display:flex;
-  align-items:center;       /* 垂直居中 */
-  justify-content:center;   /* 水平居中 */
+  align-items:center;
+  justify-content:center;
   font-weight:950;
-  font-size:34px;           /* 更大 */
+  font-size:24px;     /* bigger */
   line-height:1;
-  color:rgba(234,240,255,.72);
-  text-shadow: 0 10px 26px rgba(0,0,0,.55);
+  color:rgba(234,240,255,.90);
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  flex:0 0 auto;
 }
 
-.primary{ min-width:0; }
+.nameWrap{ min-width:0; }
 .beerName{
   font-weight:950;
-  letter-spacing:.3px;
+  font-size:18px;
   line-height:1.05;
-  font-size:22px;
+  letter-spacing:.2px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 .beerStyle{
-  margin-top:8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
+  margin-top:5px;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.6px;
+  color:rgba(234,240,255,.70);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.beerStyle .pill{
-  flex:0 0 auto;
-  font-size:12px;
-  font-weight:900;
-  color:rgba(234,240,255,.88);
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
-  border-radius:999px;
-  padding:6px 10px;
-}
 
-.rightBlock{ flex:0 0 auto; display:flex; align-items:flex-start; justify-content:flex-end; }
-
-/* 状态灯：往左挪 + 限量时再让位 */
 .badge{
-  min-width:132px;
+  min-width:108px;
   text-align:center;
-  border-radius:14px;
-  padding:10px 10px 9px;
+  border-radius:12px;
+  padding:7px 8px 6px;
   font-weight:950;
   color:#0b0f18;
-  box-shadow: 0 12px 26px rgba(0,0,0,.45);
-  border:1px solid rgba(0,0,0,.18);
-  transform-origin: center;
-  margin-right: 8px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  border:1px solid rgba(0,0,0,.15);
+  flex:0 0 auto;
 }
-.card.limited .badge{ margin-right: 54px; }
-
-.badge .b1{ font-size:16px; line-height:1.05; }
+.badge .b1{ font-size:13px; line-height:1.05; }
 .badge .b2{
-  margin-top:6px;
-  font-size:16px;
+  margin-top:4px;
+  font-size:14px;
   line-height:1;
-  letter-spacing:.9px;
+  letter-spacing:.8px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -200,8 +225,8 @@ main{
   animation: wobble 1.05s ease-in-out infinite;
 }
 @keyframes breathing{
-  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.28), 0 12px 26px rgba(0,0,0,.45); transform: translateY(0); }
-  50%     { box-shadow: 0 0 0 12px rgba(74,222,128,.10), 0 14px 32px rgba(0,0,0,.50); transform: translateY(-1px); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
+  50%     { box-shadow: 0 0 0 10px rgba(74,222,128,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
 }
 @keyframes wobble{
   0%   { transform: rotate(-3deg) translateY(0); }
@@ -209,80 +234,50 @@ main{
   100% { transform: rotate(-3deg) translateY(0); }
 }
 
-/* 斜标：更贴角落，减少压住灯 */
-.ribbon{
-  position:absolute;
-  top:10px;
-  right:-56px;
-  width:170px;
-  transform: rotate(45deg);
-  background: linear-gradient(180deg, rgba(255,92,138,1), rgba(255,92,138,.86));
-  color:#fff;
-  font-weight:950;
-  text-align:center;
-  padding:7px 0;
-  letter-spacing:.6px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.52);
-  z-index:6;
-  pointer-events:none;
-}
-.ribbon span{ display:block; line-height:1.05; font-size:12px; }
-
-/* ===== Body ===== */
-.cardBody{ padding: 12px 14px 12px; }
-
-/* 四宫格 => 两行（ABV/IBU + Capacity/Temp） */
-.meta{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px 12px;
-}
-.field small{
-  display:block;
-  color:rgba(234,240,255,.55);
-  font-size:11px;
-  margin-bottom:4px;
-  letter-spacing:.2px;
-}
-.field .v{
-  font-weight:900;
-  letter-spacing:.2px;
-  word-break: break-word;
-  font-variant-numeric: tabular-nums;
+.cardBody{
+  padding: 8px 14px 10px;
 }
 
-/* ===== Progress row：Start | Bar | End ===== */
-.progressWrap{ margin-top:12px; }
-
-.progressRow{
-  display:grid;
-  grid-template-columns: 64px 1fr 64px;
-  gap:10px;
+/* One-line metrics */
+.metrics{
+  display:flex;
   align-items:center;
-}
-
-.sideDate{
-  color:rgba(234,240,255,.78);
+  gap:8px;
+  flex-wrap:wrap;
   font-weight:900;
-  font-size:12px;
-  text-align:left;
-  white-space:nowrap;
+  font-size:13px;
+  color:rgba(234,240,255,.90);
+  margin: 2px 0 8px;
 }
-.sideDate.end{ text-align:right; }
-.sideDate small{
-  display:block;
-  color:rgba(234,240,255,.48);
-  font-weight:800;
-  font-size:10px;
-  letter-spacing:.3px;
-  margin-bottom:2px;
+.metrics span{
+  white-space:nowrap;
+  color:rgba(234,240,255,.88);
+}
+.metrics .dot{
+  color:rgba(234,240,255,.35);
+  font-weight:900;
 }
 
+/* Start | Bar | End (compact) */
+.progressRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--sub);
+}
+.date{
+  width:44px;
+  text-align:center;
+  font-variant-numeric: tabular-nums;
+  font-weight:850;
+}
 .progressBar{
+  flex:1;
   position:relative;
-  height:16px;
+  height:10px; /* thinner */
   border-radius:999px;
-  background: rgba(255,255,255,.07);
+  background: rgba(255,255,255,.08);
   overflow:hidden;
   border:1px solid rgba(255,255,255,.08);
 }
@@ -290,10 +285,9 @@ main{
   display:block;
   height:100%;
   width:0%;
-  background: linear-gradient(90deg, var(--bar1), var(--bar2));
+  background: linear-gradient(90deg, var(--blue1), var(--blue2));
   border-radius:999px;
   transition: width .8s ease;
-  box-shadow: 0 10px 22px rgba(0,0,0,.35) inset;
 }
 .progressBar > b{
   position:absolute;
@@ -301,17 +295,15 @@ main{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:12px;
+  font-size:11px;
   font-weight:950;
   color:rgba(255,255,255,.92);
-  text-shadow: 0 1px 10px rgba(0,0,0,.55);
+  text-shadow: 0 1px 8px rgba(0,0,0,.45);
 }
 
-/* 空态 */
 .empty{
-  max-width: 980px;
-  margin: 18px auto 0;
-  padding: 18px 16px;
+  margin: 14px auto 0;
+  padding: 16px 14px;
   border-radius: var(--r);
   border:1px dashed rgba(255,255,255,.18);
   background: rgba(255,255,255,.03);
@@ -325,31 +317,17 @@ footer{
   color:rgba(234,240,255,.55);
   font-size:13px;
 }
-
-@media (max-width: 560px){
-  header{ padding:14px 14px 12px; padding-top: calc(14px + env(safe-area-inset-top)); }
-  .h-row{ align-items:flex-start; }
-  .h-time{ padding:8px 10px; font-size:12px; }
-  main{ padding: 14px 12px 22px; padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
-
-  .tankNo{ width:46px; flex:0 0 46px; font-size:36px; } /* 手机上再大一点 */
-  .beerName{ font-size:20px; }
-  .badge{ min-width:126px; padding:9px 9px 8px; margin-right: 6px; }
-  .card.limited .badge{ margin-right: 52px; }
-
-  .progressRow{ grid-template-columns: 60px 1fr 60px; }
-}
 </style>
 </head>
 
 <body>
 <header>
-  <div class="h-row">
+  <div class="hrow">
     <div>
-      <div class="h-title">时光酿造所 · 发酵监控 / Brewing Dashboard</div>
-      <div class="h-sub">实时读取共享数据源（Redis） · 手机端列表化展示</div>
+      <div class="htitle">时光酿造所 · 发酵监控</div>
+      <div class="hsub">共享数据源实时展示 · 紧凑列表</div>
     </div>
-    <div class="h-time" id="time">--</div>
+    <div class="htime" id="time">--</div>
   </div>
 </header>
 
@@ -357,7 +335,7 @@ footer{
   <div class="list" id="list"></div>
   <div class="empty" id="empty" style="display:none;">
     暂无数据（共享数据源为空或未勾选“展示”）。<br/>
-    请在后台 <b>admin.html</b> 填写并保存后刷新本页。
+    请在后台 <b>admin.html</b> 勾选“展示”并保存后刷新本页。
   </div>
 </main>
 
@@ -366,18 +344,20 @@ footer{
 <script>
 const LOAD_URL = "/api/load";
 const POLL_MS  = 15000;
+const READY_THRESHOLD = 95; // >=95% -> 黄灯
 
 function pad2(n){ return String(n).padStart(2,"0"); }
 function nowText(){
   const d = new Date();
   return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
+function tick(){ document.getElementById("time").textContent = nowText(); }
 
-function formatMD(dateStr){
-  if(!dateStr) return "--";
+function formatMDshort(dateStr){
+  if(!dateStr) return "--/--";
   const d = new Date(dateStr);
-  if(isNaN(d)) return "--";
-  return `${d.getMonth()+1}月${d.getDate()}日`;
+  if(isNaN(d)) return "--/--";
+  return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
 }
 
 function daysSince(startStr){
@@ -386,7 +366,7 @@ function daysSince(startStr){
   if(isNaN(s)) return null;
   const ms = Date.now() - s.getTime();
   if(ms < 0) return 0;
-  return Math.floor(ms / 86400000) + 1;
+  return Math.floor(ms / 86400000) + 1; // DAY 1 起算
 }
 
 function calcProgress(startStr, endStr){
@@ -399,18 +379,21 @@ function calcProgress(startStr, endStr){
   return Math.round(p);
 }
 
-function resolveStatus(row){
+/** 状态自动化：
+ * - 若 now >= end -> ready
+ * - 若 progress >= 95 -> ready
+ * - 否则 fermenting
+ * - 支持 row.status 强制（ready/fermenting）
+ */
+function resolveStatus(row, progress){
   const st = (row.status || "auto").toLowerCase();
   if(st === "fermenting" || st === "ready") return st;
+
   const end = new Date(row.end);
   if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
-  return "fermenting";
-}
+  if(typeof progress === "number" && progress >= READY_THRESHOLD) return "ready";
 
-function statusText(status){
-  return status === "ready"
-    ? { cn:"即将开罐" }
-    : { cn:"发酵中" };
+  return "fermenting";
 }
 
 function safe(v, fallback="--"){
@@ -418,21 +401,30 @@ function safe(v, fallback="--"){
   return String(v);
 }
 
+function toABV(v){
+  const s = safe(v);
+  if(s === "--") return s;
+  if(String(s).includes("%")) return String(s);
+  const n = Number(String(s).trim());
+  if(!Number.isNaN(n)) return `${n}%`;
+  return String(s);
+}
+
+function toTemp(v){
+  const s = safe(v);
+  if(s === "--") return "--℃";
+  const t = String(s).trim();
+  if(t.includes("°")) return t;
+  const n = Number(t);
+  if(!Number.isNaN(n)) return `${n.toFixed(1)}℃`;
+  return t;
+}
+
 function tankNoFromId(id){
   const m = /^F(\d+)$/i.exec(id || "");
   if(m) return Number(m[1]);
   const n = String(id||"").match(/\d+/);
   return n ? Number(n[0]) : 0;
-}
-
-function formatABV(v){
-  const s = safe(v);
-  if(s === "--") return s;
-  // 如果已经带%就不重复加
-  if(String(s).includes("%")) return String(s);
-  // 纯数字 / 数字字符串 => 加%
-  if(!isNaN(Number(s))) return `${s}%`;
-  return String(s);
 }
 
 function render(dataObj){
@@ -460,93 +452,69 @@ function render(dataObj){
   });
 
   for(const item of entries){
-    const status = resolveStatus(item);
-    const stText = statusText(status);
-    const day = daysSince(item.start);
     const progress = calcProgress(item.start, item.end);
+    const status = resolveStatus(item, progress);
+    const day = daysSince(item.start);
     const limited = item.limited === true;
 
     const badgeClass = status === "ready" ? "ready" : "fermenting";
-    const dayText = (day === null) ? "" : `DAY ${day}`;
+    const badgeCN = status === "ready" ? "即将开罐" : "发酵中";
+    const dayText = (day === null) ? "DAY --" : `DAY ${day}`;
 
     const beerName = safe(item.beer, "（未命名）");
-    const beerStyle = safe(item.style, "--");
+    const style = safe(item.style, "--");
 
-    const abv = formatABV(item.abv);
+    const abv = toABV(item.abv);
     const ibu = safe(item.ibu);
     const cap = safe(item.capacity);
-    const temp = safe(item.temp);
+    const temp = toTemp(item.temp);
 
-    const start = formatMD(item.start);
-    const end   = formatMD(item.end);
+    const start = formatMDshort(item.start);
+    const end   = formatMDshort(item.end);
 
     const no = tankNoFromId(item.id);
 
     const card = document.createElement("div");
-    card.className = "card" + (limited ? " limited" : "");
+    card.className = "card";
 
     card.innerHTML = `
-      ${limited ? `<div class="ribbon"><span>限量款</span><span>Limited</span></div>` : ""}
+      ${limited ? `<div class="ribbon"><span>Limited</span></div>` : ""}
 
       <div class="cardHead">
         <div class="headRow">
-          <div class="leftBlock">
+          <div class="leftTitle">
             <div class="tankNo">${no || ""}</div>
-            <div class="primary">
-              <div class="beerName">${beerName}</div>
-              <div class="beerStyle">
-                <span class="pill">${beerStyle}</span>
-              </div>
+            <div class="nameWrap">
+              <div class="beerName" title="${escapeHtml(beerName)}">${escapeHtml(beerName)}</div>
+              <div class="beerStyle" title="${escapeHtml(style)}">${escapeHtml(style)}</div>
             </div>
           </div>
 
-          <div class="rightBlock">
-            <div class="badge ${badgeClass}">
-              <div class="b1">${stText.cn}</div>
-              <div class="b2">${dayText}</div>
-            </div>
+          <div class="badge ${badgeClass}">
+            <div class="b1">${badgeCN}</div>
+            <div class="b2">${dayText}</div>
           </div>
         </div>
       </div>
 
       <div class="cardBody">
-        <div class="meta">
-          <div class="field">
-            <small>ABV</small>
-            <div class="v">${abv}</div>
-          </div>
-          <div class="field">
-            <small>IBU</small>
-            <div class="v">${ibu}</div>
-          </div>
-
-          <div class="field">
-            <small>产量</small>
-            <div class="v">${cap}</div>
-          </div>
-          <div class="field">
-            <small>温度</small>
-            <div class="v">${temp}</div>
-          </div>
+        <div class="metrics" aria-label="metrics">
+          <span>ABV ${escapeHtml(abv)}</span>
+          <span class="dot">·</span>
+          <span>IBU ${escapeHtml(ibu)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(cap)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(temp)}</span>
         </div>
 
-        <div class="progressWrap">
-          <div class="progressRow">
-            <div class="sideDate">
-              <small>入罐</small>
-              ${start}
-            </div>
-
-            <div class="progressBar">
-              <i style="width:${progress}%"></i>
-              <b>${progress}%</b>
-            </div>
-
-            <div class="sideDate end">
-              <small>开罐</small>
-              ${end}
-            </div>
+        <div class="progressRow">
+          <div class="date">${start}</div>
+          <div class="progressBar" aria-label="progress">
+            <i style="width:${progress}%"></i>
+            <b>${progress}%</b>
           </div>
+          <div class="date">${end}</div>
         </div>
       </div>
     `;
@@ -555,18 +523,18 @@ function render(dataObj){
   }
 }
 
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
 async function load(){
   try{
-    const res = await fetch("/api/load", { cache:"no-store" });
+    const res = await fetch(LOAD_URL, { cache:"no-store" });
     const data = await res.json();
     render(data || {});
   }catch(e){
     render({});
   }
-}
-
-function tick(){
-  document.getElementById("time").textContent = nowText();
 }
 
 tick();
