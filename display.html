@@ -27,14 +27,13 @@
   --shadow: 0 14px 34px rgba(0,0,0,.55);
 }
 
-/* logo 区域 */
+/* logo */
 .logo{
-  height:50px;     /* 可以按需要再调高低 */
+  height:38px;     /* 按你之前大小 */
   width:auto;
   border-radius:8px;
 }
 
-/* 原来就有的通用样式 */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -48,7 +47,6 @@ body{
     linear-gradient(180deg, var(--bg1), var(--bg0));
 }
 
-/* 头部：LOGO 和时间都居中 */
 header{
   position:sticky; top:0; z-index:20;
   padding:14px 14px 12px;
@@ -58,27 +56,25 @@ header{
   border-bottom:1px solid var(--line);
 }
 
-.header-inner{
+/* 头部左右布局：logo 左，时间右 */
+.h-row{
   display:flex;
-  flex-direction:column;
   align-items:center;
-  justify-content:center;
-  gap:8px;
+  justify-content:space-between;
+  gap:12px;
 }
 
-.h-time{
+.htime{
   white-space:nowrap;
   font-variant-numeric: tabular-nums;
   color:rgba(234,240,255,.78);
   font-weight:800;
-  padding:6px 12px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  background:rgba(255,255,255,.03);
-  font-size:12px;
+  padding:8px 10px;                 /* 之前的 */
+  border:1px solid var(--line);     /* 之前的 */
+  border-radius:999px;              /* 之前的 */
+  background:rgba(255,255,255,.03); /* 之前的 */
+  font-size:12px;                   /* 之前的 */
 }
-
-/* 下面开始是卡片 / 列表等原有样式，保持不变 */
 
 main{
   max-width: 1100px;
@@ -314,11 +310,9 @@ footer{
 
 <body>
 <header>
-  <div class="header-inner">
-    <!-- LOGO 居中显示 -->
+  <div class="h-row">
     <img src="/logo.png" alt="时光酿造所 Logo" class="logo" />
-    <!-- 当前时间显示在 LOGO 下方 -->
-    <div class="h-time" id="time">--</div>
+    <div class="htime" id="time">--</div>
   </div>
 </header>
 
@@ -343,8 +337,8 @@ const TEMP_TICK_MS = 5000;         // 每 5 秒刷新
 const TEMP_STEPS = [0.1, 0.2];     // 每次变化 0.1 或 0.2
 
 // 每个罐独立温度（仅前端显示）
-const tempState = new Map();       // id -> number
-let lastDataCache = {};            // 保存最新数据，用于温度 tick 时可重绘温度文本
+const tempState = new Map(); /* id -> number */
+let lastDataCache = {};      /* 最新数据缓存 */
 
 function pad2(n){ return String(n).padStart(2,"0"); }
 function nowText(){
@@ -356,12 +350,10 @@ function tickClock(){ document.getElementById("time").textContent = nowText(); }
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
-
 function safe(v, fallback="--"){
   if(v === undefined || v === null || v === "") return fallback;
   return String(v);
 }
-
 function toABV(v){
   const s = safe(v);
   if(s === "--") return s;
@@ -378,12 +370,8 @@ function parseTempNumber(v){
   if(Number.isNaN(n)) return null;
   return n;
 }
-function clampTemp(x){
-  return Math.max(TEMP_MIN, Math.min(TEMP_MAX, x));
-}
-function fmtTemp(x){
-  return `${Number(x).toFixed(1)}℃`;
-}
+function clampTemp(x){ return Math.max(TEMP_MIN, Math.min(TEMP_MAX, x)); }
+function fmtTemp(x){ return `${Number(x).toFixed(1)}℃`; }
 
 function ensureTemp(id, backendTemp){
   if(tempState.has(id)) return tempState.get(id);
@@ -392,23 +380,16 @@ function ensureTemp(id, backendTemp){
   tempState.set(id, init);
   return init;
 }
-
 function bumpTemp(id){
   const cur = tempState.get(id);
   if(cur === undefined) return;
-
   const step = TEMP_STEPS[Math.floor(Math.random()*TEMP_STEPS.length)];
   const dir = Math.random() < 0.5 ? -1 : 1;
   let next = cur + dir * step;
-
-  // 触边就反弹
   if(next < TEMP_MIN) next = cur + step;
   if(next > TEMP_MAX) next = cur - step;
-
   next = clampTemp(next);
-  // 一位小数对齐
   next = Math.round(next * 10) / 10;
-
   tempState.set(id, next);
 }
 
@@ -418,7 +399,6 @@ function formatMDshort(dateStr){
   if(isNaN(d)) return "--/--";
   return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
 }
-
 function daysSince(startStr){
   if(!startStr) return null;
   const s = new Date(startStr);
@@ -427,7 +407,6 @@ function daysSince(startStr){
   if(ms < 0) return 0;
   return Math.floor(ms / 86400000) + 1;
 }
-
 function calcProgress(startStr, endStr){
   const s = new Date(startStr).getTime();
   const e = new Date(endStr).getTime();
@@ -437,17 +416,14 @@ function calcProgress(startStr, endStr){
   p = Math.max(0, Math.min(100, p));
   return Math.round(p);
 }
-
 function resolveStatus(row, progress){
   const st = (row.status || "auto").toLowerCase();
   if(st === "fermenting" || st === "ready") return st;
-
   const end = new Date(row.end);
   if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
   if(typeof progress === "number" && progress >= READY_THRESHOLD) return "ready";
   return "fermenting";
 }
-
 function tankNoFromId(id){
   const m = /^F(\d+)$/i.exec(id || "");
   if(m) return Number(m[1]);
@@ -457,7 +433,6 @@ function tankNoFromId(id){
 
 function render(dataObj){
   lastDataCache = dataObj || {};
-
   const list = document.getElementById("list");
   const empty = document.getElementById("empty");
   list.innerHTML = "";
@@ -557,16 +532,13 @@ function render(dataObj){
 }
 
 function tickTemps(){
-  // 只更新当前“show=true”的那些罐
   const entries = Object.entries(lastDataCache || {})
     .map(([id, row]) => ({ id, ...(row||{}) }))
     .filter(x => x.show === true);
 
   for(const item of entries){
     const id = item.id;
-    // 确保有初始值
     ensureTemp(id, item.temp);
-    // 变化
     bumpTemp(id);
 
     const el = document.getElementById(`temp-${id}`);
@@ -591,8 +563,6 @@ setInterval(tickClock, 1000);
 
 load();
 setInterval(load, POLL_MS);
-
-// 温度：每 5 秒微波动一次（不请求后端）
 setInterval(tickTemps, TEMP_TICK_MS);
 </script>
 </body>
