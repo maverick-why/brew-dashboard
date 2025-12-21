@@ -17,12 +17,15 @@ const FINAL_MAX = 5.0;
 // 温度状态单独存（避免写回主数据，且更不容易被人从前端推断）
 const TEMP_STATE_KEY = "brew_dash_temp_state_v1";
 
-// 你想要“每次刷新变化 ≤ 0.3”，但不需要每秒变动；这里按 60 秒一个桶更新
-const TEMP_BUCKET_MS = 60 * 1000;
+// 更新频率：建议 30 分钟一个桶（更像真实设备，不会每分钟跳）
+// 你前端 15 秒轮询没关系：同一桶内温度保持不变
+const TEMP_BUCKET_MS = 30 * 60 * 1000;
 
-// 每次更新可选步长（满足 ≤0.3）
-// 允许轻微回弹 +0.1（更真实），但整体仍受目标曲线约束
-const STEP_CHOICES = [-0.3, -0.2, -0.1, 0, +0.1];
+// “每天最多降 2℃”硬约束（关键！）
+const MAX_DROP_PER_DAY = 2.0;
+
+// 允许轻微回弹（更真实）：每天最多回弹 0.4℃
+const MAX_RISE_PER_DAY = 0.4;
 
 let redis;
 function getRedis() {
@@ -91,7 +94,6 @@ function hash32(str) {
 function rngFromSeed(seedU32) {
   let x = seedU32 >>> 0;
   return () => {
-    // xorshift32
     x ^= x << 13;
     x ^= x >>> 17;
     x ^= x << 5;
@@ -124,7 +126,7 @@ function formatMDshort(dateStr) {
   return `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())}`;
 }
 
-// 平滑目标曲线：cosine easing（平滑且从一开始就会有变化）
+// 平滑曲线：cosine easing（平滑、自然）
 function cosineEase01(t01) {
   const t = clamp(t01, 0, 1);
   return (1 - Math.cos(Math.PI * t)) / 2;
@@ -166,9 +168,12 @@ async function setTempState(r, id, st) {
   await r.hset(TEMP_STATE_KEY, id, JSON.stringify(st));
 }
 
-// 生成“真实”温度：
-// - 降温期：受目标曲线约束，且每次变化 <=0.3，允许回弹 +0.1
-// - 非降温期：保持 setpoint（不乱抖）
+/**
+ * 生成“真实故事”温度：
+ * - 非降温期：恒温 setpoint（18.2~19.9），不抖
+ * - 降温期（倒数10天起）：按平滑目标曲线下探到 4~5，且“每天降温 ≤ 2℃”
+ * - 超过 end：锁定 finalT，并显示“即将开罐”
+ */
 async function computeTempForTank(r, id, row, nowMs) {
   const startStr = safeStr(row.start, "");
   const endStr = safeStr(row.end, "");
@@ -176,118 +181,150 @@ async function computeTempForTank(r, id, row, nowMs) {
   const startMs = new Date(startStr).getTime();
   const endMs = new Date(endStr).getTime();
 
-  // 没有合法 end：就维持设定温度（或稳定 setpoint）
+  const startOk = Number.isFinite(startMs);
   const endOk = Number.isFinite(endMs);
 
+  // setpoint：优先用你后台填的温度（当作“设定温度”），否则每罐生成一个固定 setpoint
   const backendTemp = parseTempNumber(row.temp);
-  const setpoint = backendTemp !== null ? clamp(backendTemp, SETPOINT_MIN, SETPOINT_MAX) : makeStableSetpoint(id, startStr);
+  const setpoint =
+    backendTemp !== null
+      ? clamp(backendTemp, SETPOINT_MIN, SETPOINT_MAX)
+      : makeStableSetpoint(id, startStr);
+
+  // final：每罐固定 4.0~5.0
   const finalT = makeStableFinal(id, endStr);
 
+  // end 不合法：没法讲“倒数10天”故事，直接恒温
   if (!endOk) {
     return { tempText: fmtTemp(setpoint), badgeCN: "发酵中", statusOut: "fermenting" };
   }
 
-  // 冷却开始时间：end-10天，但不能早于 start
-  const coolStartMs = Math.max(endMs - COOL_WINDOW_MS, Number.isFinite(startMs) ? startMs : endMs - COOL_WINDOW_MS);
+  // 冷却开始时间：end-10天，但不早于 start（如果 start 无效，就按 end-10天）
+  const coolStartMs = Math.max(
+    endMs - COOL_WINDOW_MS,
+    startOk ? startMs : endMs - COOL_WINDOW_MS
+  );
 
-  // 是否处于降温期（含超过 end 的情况也继续显示降温中）
-  const isCooling = nowMs >= coolStartMs;
+  const inCooling = nowMs >= coolStartMs;
 
-  // 输出 badge & status（为了你前端黄色 badge：用 statusOut = "ready"）
-  const badgeCN = isCooling ? "降温中" : "发酵中";
-  const statusOut = isCooling ? "ready" : "fermenting";
+  // 文案规则：超过 end 显示“即将开罐”，否则降温期显示“降温中”
+  const isPastEnd = nowMs >= endMs;
+  const badgeCN = inCooling ? (isPastEnd ? "即将开罐" : "降温中") : "发酵中";
 
-  // 非降温期：保持 setpoint（真实：发酵恒温）
-  if (!isCooling) {
+  // 你前端黄色 badge：用 statusOut="ready"
+  const statusOut = inCooling ? "ready" : "fermenting";
+
+  // 非降温期：恒温
+  if (!inCooling) {
+    // 同时把温度状态初始化为 setpoint（避免旧状态影响）
+    const bucket0 = Math.floor(nowMs / TEMP_BUCKET_MS);
+    const st0 = {
+      setpoint,
+      finalT,
+      cur: setpoint,
+      lastBucket: bucket0,
+      endMs,
+      coolStartMs,
+    };
+    await setTempState(r, id, st0);
     return { tempText: fmtTemp(setpoint), badgeCN, statusOut };
   }
 
-  // 目标曲线：从 setpoint 平滑降到 finalT
+  // 降温期目标曲线（从 coolStart -> end）
   const denom = Math.max(1, endMs - coolStartMs);
-  const t01 = (nowMs - coolStartMs) / denom;
+  const t01 = (nowMs - coolStartMs) / denom; // 0~1（超过 end 会 >1）
   const k = cosineEase01(t01);
   const target = setpoint + (finalT - setpoint) * k;
 
-  // 当前桶：每 TEMP_BUCKET_MS 才更新一次（否则太“抖”）
+  // 当前桶
   const bucket = Math.floor(nowMs / TEMP_BUCKET_MS);
 
-  // 读状态
+  // 读温度状态
   let st = await getTempState(r, id);
 
   // 初始化状态
-  if (!st || typeof st.cur !== "number") {
+  if (!st || typeof st.cur !== "number" || typeof st.lastBucket !== "number") {
     st = {
       setpoint,
       finalT,
-      cur: setpoint,      // 内部不 round，让它能累积变化
+      cur: setpoint,
       lastBucket: bucket,
+      endMs,
+      coolStartMs,
     };
+    await setTempState(r, id, st);
+  }
+
+  // 如果你改了 start/end 或温度，刷新 setpoint/final
+  st.setpoint = setpoint;
+  st.finalT = finalT;
+  st.endMs = endMs;
+  st.coolStartMs = coolStartMs;
+
+  // 超过 end：直接锁定 final（且保证不会上跳）
+  if (isPastEnd) {
+    st.cur = Math.min(st.cur, finalT);
+    // 进一步收敛到 finalT（固定在 4~5）
+    st.cur = finalT;
+    st.lastBucket = bucket;
     await setTempState(r, id, st);
     return { tempText: fmtTemp(st.cur), badgeCN, statusOut };
   }
 
-  // 如果 setpoint 或 final 发生变化（比如你改了日期），同步一下
-  st.setpoint = setpoint;
-  st.finalT = finalT;
-
-  // 同一个桶内，不更新（保持稳定）
+  // 同桶不更新
   if (st.lastBucket === bucket) {
-    // 但如果已经超过 endMs，为了确保最终落在 4~5，允许“最终归位”
-    if (nowMs >= endMs) {
-      const forced = Math.min(st.cur, finalT); // 只会更低，不会上跳
-      st.cur = forced;
-      await setTempState(r, id, st);
-    }
     return { tempText: fmtTemp(st.cur), badgeCN, statusOut };
   }
 
-  // 更新：根据目标 + 随机选择一个 step
+  // 新桶更新
   st.lastBucket = bucket;
 
-  const prev = st.cur;
+  const prev = Number(st.cur);
 
-  // 目标附近允许的浮动窗口（更真实）：
-  // - 允许略高于目标 0.1（回弹）
-  // - 允许略低于目标 0.3（提前降温也合理）
-  const upperByTarget = target + 0.1;
-  const lowerByTarget = target - 0.3;
+  // “每天降温 ≤ 2℃”换算成每桶最大下降
+  const maxDown = Math.min(
+    0.3, // 你提的“每次刷新不超过0.3”，这里仍保留上限
+    (MAX_DROP_PER_DAY * TEMP_BUCKET_MS) / 86400000
+  );
 
-  // 根据你要求：相对上次变化 <=0.3
-  const upperByStep = prev + 0.1; // 允许回弹 0.1
-  const lowerByStep = prev - 0.3;
+  // 允许轻微回弹：每天最多 0.4℃
+  const maxUp = Math.min(
+    0.1,
+    (MAX_RISE_PER_DAY * TEMP_BUCKET_MS) / 86400000
+  );
 
-  const upper = Math.min(upperByTarget, upperByStep);
-  const lower = Math.max(lowerByTarget, lowerByStep);
-
-  // 随机挑 step（稳定不可猜：加入盐 + id + bucket）
+  // 用盐 + id + bucket 生成稳定噪声（外人看数据也不容易反推出规律）
   const salt = process.env.DISPLAY_SALT || "brew";
-  const seed = hash32(`${salt}|step|${id}|${bucket}|${round1(prev)}|${round1(target)}`);
+  const seed = hash32(
+    `${salt}|temp|${id}|${bucket}|${round1(prev)}|${round1(target)}|${round1(setpoint)}|${round1(finalT)}`
+  );
   const rand = rngFromSeed(seed);
 
-  // 倾向下降：让负步长概率更高
-  // 但如果当前已经明显低于 target，就多给 0 或 +0.1
-  const gap = prev - target; // >0 表示比目标高（应该降）
-  let pool;
-  if (gap > 0.6) pool = [-0.3, -0.2, -0.2, -0.1, -0.3];         // 追赶下降
-  else if (gap > 0.3) pool = [-0.2, -0.2, -0.1, -0.1, 0];
-  else if (gap > 0.1) pool = [-0.2, -0.1, -0.1, 0, +0.1];       // 允许一点回弹
-  else pool = [-0.1, 0, 0, +0.1, -0.1];                         // 贴近目标时更“抖一点”
+  // 核心：向 target 逼近，但每桶变化受 maxDown / maxUp 限制
+  let deltaToward = target - prev; // 负数表示需要下降
+  deltaToward = clamp(deltaToward, -maxDown, +maxUp);
 
-  const step = pool[Math.floor(rand() * pool.length)];
-  let next = prev + step;
+  // 加一点非常小的噪声（更真实），但仍不能突破 maxDown/maxUp
+  // 噪声范围跟 maxDown 相关（不会大跳）
+  const noiseAmp = Math.min(0.03, Math.max(0.005, maxDown * 0.6));
+  const noise = (rand() - 0.5) * 2 * noiseAmp;
 
-  // 硬约束：不超过上下界
-  next = clamp(next, lower, upper);
+  let next = prev + deltaToward + noise;
 
-  // 还要保证最终不会低于 finalT 太多，也不会高于 setpoint 太多（合理区间）
+  // 再次硬约束：相对上次变化不超过 maxDown/maxUp
+  next = clamp(next, prev - maxDown, prev + maxUp);
+
+  // 曲线约束：不要比 target 高太多（避免“明明应该降了还卡很高”）
+  // 允许略高于 target（小回弹），但不能超过 target + 0.1
+  next = Math.min(next, target + 0.1);
+
+  // 也不要提前降过头太多：不低于 target - 0.3
+  next = Math.max(next, target - 0.3);
+
+  // 合理区间：不会超过 setpoint 上限，也不会低于 FINAL_MIN
   next = clamp(next, FINAL_MIN, SETPOINT_MAX);
 
-  // 如果已经到/超过 end，强制最终收敛到 finalT（不会上跳）
-  if (nowMs >= endMs) {
-    next = Math.min(next, finalT);
-  }
-
-  // 写回（内部不 round）
+  // 写回
   st.cur = next;
   await setTempState(r, id, st);
 
@@ -346,7 +383,7 @@ module.exports = async (req, res) => {
         start_md: formatMDshort(item.start),
         end_md: formatMDshort(item.end),
 
-        progress, // 0~100
+        progress,
 
         // ✅ 为了你前端黄色 badge：降温期输出 "ready"
         status: tempRes.statusOut,
