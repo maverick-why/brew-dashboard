@@ -447,4 +447,78 @@
 
       const j = await res.json().catch(()=> ({}));
       if(!res.ok || j.ok === false){
-        s
+        setAuthUI(false);
+        toast("保存失败：密码错误或无权限（Unauthorized）", false);
+        return;
+      }
+      setAuthUI(true);
+      toast("已保存到共享数据源", true);
+    }catch(err){
+      toast("保存失败：/api/save", false);
+    }
+  }
+
+  // ====== add
+  function addTank(){
+    const id = nextId();
+    state[id] = normalizeRow({
+      show:true,
+      beer:"",
+      style:"",
+      abv:"",
+      ibu:"",
+      capacity:"150L",
+      temp:"",
+      start:"",
+      end:"",
+      status:"auto",
+      limited:false
+    });
+    render();
+    toast(`已新增 ${id}`, true);
+    const wrap = document.querySelector(".tableWrap");
+    if(wrap) wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  // ====== date helpers
+  function toDateInput(v){
+    if(!v) return "";
+    const s = String(v).trim();
+    const m1 = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/.exec(s);
+    if(m1){
+      const y = m1[1];
+      const mo = String(m1[2]).padStart(2,"0");
+      const d  = String(m1[3]).padStart(2,"0");
+      return `${y}-${mo}-${d}`;
+    }
+    const d = new Date(s);
+    if(isNaN(d)) return "";
+    const y = d.getFullYear();
+    const mo = String(d.getMonth()+1).padStart(2,"0");
+    const da = String(d.getDate()).padStart(2,"0");
+    return `${y}-${mo}-${da}`;
+  }
+
+  function escapeHtml(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ====== wire buttons
+  document.getElementById("btnLoad").addEventListener("click", apiLoad);
+  document.getElementById("btnSave").addEventListener("click", apiSave);
+  document.getElementById("btnAdd").addEventListener("click", addTank);
+
+  // ====== login on entry
+  (function init(){
+    ADMIN_PASS = prompt("请输入后台写入密码（用于加载/保存）") || "";
+    setAuthUI(!!ADMIN_PASS);
+    if(ADMIN_PASS) apiLoad();
+  })();
+</script>
+</body>
+</html>
