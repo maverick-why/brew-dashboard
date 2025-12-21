@@ -1,360 +1,439 @@
-// /api/public.js
-const Redis = require("ioredis");
-const { sanitizeState, safeStr } = require("./_schema");
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title> ·发酵进度*咕噜咕噜· </title>
 
-const KEY = "brew_dash_records_v1";
+<style>
+:root{
+  --bg0:#070b12;
+  --bg1:#0b1220;
 
-// 温控故事规则
-const COOL_DAYS = 10; // 倒数10天开始降温
-const COOL_WINDOW_MS = COOL_DAYS * 86400000;
+  --card:#0f1726;
+  --line:rgba(255,255,255,.09);
 
-const SETPOINT_MIN = 18.2;
-const SETPOINT_MAX = 19.9;
+  --text:#eaf0ff;
+  --sub:rgba(234,240,255,.62);
 
-const FINAL_MIN = 4.0;
-const FINAL_MAX = 5.0;
+  --green:#4ade80;
+  --yellow:#ffcc00;
 
-// 温度状态单独存（避免写回主数据）
-const TEMP_STATE_KEY = "brew_dash_temp_state_v1";
+  /* ✅ 冷酷蓝（你要的“冷沉蓝”） */
+  --coolBlue1:#4aa3ff;
+  --coolBlue2:#1f6dff;
 
-// ✅ 2 秒一个桶（你要的“每2秒一次更新”）
-const TEMP_BUCKET_MS = 2 * 1000;
+  --blue1:#7bd3ff;
+  --blue2:#2b80ff;
 
-// 每次刷新最大变化（你说差距不能 > 0.3；这里用 0.1 更自然）
-const MAX_STEP_DOWN = 0.1;
-const MAX_STEP_UP = 0.1;
+  --r:18px;
+  --shadow: 0 14px 34px rgba(0,0,0,.55);
+}
 
-// “每天平均降低不超过2度”
-const MAX_DROP_PER_DAY = 2.0;
+/* logo */
+.logo{
+  height:50px;
+  width:auto;
+  border-radius:8px;
+}
 
-// 允许少量回弹（更真实）
-const MAX_RISE_PER_DAY = 0.4;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1100px 650px at 18% 10%, rgba(79,140,255,.13), transparent 62%),
+    radial-gradient(900px 600px at 84% 26%, rgba(0,255,180,.11), transparent 62%),
+    radial-gradient(900px 600px at 52% 92%, rgba(255,92,138,.10), transparent 62%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
 
-let redis;
-function getRedis() {
-  if (!redis) {
-    if (!process.env.REDIS_URL) throw new Error("REDIS_URL is missing");
-    redis = new Redis(process.env.REDIS_URL, {
-      maxRetriesPerRequest: 1,
-      enableReadyCheck: false,
-      lazyConnect: true,
-    });
+header{
+  position:sticky; top:0; z-index:20;
+  padding:10px 10px 2px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(10,16,28,.90), rgba(10,16,28,.62));
+  border-bottom:1px solid var(--line);
+}
+
+/* 头部左右布局：logo 左，时间右 */
+.h-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.htime{
+  white-space:nowrap;
+  font-variant-numeric: tabular-nums;
+  color:rgba(234,240,255,.78);
+  font-weight:800;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+  font-size:12px;
+}
+
+main{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 12px 22px;
+  padding-bottom: calc(22px + env(safe-area-inset-bottom));
+}
+
+.list{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+}
+@media (min-width: 860px){
+  .list{ grid-template-columns: repeat(2, minmax(360px, 1fr)); gap:14px; }
+}
+@media (min-width: 1180px){
+  .list{ grid-template-columns: repeat(3, minmax(340px, 1fr)); gap:16px; }
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  border-radius: var(--r);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0) 48%),
+    linear-gradient(135deg, rgba(123,211,255,.06), rgba(74,222,128,.04) 35%, rgba(255,92,138,.05) 75%, rgba(255,255,255,0) 100%),
+    var(--card);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-80px -110px auto auto;
+  width:240px; height:240px;
+  background: radial-gradient(circle at 30% 30%, rgba(123,211,255,.20), transparent 62%);
+  transform: rotate(18deg);
+  pointer-events:none;
+}
+
+.ribbon{
+  position:absolute;
+  top:10px;
+  left:-38px;
+  width:120px;
+  transform: rotate(-45deg);
+  background: linear-gradient(180deg, rgba(255,92,138,1), rgba(255,92,138,.88));
+  color:#fff;
+  font-weight:950;
+  text-align:center;
+  padding:7px 0;
+  letter-spacing:.6px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.50);
+  z-index:6;
+  pointer-events:none;
+}
+.ribbon span{ display:block; font-size:12px; line-height:1; }
+
+.cardHead{
+  padding:12px 14px 8px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+}
+
+.headRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.leftTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.tankNo{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  font-size:24px;
+  line-height:1;
+  color:rgba(234,240,255,.90);
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  flex:0 0 auto;
+}
+
+.nameWrap{ min-width:0; }
+.beerName{
+  font-weight:950;
+  font-size:18px;
+  line-height:1.05;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.beerStyle{
+  margin-top:5px;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.6px;
+  color:rgba(234,240,255,.70);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.badge{
+  min-width:108px;
+  text-align:center;
+  border-radius:12px;
+  padding:7px 8px 6px;
+  font-weight:950;
+  color:#0b0f18;
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  border:1px solid rgba(0,0,0,.15);
+  flex:0 0 auto;
+}
+.badge .b1{ font-size:13px; line-height:1.05; }
+.badge .b2{
+  margin-top:4px;
+  font-size:14px;
+  line-height:1;
+  letter-spacing:.8px;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes breathing{
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
+  50%     { box-shadow: 0 0 0 10px rgba(74,222,128,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
+}
+
+.badge.fermenting{
+  background: linear-gradient(180deg, rgba(74,222,128,1), rgba(74,222,128,.86));
+  animation: breathing 2.1s ease-in-out infinite;
+}
+
+/* ✅ 冷沉：蓝色 + 呼吸闪烁（不晃动） */
+.badge.cooling{
+  background: linear-gradient(180deg, var(--coolBlue1), var(--coolBlue2));
+  animation: breathingCool 2.1s ease-in-out infinite;
+}
+@keyframes breathingCool{
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,163,255,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
+  50%     { box-shadow: 0 0 0 10px rgba(74,163,255,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
+}
+
+/* ✅ 即将开罐：黄色（保留原来的“ready”表现，但不影响你这次需求） */
+.badge.ready{
+  background: linear-gradient(180deg, rgba(255,204,0,1), rgba(255,204,0,.86));
+  /* 不要求我改它，就保持静态（不晃动也行） */
+}
+
+.cardBody{
+  padding: 8px 14px 10px;
+}
+
+.metrics{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-weight:900;
+  font-size:13px;
+  color:rgba(234,240,255,.90);
+  margin: 2px 0 8px;
+}
+.metrics span{ white-space:nowrap; color:rgba(234,240,255,.88); }
+.metrics .dot{ color:rgba(234,240,255,.35); font-weight:900; }
+
+.progressRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--sub);
+}
+.date{
+  width:44px;
+  text-align:center;
+  font-variant-numeric: tabular-nums;
+  font-weight:850;
+}
+.progressBar{
+  flex:1;
+  position:relative;
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.08);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+}
+.progressBar > i{
+  display:block;
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--blue1), var(--blue2));
+  border-radius:999px;
+  transition: width .8s ease;
+}
+.progressBar > b{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:950;
+  color:rgba(255,255,255,.92);
+  text-shadow: 0 1px 8px rgba(0,0,0,.45);
+}
+
+.empty{
+  margin: 14px auto 0;
+  padding: 16px 14px;
+  border-radius: var(--r);
+  border:1px dashed rgba(255,255,255,.18);
+  background: rgba(255,255,255,.03);
+  color:rgba(234,240,255,.75);
+  text-align:center;
+}
+
+footer{
+  padding: 18px 0 26px;
+  text-align:center;
+  color:rgba(234,240,255,.55);
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="h-row">
+    <img src="/logo.png" alt="时光酿造所 Logo" class="logo" />
+    <div class="htime" id="time">--</div>
+  </div>
+</header>
+
+<main>
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty" style="display:none;">
+    暂无数据（共享数据源为空或未勾选“展示”）。<br/>
+    请在后台 <b>admin.html</b> 勾选“展示”并保存后刷新本页。
+  </div>
+</main>
+
+<footer>© 时光酿造所 · ChronoBrewery</footer>
+
+<script>
+const LOAD_URL = "/api/public";
+const POLL_MS  = 15000;
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+function nowText(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+function tickClock(){ document.getElementById("time").textContent = nowText(); }
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function renderItems(items){
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  list.innerHTML = "";
+
+  const arr = Array.isArray(items) ? items : [];
+  if(arr.length === 0){
+    empty.style.display = "block";
+    return;
   }
-  return redis;
-}
+  empty.style.display = "none";
 
-function pad2(n) {
-  return String(n).padStart(2, "0");
-}
+  for(const it of arr){
+    // ✅ 三态：fermenting / cooling / ready
+    const st = String(it.status || "fermenting").toLowerCase();
+    const badgeClass =
+      st === "cooling" ? "cooling" :
+      st === "ready" ? "ready" :
+      "fermenting";
 
-function tankNoFromId(id) {
-  const m = /^F(\d+)$/i.exec(id || "");
-  if (m) return Number(m[1]);
-  const n = String(id || "").match(/\d+/);
-  return n ? Number(n[0]) : 0;
-}
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      ${it.limited ? `<div class="ribbon"><span>Limited</span></div>` : ""}
 
-function toABV(v) {
-  const s = safeStr(v, "");
-  if (!s) return "--";
-  if (s.includes("%")) return s;
-  const n = Number(String(s).trim());
-  if (!Number.isNaN(n)) return `${n}%`;
-  return s;
-}
+      <div class="cardHead">
+        <div class="headRow">
+          <div class="leftTitle">
+            <div class="tankNo">${escapeHtml(it.no || "")}</div>
+            <div class="nameWrap">
+              <div class="beerName" title="${escapeHtml(it.beer)}">${escapeHtml(it.beer)}</div>
+              <div class="beerStyle" title="${escapeHtml(it.style)}">${escapeHtml(it.style)}</div>
+            </div>
+          </div>
 
-function parseTempNumber(v) {
-  if (v === undefined || v === null || v === "") return null;
-  const t = String(v).trim().replace("℃", "").replace("°C", "").replace("°", "").trim();
-  const n = Number(t);
-  if (Number.isNaN(n)) return null;
-  return n;
-}
+          <div class="badge ${badgeClass}">
+            <div class="b1">${escapeHtml(it.badgeCN)}</div>
+            <div class="b2">${escapeHtml(it.dayText)}</div>
+          </div>
+        </div>
+      </div>
 
-function clamp(x, a, b) {
-  return Math.max(a, Math.min(b, x));
-}
+      <div class="cardBody">
+        <div class="metrics" aria-label="metrics">
+          <span>ABV ${escapeHtml(it.abv)}</span>
+          <span class="dot">·</span>
+          <span>IBU ${escapeHtml(it.ibu)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(it.capacity)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(it.temp)}</span>
+        </div>
 
-function round1(x) {
-  return Math.round(Number(x) * 10) / 10;
-}
-
-function fmtTemp(x) {
-  return `${round1(x).toFixed(1)}℃`;
-}
-
-// 简单稳定 hash
-function hash32(str) {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
-// xorshift32 伪随机（加 DISPLAY_SALT 增加不可猜性）
-function rngFromSeed(seedU32) {
-  let x = seedU32 >>> 0;
-  return () => {
-    x ^= x << 13;
-    x ^= x >>> 17;
-    x ^= x << 5;
-    return (x >>> 0) / 4294967296;
-  };
-}
-
-function calcProgress(startStr, endStr, nowMs) {
-  const s = new Date(startStr).getTime();
-  const e = new Date(endStr).getTime();
-  if (!Number.isFinite(s) || !Number.isFinite(e) || e <= s) return 0;
-  let p = ((nowMs - s) / (e - s)) * 100;
-  p = clamp(p, 0, 100);
-  return Math.round(p);
-}
-
-function daysSince(startStr, nowMs) {
-  if (!startStr) return null;
-  const s = new Date(startStr).getTime();
-  if (!Number.isFinite(s)) return null;
-  const ms = nowMs - s;
-  if (ms < 0) return 0;
-  return Math.floor(ms / 86400000) + 1;
-}
-
-function formatMDshort(dateStr) {
-  if (!dateStr) return "--/--";
-  const d = new Date(dateStr);
-  if (isNaN(d)) return "--/--";
-  return `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())}`;
-}
-
-// 平滑目标曲线：cosine easing
-function cosineEase01(t01) {
-  const t = clamp(t01, 0, 1);
-  return (1 - Math.cos(Math.PI * t)) / 2;
-}
-
-function makeStableSetpoint(id, startStr) {
-  // 每罐固定 setpoint：18.2~19.9，步进 0.1
-  const salt = process.env.DISPLAY_SALT || "brew";
-  const seed = hash32(`${salt}|sp|${id}|${startStr || ""}`);
-  const rand = rngFromSeed(seed);
-  const steps = Math.round((SETPOINT_MAX - SETPOINT_MIN) / 0.1);
-  const idx = Math.floor(rand() * (steps + 1));
-  const t = SETPOINT_MIN + idx * 0.1;
-  return clamp(Math.round(t * 10) / 10, SETPOINT_MIN, SETPOINT_MAX);
-}
-
-function makeStableFinal(id, endStr) {
-  // 每罐固定 final：4.0~5.0，步进 0.1
-  const salt = process.env.DISPLAY_SALT || "brew";
-  const seed = hash32(`${salt}|final|${id}|${endStr || ""}`);
-  const rand = rngFromSeed(seed);
-  const steps = Math.round((FINAL_MAX - FINAL_MIN) / 0.1);
-  const idx = Math.floor(rand() * (steps + 1));
-  const t = FINAL_MIN + idx * 0.1;
-  return clamp(Math.round(t * 10) / 10, FINAL_MIN, FINAL_MAX);
-}
-
-async function getTempState(r, id) {
-  const raw = await r.hget(TEMP_STATE_KEY, id);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
+        <div class="progressRow">
+          <div class="date">${escapeHtml(it.start_md)}</div>
+          <div class="progressBar" aria-label="progress">
+            <i style="width:${Number(it.progress||0)}%"></i>
+            <b>${Number(it.progress||0)}%</b>
+          </div>
+          <div class="date">${escapeHtml(it.end_md)}</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
   }
 }
 
-async function setTempState(r, id, st) {
-  await r.hset(TEMP_STATE_KEY, id, JSON.stringify(st));
+async function load(){
+  try{
+    const res = await fetch(LOAD_URL, { cache:"no-store" });
+    const data = await res.json();
+    if(!res.ok || data.ok === false) return renderItems([]);
+    renderItems(data.items || []);
+  }catch(e){
+    renderItems([]);
+  }
 }
 
-async function computeTempForTank(r, id, row, nowMs) {
-  const startStr = safeStr(row.start, "");
-  const endStr = safeStr(row.end, "");
-
-  const startMs = new Date(startStr).getTime();
-  const endMs = new Date(endStr).getTime();
-  const startOk = Number.isFinite(startMs);
-  const endOk = Number.isFinite(endMs);
-
-  const backendTemp = parseTempNumber(row.temp);
-  const setpoint =
-    backendTemp !== null
-      ? clamp(backendTemp, SETPOINT_MIN, SETPOINT_MAX)
-      : makeStableSetpoint(id, startStr);
-
-  const finalT = makeStableFinal(id, endStr);
-
-  // 没有 end：恒温发酵
-  if (!endOk) {
-    return { tempText: fmtTemp(setpoint), badgeCN: "发酵中", statusOut: "fermenting" };
-  }
-
-  const coolStartMs = Math.max(
-    endMs - COOL_WINDOW_MS,
-    startOk ? startMs : endMs - COOL_WINDOW_MS
-  );
-
-  const inCooling = nowMs >= coolStartMs;
-  const isPastEnd = nowMs >= endMs;
-
-  const badgeCN = inCooling ? (isPastEnd ? "即将开罐" : "降温中") : "发酵中";
-  const statusOut = inCooling ? "ready" : "fermenting";
-
-  // 非降温期：恒温 + 重置状态
-  if (!inCooling) {
-    const bucket0 = Math.floor(nowMs / TEMP_BUCKET_MS);
-    await setTempState(r, id, {
-      cur: setpoint,
-      lastBucket: bucket0,
-      setpoint,
-      finalT,
-      endMs,
-      coolStartMs,
-    });
-    return { tempText: fmtTemp(setpoint), badgeCN, statusOut };
-  }
-
-  // 超过 end：锁 final
-  if (isPastEnd) {
-    const bucket = Math.floor(nowMs / TEMP_BUCKET_MS);
-    await setTempState(r, id, {
-      cur: finalT,
-      lastBucket: bucket,
-      setpoint,
-      finalT,
-      endMs,
-      coolStartMs,
-    });
-    return { tempText: fmtTemp(finalT), badgeCN, statusOut };
-  }
-
-  // 目标曲线（coolStart -> end）
-  const denom = Math.max(1, endMs - coolStartMs);
-  const t01 = (nowMs - coolStartMs) / denom;
-  const k = cosineEase01(t01);
-  const target = setpoint + (finalT - setpoint) * k;
-
-  const bucket = Math.floor(nowMs / TEMP_BUCKET_MS);
-  let st = await getTempState(r, id);
-
-  if (!st || typeof st.cur !== "number") {
-    st = { cur: setpoint, lastBucket: bucket };
-    await setTempState(r, id, st);
-  }
-
-  // 同桶不更新（你要“每2秒一次更新”，桶=2秒）
-  if (st.lastBucket === bucket) {
-    return { tempText: fmtTemp(st.cur), badgeCN, statusOut };
-  }
-  st.lastBucket = bucket;
-
-  const prev = Number(st.cur);
-
-  // ✅ “每天最多降2度”的全局约束：此时刻允许的最低温（不能降太快）
-  const elapsedDays = (nowMs - coolStartMs) / 86400000;
-  const minAllowed = setpoint - MAX_DROP_PER_DAY * clamp(elapsedDays, 0, 1000);
-  const maxAllowed = setpoint + MAX_RISE_PER_DAY * clamp(elapsedDays, 0, 1000);
-
-  // 允许围绕 target 小幅跳动，但整体跟随 target 往下走
-  const salt = process.env.DISPLAY_SALT || "brew";
-  const seed = hash32(`${salt}|2s|${id}|${bucket}|${round1(prev)}|${round1(target)}`);
-  const rand = rngFromSeed(seed);
-
-  // 根据“离目标差距”选步长：更偏向下降
-  const gap = prev - target; // >0 表示比目标高，需要降
-  let stepPool;
-  if (gap > 0.6) stepPool = [-0.1, -0.1, -0.1, 0];
-  else if (gap > 0.3) stepPool = [-0.1, -0.1, 0, +0.1];
-  else if (gap > 0.1) stepPool = [-0.1, 0, 0, +0.1];
-  else stepPool = [-0.1, 0, +0.1, 0];
-
-  const step = stepPool[Math.floor(rand() * stepPool.length)];
-
-  // 每次变化限制（满足你：差距不大于0.3；这里更严格）
-  let next = prev + step;
-  next = clamp(next, prev - MAX_STEP_DOWN, prev + MAX_STEP_UP);
-
-  // 目标附近窗口（更真实）
-  next = Math.min(next, target + 0.1);
-  next = Math.max(next, target - 0.3);
-
-  // 全局约束：不能降太快
-  next = Math.max(next, minAllowed);
-  next = Math.min(next, maxAllowed);
-
-  // 合理范围
-  next = clamp(next, FINAL_MIN, SETPOINT_MAX);
-
-  st.cur = next;
-  await setTempState(r, id, st);
-
-  return { tempText: fmtTemp(next), badgeCN, statusOut };
-}
-
-module.exports = async (req, res) => {
-  try {
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-
-    const r = getRedis();
-    const val = await r.get(KEY);
-    const nowMs = Date.now();
-
-    if (!val) {
-      return res.status(200).end(JSON.stringify({ ok: true, items: [], server_time: nowMs }));
-    }
-
-    let obj = {};
-    try {
-      obj = JSON.parse(val);
-    } catch {
-      obj = {};
-    }
-
-    const cleaned = sanitizeState(obj);
-
-    const entries = Object.entries(cleaned)
-      .map(([id, row]) => ({ id, ...row }))
-      .filter((x) => x.show === true)
-      .sort((a, b) => tankNoFromId(a.id) - tankNoFromId(b.id));
-
-    const items = [];
-    for (const item of entries) {
-      const progress = calcProgress(item.start, item.end, nowMs);
-      const day = daysSince(item.start, nowMs);
-
-      const tempRes = await computeTempForTank(r, item.id, item, nowMs);
-
-      items.push({
-        id: item.id,
-        no: tankNoFromId(item.id),
-        limited: item.limited === true,
-
-        beer: safeStr(item.beer, "（未命名）"),
-        style: safeStr(item.style, "--"),
-
-        abv: toABV(item.abv),
-        ibu: safeStr(item.ibu, "--"),
-        capacity: safeStr(item.capacity, "--"),
-
-        temp: tempRes.tempText,
-
-        start_md: formatMDshort(item.start),
-        end_md: formatMDshort(item.end),
-
-        progress,
-        status: tempRes.statusOut,
-        badgeCN: tempRes.badgeCN,
-        dayText: day === null ? "DAY --" : `DAY ${day}`,
-      });
-    }
-
-    return res.status(200).end(JSON.stringify({ ok: true, items, server_time: nowMs }));
-  } catch (e) {
-    return res.status(500).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
-  }
-};
+tickClock();
+setInterval(tickClock, 1000);
+load();
+setInterval(load, POLL_MS);
+</script>
+</body>
+</html>
