@@ -92,4 +92,372 @@ main{
   gap:12px;
 }
 @media (min-width: 860px){
-  .list{ grid-template-columns: repeat(2, minmax(360px, 1fr));
+  .list{ grid-template-columns: repeat(2, minmax(360px, 1fr)); gap:14px; }
+}
+@media (min-width: 1180px){
+  .list{ grid-template-columns: repeat(3, minmax(340px, 1fr)); gap:16px; }
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  border-radius: var(--r);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0) 48%),
+    linear-gradient(135deg, rgba(123,211,255,.06), rgba(74,222,128,.04) 35%, rgba(255,92,138,.05) 75%, rgba(255,255,255,0) 100%),
+    var(--card);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-80px -110px auto auto;
+  width:240px; height:240px;
+  background: radial-gradient(circle at 30% 30%, rgba(123,211,255,.20), transparent 62%);
+  transform: rotate(18deg);
+  pointer-events:none;
+}
+
+.ribbon{
+  position:absolute;
+  top:10px;
+  left:-38px;
+  width:120px;
+  transform: rotate(-45deg);
+  background: linear-gradient(180deg, rgba(255,92,138,1), rgba(255,92,138,.88));
+  color:#fff;
+  font-weight:950;
+  text-align:center;
+  padding:7px 0;
+  letter-spacing:.6px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.50);
+  z-index:6;
+  pointer-events:none;
+}
+.ribbon span{ display:block; font-size:12px; line-height:1; }
+
+.cardHead{
+  padding:12px 14px 8px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+}
+
+.headRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.leftTitle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.tankNo{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  font-size:24px;
+  line-height:1;
+  color:rgba(234,240,255,.90);
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  flex:0 0 auto;
+}
+
+.nameWrap{ min-width:0; }
+.beerName{
+  font-weight:950;
+  font-size:18px;
+  line-height:1.05;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.beerStyle{
+  margin-top:5px;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.6px;
+  color:rgba(234,240,255,.70);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.badge{
+  min-width:108px;
+  text-align:center;
+  border-radius:12px;
+  padding:7px 8px 6px;
+  font-weight:950;
+  color:#0b0f18;
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  border:1px solid rgba(0,0,0,.15);
+  flex:0 0 auto;
+  will-change: transform, filter, box-shadow;
+}
+.badge .b1{ font-size:13px; line-height:1.05; }
+.badge .b2{
+  margin-top:4px;
+  font-size:14px;
+  line-height:1;
+  letter-spacing:.8px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 发酵中：绿色呼吸 */
+@keyframes breathing{
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
+  50%     { box-shadow: 0 0 0 10px rgba(74,222,128,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
+}
+.badge.fermenting{
+  background: linear-gradient(180deg, rgba(74,222,128,1), rgba(74,222,128,.86));
+  animation: breathing 2.1s ease-in-out infinite;
+}
+
+/* ✅ 降温冷沉：蓝色呼吸（不晃动、不位移） */
+@keyframes breathingCool{
+  0%,100% {
+    box-shadow: 0 0 0 0 rgba(74,163,255,.28), 0 10px 22px rgba(0,0,0,.35);
+    filter: brightness(1);
+    transform: none;
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(74,163,255,.10), 0 12px 28px rgba(0,0,0,.42);
+    filter: brightness(1.06);
+    transform: none;
+  }
+}
+.badge.cooling{
+  background: linear-gradient(180deg, var(--coolBlue1), var(--coolBlue2));
+  animation: breathingCool 2.1s ease-in-out infinite;
+}
+
+/* ✅ 即将开罐：黄色晃动（恢复） */
+@keyframes wobble{
+  0%   { transform: rotate(-3deg) translateY(0); }
+  50%  { transform: rotate(3deg) translateY(-1px); }
+  100% { transform: rotate(-3deg) translateY(0); }
+}
+.badge.ready{
+  background: linear-gradient(180deg, rgba(255,204,0,1), rgba(255,204,0,.86));
+  animation: wobble 1.05s ease-in-out infinite;
+}
+
+.cardBody{
+  padding: 8px 14px 10px;
+}
+
+.metrics{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-weight:900;
+  font-size:13px;
+  color:rgba(234,240,255,.90);
+  margin: 2px 0 8px;
+}
+.metrics span{ white-space:nowrap; color:rgba(234,240,255,.88); }
+.metrics .dot{ color:rgba(234,240,255,.35); font-weight:900; }
+
+.progressRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--sub);
+}
+.date{
+  width:44px;
+  text-align:center;
+  font-variant-numeric: tabular-nums;
+  font-weight:850;
+}
+.progressBar{
+  flex:1;
+  position:relative;
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.08);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+}
+.progressBar > i{
+  display:block;
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--blue1), var(--blue2));
+  border-radius:999px;
+  transition: width .8s ease;
+}
+.progressBar > b{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:950;
+  color:rgba(255,255,255,.92);
+  text-shadow: 0 1px 8px rgba(0,0,0,.45);
+}
+
+.empty{
+  margin: 14px auto 0;
+  padding: 16px 14px;
+  border-radius: var(--r);
+  border:1px dashed rgba(255,255,255,.18);
+  background: rgba(255,255,255,.03);
+  color:rgba(234,240,255,.75);
+  text-align:center;
+}
+
+footer{
+  padding: 18px 0 26px;
+  text-align:center;
+  color:rgba(234,240,255,.55);
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="h-row">
+    <img src="/logo.png" alt="时光酿造所 Logo" class="logo" />
+    <div class="htime" id="time">--</div>
+  </div>
+</header>
+
+<main>
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty" style="display:none;">
+    暂无数据（共享数据源为空或未勾选“展示”）。<br/>
+    请在后台 <b>admin.html</b> 勾选“展示”并保存后刷新本页。
+  </div>
+</main>
+
+<footer>© 时光酿造所 · ChronoBrewery</footer>
+
+<script>
+const LOAD_URL = "/api/public";
+const POLL_MS  = 15000;
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+function nowText(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+function tickClock(){ document.getElementById("time").textContent = nowText(); }
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function normalizeBadgeCN(it){
+  // 兜底：如果后端还回“降温中”，前端统一显示“降温冷沉”
+  const s = String(it.badgeCN || "");
+  if (s.includes("降温") && !s.includes("冷沉")) return "降温冷沉";
+  return s || "--";
+}
+
+function renderItems(items){
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  list.innerHTML = "";
+
+  const arr = Array.isArray(items) ? items : [];
+  if(arr.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  for(const it of arr){
+    const badgeText = normalizeBadgeCN(it);
+
+    // ✅ 关键修复：以“文案”为准强制分流
+    // 只要文案含“降温”，就一定走 cooling 蓝色（即使后端 status 还是 ready）
+    const st = String(it.status || "fermenting").toLowerCase();
+    const badgeClass =
+      badgeText.includes("降温") ? "cooling" :
+      st === "ready" ? "ready" :
+      "fermenting";
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      ${it.limited ? `<div class="ribbon"><span>Limited</span></div>` : ""}
+
+      <div class="cardHead">
+        <div class="headRow">
+          <div class="leftTitle">
+            <div class="tankNo">${escapeHtml(it.no || "")}</div>
+            <div class="nameWrap">
+              <div class="beerName" title="${escapeHtml(it.beer)}">${escapeHtml(it.beer)}</div>
+              <div class="beerStyle" title="${escapeHtml(it.style)}">${escapeHtml(it.style)}</div>
+            </div>
+          </div>
+
+          <div class="badge ${badgeClass}">
+            <div class="b1">${escapeHtml(badgeText)}</div>
+            <div class="b2">${escapeHtml(it.dayText)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cardBody">
+        <div class="metrics" aria-label="metrics">
+          <span>ABV ${escapeHtml(it.abv)}</span>
+          <span class="dot">·</span>
+          <span>IBU ${escapeHtml(it.ibu)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(it.capacity)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(it.temp)}</span>
+        </div>
+
+        <div class="progressRow">
+          <div class="date">${escapeHtml(it.start_md)}</div>
+          <div class="progressBar" aria-label="progress">
+            <i style="width:${Number(it.progress||0)}%"></i>
+            <b>${Number(it.progress||0)}%</b>
+          </div>
+          <div class="date">${escapeHtml(it.end_md)}</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  }
+}
+
+async function load(){
+  try{
+    const res = await fetch(LOAD_URL, { cache:"no-store" });
+    const data = await res.json();
+    if(!res.ok || data.ok === false) return renderItems([]);
+    renderItems(data.items || []);
+  }catch(e){
+    renderItems([]);
+  }
+}
+
+tickClock();
+setInterval(tickClock, 1000);
+load();
+setInterval(load, POLL_MS);
+</script>
+</body>
+</html>
