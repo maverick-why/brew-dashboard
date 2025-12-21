@@ -19,7 +19,7 @@ const TEMP_STATE_KEY = "brew_dash_temp_state_v1";
 
 // 更新频率：建议 30 分钟一个桶（更像真实设备，不会每分钟跳）
 // 你前端 15 秒轮询没关系：同一桶内温度保持不变
-const TEMP_BUCKET_MS = 30 * 60 * 1000;
+const TEMP_BUCKET_MS = 1000;
 
 // “每天最多降 2℃”硬约束（关键！）
 const MAX_DROP_PER_DAY = 2.0;
