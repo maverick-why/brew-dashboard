@@ -354,7 +354,11 @@ function renderItems(items){
   empty.style.display = "none";
 
   for(const it of arr){
-    const badgeClass = it.status === "ready" ? "ready" : "fermenting";
+    // ✅ 现在有三种：fermenting / cooling / ready
+    const badgeClass =
+      it.status === "ready" ? "ready" :
+      it.status === "cooling" ? "ready" : // 降溫中用黄灯更符合“接近开罐”
+      "fermenting";
 
     const card = document.createElement("div");
     card.className = "card";
