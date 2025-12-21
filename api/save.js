@@ -1,5 +1,6 @@
 // /api/save.js
 const Redis = require("ioredis");
+const { sanitizeState } = require("./_schema");
 
 const KEY = "brew_dash_records_v1";
 
@@ -25,6 +26,15 @@ function readBody(req) {
   });
 }
 
+function requireAdminPass(req) {
+  const pass = req.headers["x-admin-pass"] || req.headers["x-admin-password"];
+  if (!pass || pass !== process.env.ADMIN_WRITE_PASSWORD) {
+    const err = new Error("Unauthorized");
+    err.statusCode = 401;
+    throw err;
+  }
+}
+
 module.exports = async (req, res) => {
   try {
     res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -35,10 +45,7 @@ module.exports = async (req, res) => {
       return res.status(405).end(JSON.stringify({ ok: false, error: "Method Not Allowed" }));
     }
 
-    const pass = req.headers["x-admin-pass"] || req.headers["x-admin-password"];
-    if (!pass || pass !== process.env.ADMIN_WRITE_PASSWORD) {
-      return res.status(401).end(JSON.stringify({ ok: false, error: "Unauthorized" }));
-    }
+    requireAdminPass(req);
 
     const body = await readBody(req);
     let obj;
@@ -48,11 +55,15 @@ module.exports = async (req, res) => {
       return res.status(400).end(JSON.stringify({ ok: false, error: "Bad JSON" }));
     }
 
+    // ✅ 后端统一清洗/默认值/限制字段
+    const cleaned = sanitizeState(obj);
+
     const r = getRedis();
-    await r.set(KEY, JSON.stringify(obj || {}));
+    await r.set(KEY, JSON.stringify(cleaned));
 
     return res.status(200).end(JSON.stringify({ ok: true }));
   } catch (e) {
-    return res.status(500).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
+    const status = e.statusCode || 500;
+    return res.status(status).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
   }
 };
