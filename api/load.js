@@ -18,8 +18,24 @@ function getRedis() {
 }
 
 function requireAdminPass(req) {
-  const pass = req.headers["x-admin-pass"] || req.headers["x-admin-password"];
-  if (!pass || pass !== process.env.ADMIN_WRITE_PASSWORD) {
+  const raw =
+    req.headers["x-admin-pass"] ||
+    req.headers["x-admin-password"] ||
+    req.headers["authorization"]; // 兼容 Authorization: Bearer xxx
+
+  const pass = String(raw || "")
+    .replace(/^Bearer\s+/i, "")
+    .trim();
+
+  const expected = String(process.env.ADMIN_WRITE_PASSWORD || "").trim();
+
+  if (!expected) {
+    const err = new Error("ADMIN_WRITE_PASSWORD is missing");
+    err.statusCode = 500;
+    throw err;
+  }
+
+  if (!pass || pass !== expected) {
     const err = new Error("Unauthorized");
     err.statusCode = 401;
     throw err;
@@ -31,14 +47,12 @@ module.exports = async (req, res) => {
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.setHeader("Cache-Control", "no-store");
 
-    // ✅ 管理端口令校验（GET 也要）
     requireAdminPass(req);
 
     const r = getRedis();
     const val = await r.get(KEY);
     if (!val) return res.status(200).end(JSON.stringify({}));
 
-    // 保险：即使 Redis 里有脏数据也清洗后返回
     let obj = {};
     try {
       obj = JSON.parse(val);
