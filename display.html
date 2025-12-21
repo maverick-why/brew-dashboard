@@ -205,6 +205,7 @@ main{
   box-shadow: 0 10px 22px rgba(0,0,0,.35);
   border:1px solid rgba(0,0,0,.15);
   flex:0 0 auto;
+  will-change: transform, filter, box-shadow;
 }
 .badge .b1{ font-size:13px; line-height:1.05; }
 .badge .b2{
@@ -215,30 +216,43 @@ main{
   font-variant-numeric: tabular-nums;
 }
 
+/* ✅ 发酵中：绿色呼吸（保留你原来的轻微上浮） */
 @keyframes breathing{
   0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
   50%     { box-shadow: 0 0 0 10px rgba(74,222,128,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
 }
-
 .badge.fermenting{
   background: linear-gradient(180deg, rgba(74,222,128,1), rgba(74,222,128,.86));
   animation: breathing 2.1s ease-in-out infinite;
 }
 
-/* ✅ 冷沉：蓝色 + 呼吸闪烁（不晃动） */
+/* ✅ 降温冷沉：蓝色“纯呼吸闪烁”（不晃动、不位移） */
+@keyframes breathingCool{
+  0%,100% {
+    box-shadow: 0 0 0 0 rgba(74,163,255,.28), 0 10px 22px rgba(0,0,0,.35);
+    filter: brightness(1);
+    transform: none;
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(74,163,255,.10), 0 12px 28px rgba(0,0,0,.42);
+    filter: brightness(1.06);
+    transform: none;
+  }
+}
 .badge.cooling{
   background: linear-gradient(180deg, var(--coolBlue1), var(--coolBlue2));
   animation: breathingCool 2.1s ease-in-out infinite;
 }
-@keyframes breathingCool{
-  0%,100% { box-shadow: 0 0 0 0 rgba(74,163,255,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
-  50%     { box-shadow: 0 0 0 10px rgba(74,163,255,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
-}
 
-/* ✅ 即将开罐：黄色（保留原来的“ready”表现，但不影响你这次需求） */
+/* ✅ 即将开罐：黄色“晃动”恢复 */
+@keyframes wobble{
+  0%   { transform: rotate(-3deg) translateY(0); }
+  50%  { transform: rotate(3deg) translateY(-1px); }
+  100% { transform: rotate(-3deg) translateY(0); }
+}
 .badge.ready{
   background: linear-gradient(180deg, rgba(255,204,0,1), rgba(255,204,0,.86));
-  /* 不要求我改它，就保持静态（不晃动也行） */
+  animation: wobble 1.05s ease-in-out infinite;
 }
 
 .cardBody{
@@ -352,6 +366,13 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+function normalizeBadgeCN(it){
+  // ✅ 兜底：如果后端还回“降温中”，前端统一显示“降温冷沉”
+  const s = String(it.badgeCN || "");
+  if (s.includes("降温") && !s.includes("冷沉")) return "降温冷沉";
+  return s || "--";
+}
+
 function renderItems(items){
   const list = document.getElementById("list");
   const empty = document.getElementById("empty");
@@ -372,6 +393,8 @@ function renderItems(items){
       st === "ready" ? "ready" :
       "fermenting";
 
+    const badgeText = normalizeBadgeCN(it);
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
@@ -388,7 +411,7 @@ function renderItems(items){
           </div>
 
           <div class="badge ${badgeClass}">
-            <div class="b1">${escapeHtml(it.badgeCN)}</div>
+            <div class="b1">${escapeHtml(badgeText)}</div>
             <div class="b2">${escapeHtml(it.dayText)}</div>
           </div>
         </div>
