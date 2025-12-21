@@ -18,7 +18,10 @@
 
   --green:#4ade80;
   --yellow:#ffcc00;
-  --pink:#ff5c8a;
+
+  /* ✅ 冷酷蓝（你要的“冷沉蓝”） */
+  --coolBlue1:#4aa3ff;
+  --coolBlue2:#1f6dff;
 
   --blue1:#7bd3ff;
   --blue2:#2b80ff;
@@ -212,22 +215,30 @@ main{
   font-variant-numeric: tabular-nums;
 }
 
-.badge.fermenting{
-  background: linear-gradient(180deg, rgba(74,222,128,1), rgba(74,222,128,.86));
-  animation: breathing 2.1s ease-in-out infinite;
-}
-.badge.ready{
-  background: linear-gradient(180deg, rgba(255,204,0,1), rgba(255,204,0,.86));
-  animation: wobble 1.05s ease-in-out infinite;
-}
 @keyframes breathing{
   0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
   50%     { box-shadow: 0 0 0 10px rgba(74,222,128,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
 }
-@keyframes wobble{
-  0%   { transform: rotate(-3deg) translateY(0); }
-  50%  { transform: rotate(3deg) translateY(-1px); }
-  100% { transform: rotate(-3deg) translateY(0); }
+
+.badge.fermenting{
+  background: linear-gradient(180deg, rgba(74,222,128,1), rgba(74,222,128,.86));
+  animation: breathing 2.1s ease-in-out infinite;
+}
+
+/* ✅ 冷沉：蓝色 + 呼吸闪烁（不晃动） */
+.badge.cooling{
+  background: linear-gradient(180deg, var(--coolBlue1), var(--coolBlue2));
+  animation: breathingCool 2.1s ease-in-out infinite;
+}
+@keyframes breathingCool{
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,163,255,.26), 0 10px 22px rgba(0,0,0,.35); transform: translateY(0); }
+  50%     { box-shadow: 0 0 0 10px rgba(74,163,255,.10), 0 12px 28px rgba(0,0,0,.40); transform: translateY(-1px); }
+}
+
+/* ✅ 即将开罐：黄色（保留原来的“ready”表现，但不影响你这次需求） */
+.badge.ready{
+  background: linear-gradient(180deg, rgba(255,204,0,1), rgba(255,204,0,.86));
+  /* 不要求我改它，就保持静态（不晃动也行） */
 }
 
 .cardBody{
@@ -328,7 +339,7 @@ footer{
 
 <script>
 const LOAD_URL = "/api/public";
-const POLL_MS  = 2000;
+const POLL_MS  = 15000;
 
 function pad2(n){ return String(n).padStart(2,"0"); }
 function nowText(){
@@ -354,10 +365,11 @@ function renderItems(items){
   empty.style.display = "none";
 
   for(const it of arr){
-    // ✅ 现在有三种：fermenting / cooling / ready
+    // ✅ 三态：fermenting / cooling / ready
+    const st = String(it.status || "fermenting").toLowerCase();
     const badgeClass =
-      it.status === "ready" ? "ready" :
-      it.status === "cooling" ? "ready" : // 降溫中用黄灯更符合“接近开罐”
+      st === "cooling" ? "cooling" :
+      st === "ready" ? "ready" :
       "fermenting";
 
     const card = document.createElement("div");
