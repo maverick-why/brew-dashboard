@@ -1,69 +1,24 @@
-// /api/save.js
-const Redis = require("ioredis");
-const { sanitizeState } = require("./_schema");
-
-const KEY = "brew_dash_records_v1";
-
-let redis;
-function getRedis() {
-  if (!redis) {
-    if (!process.env.REDIS_URL) throw new Error("REDIS_URL is missing");
-    redis = new Redis(process.env.REDIS_URL, {
-      maxRetriesPerRequest: 1,
-      enableReadyCheck: false,
-      lazyConnect: true,
-    });
-  }
-  return redis;
-}
-
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (c) => (body += c));
-    req.on("end", () => resolve(body));
-    req.on("error", reject);
-  });
-}
-
 function requireAdminPass(req) {
-  const pass = req.headers["x-admin-pass"] || req.headers["x-admin-password"];
-  if (!pass || pass !== process.env.ADMIN_WRITE_PASSWORD) {
+  const raw =
+    req.headers["x-admin-pass"] ||
+    req.headers["x-admin-password"] ||
+    req.headers["authorization"];
+
+  const pass = String(raw || "")
+    .replace(/^Bearer\s+/i, "")
+    .trim();
+
+  const expected = String(process.env.ADMIN_WRITE_PASSWORD || "").trim();
+
+  if (!expected) {
+    const err = new Error("ADMIN_WRITE_PASSWORD is missing");
+    err.statusCode = 500;
+    throw err;
+  }
+
+  if (!pass || pass !== expected) {
     const err = new Error("Unauthorized");
     err.statusCode = 401;
     throw err;
   }
 }
-
-module.exports = async (req, res) => {
-  try {
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-
-    if (req.method !== "POST") {
-      res.setHeader("Allow", "POST");
-      return res.status(405).end(JSON.stringify({ ok: false, error: "Method Not Allowed" }));
-    }
-
-    requireAdminPass(req);
-
-    const body = await readBody(req);
-    let obj;
-    try {
-      obj = JSON.parse(body || "{}");
-    } catch {
-      return res.status(400).end(JSON.stringify({ ok: false, error: "Bad JSON" }));
-    }
-
-    // ✅ 后端统一清洗/默认值/限制字段
-    const cleaned = sanitizeState(obj);
-
-    const r = getRedis();
-    await r.set(KEY, JSON.stringify(cleaned));
-
-    return res.status(200).end(JSON.stringify({ ok: true }));
-  } catch (e) {
-    const status = e.statusCode || 500;
-    return res.status(status).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
-  }
-};
