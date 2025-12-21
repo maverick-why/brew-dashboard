@@ -515,7 +515,7 @@
 
   // ====== login on entry
   (function init(){
-    ADMIN_PASS = prompt("请输入后台写入密码（用于加载/保存）") || "";
+    ADMIN_PASS = (prompt("请输入后台写入密码（用于加载/保存）") || "").trim();
     setAuthUI(!!ADMIN_PASS);
     if(ADMIN_PASS) apiLoad();
   })();
