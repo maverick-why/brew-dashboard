@@ -404,10 +404,9 @@
       }
 
       const res = await fetch(LOAD_URL, {
-        cache:"no-store",
-        headers:{ "x-admin-pass": ADMIN_PASS }
-      });
-
+  cache: "no-store",
+  headers: { "x-admin-pass": ADMIN_PASS }
+});
       const data = await res.json().catch(()=> ({}));
       if(!res.ok || data.ok === false){
         setAuthUI(false);
