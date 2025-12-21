@@ -403,9 +403,13 @@
         return;
       }
 
-      const res = await fetch(LOAD_URL, {
-  cache: "no-store",
-  headers: { "x-admin-pass": ADMIN_PASS }
+      const res = await fetch(SAVE_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-admin-pass": ADMIN_PASS
+  },
+  body: JSON.stringify(out)
 });
       const data = await res.json().catch(()=> ({}));
       if(!res.ok || data.ok === false){
