@@ -29,7 +29,7 @@
 
 /* logo */
 .logo{
-  height:50px;     /* 按你之前大小 */
+  height:50px;
   width:auto;
   border-radius:8px;
 }
@@ -69,11 +69,11 @@ header{
   font-variant-numeric: tabular-nums;
   color:rgba(234,240,255,.78);
   font-weight:800;
-  padding:8px 10px;                 /* 之前的 */
-  border:1px solid var(--line);     /* 之前的 */
-  border-radius:999px;              /* 之前的 */
-  background:rgba(255,255,255,.03); /* 之前的 */
-  font-size:12px;                   /* 之前的 */
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+  font-size:12px;
 }
 
 main{
@@ -327,18 +327,8 @@ footer{
 <footer>© 时光酿造所 · ChronoBrewery</footer>
 
 <script>
-const LOAD_URL = "/api/load";
+const LOAD_URL = "/api/public";
 const POLL_MS  = 15000;
-
-const READY_THRESHOLD = 95;        // >=95% -> 黄灯
-const TEMP_MIN = 18.0;
-const TEMP_MAX = 19.9;
-const TEMP_TICK_MS = 5000;         // 每 5 秒刷新
-const TEMP_STEPS = [0.1, 0.2];     // 每次变化 0.1 或 0.2
-
-// 每个罐独立温度（仅前端显示）
-const tempState = new Map(); /* id -> number */
-let lastDataCache = {};      /* 最新数据缓存 */
 
 function pad2(n){ return String(n).padStart(2,"0"); }
 function nowText(){
@@ -350,201 +340,66 @@ function tickClock(){ document.getElementById("time").textContent = nowText(); }
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
-function safe(v, fallback="--"){
-  if(v === undefined || v === null || v === "") return fallback;
-  return String(v);
-}
-function toABV(v){
-  const s = safe(v);
-  if(s === "--") return s;
-  if(String(s).includes("%")) return String(s);
-  const n = Number(String(s).trim());
-  if(!Number.isNaN(n)) return `${n}%`;
-  return String(s);
-}
 
-function parseTempNumber(v){
-  if(v === undefined || v === null || v === "") return null;
-  const t = String(v).trim().replace("℃","").replace("°C","").replace("°","").trim();
-  const n = Number(t);
-  if(Number.isNaN(n)) return null;
-  return n;
-}
-function clampTemp(x){ return Math.max(TEMP_MIN, Math.min(TEMP_MAX, x)); }
-function fmtTemp(x){ return `${Number(x).toFixed(1)}℃`; }
-
-function ensureTemp(id, backendTemp){
-  if(tempState.has(id)) return tempState.get(id);
-  const n = parseTempNumber(backendTemp);
-  const init = clampTemp(n ?? TEMP_MIN);
-  tempState.set(id, init);
-  return init;
-}
-function bumpTemp(id){
-  const cur = tempState.get(id);
-  if(cur === undefined) return;
-  const step = TEMP_STEPS[Math.floor(Math.random()*TEMP_STEPS.length)];
-  const dir = Math.random() < 0.5 ? -1 : 1;
-  let next = cur + dir * step;
-  if(next < TEMP_MIN) next = cur + step;
-  if(next > TEMP_MAX) next = cur - step;
-  next = clampTemp(next);
-  next = Math.round(next * 10) / 10;
-  tempState.set(id, next);
-}
-
-function formatMDshort(dateStr){
-  if(!dateStr) return "--/--";
-  const d = new Date(dateStr);
-  if(isNaN(d)) return "--/--";
-  return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
-}
-function daysSince(startStr){
-  if(!startStr) return null;
-  const s = new Date(startStr);
-  if(isNaN(s)) return null;
-  const ms = Date.now() - s.getTime();
-  if(ms < 0) return 0;
-  return Math.floor(ms / 86400000) + 1;
-}
-function calcProgress(startStr, endStr){
-  const s = new Date(startStr).getTime();
-  const e = new Date(endStr).getTime();
-  const n = Date.now();
-  if(isNaN(s) || isNaN(e) || e<=s) return 0;
-  let p = ((n - s) / (e - s)) * 100;
-  p = Math.max(0, Math.min(100, p));
-  return Math.round(p);
-}
-function resolveStatus(row, progress){
-  const st = (row.status || "auto").toLowerCase();
-  if(st === "fermenting" || st === "ready") return st;
-  const end = new Date(row.end);
-  if(!isNaN(end) && Date.now() >= end.getTime()) return "ready";
-  if(typeof progress === "number" && progress >= READY_THRESHOLD) return "ready";
-  return "fermenting";
-}
-function tankNoFromId(id){
-  const m = /^F(\d+)$/i.exec(id || "");
-  if(m) return Number(m[1]);
-  const n = String(id||"").match(/\d+/);
-  return n ? Number(n[0]) : 0;
-}
-
-function render(dataObj){
-  lastDataCache = dataObj || {};
+function renderItems(items){
   const list = document.getElementById("list");
   const empty = document.getElementById("empty");
   list.innerHTML = "";
 
-  const entries = Object.entries(dataObj || {})
-    .map(([id, row]) => ({ id, ...(row||{}) }))
-    .filter(x => x.show === true);
-
-  if(entries.length === 0){
+  const arr = Array.isArray(items) ? items : [];
+  if(arr.length === 0){
     empty.style.display = "block";
     return;
   }
   empty.style.display = "none";
 
-  entries.sort((a,b)=>{
-    const na = tankNoFromId(a.id);
-    const nb = tankNoFromId(b.id);
-    if(na && nb) return na - nb;
-    if(na) return -1;
-    if(nb) return 1;
-    return (a.id||"").localeCompare(b.id||"");
-  });
-
-  for(const item of entries){
-    const id = item.id;
-    const progress = calcProgress(item.start, item.end);
-    const status = resolveStatus(item, progress);
-    const day = daysSince(item.start);
-    const limited = item.limited === true;
-
-    const badgeClass = status === "ready" ? "ready" : "fermenting";
-    const badgeCN = status === "ready" ? "即将开罐" : "发酵中";
-    const dayText = (day === null) ? "DAY --" : `DAY ${day}`;
-
-    const beerName = safe(item.beer, "（未命名）");
-    const style = safe(item.style, "--");
-
-    const abv = toABV(item.abv);
-    const ibu = safe(item.ibu);
-    const cap = safe(item.capacity);
-
-    const tempNum = ensureTemp(id, item.temp);
-    const tempText = fmtTemp(tempNum);
-
-    const start = formatMDshort(item.start);
-    const end   = formatMDshort(item.end);
-
-    const no = tankNoFromId(id);
+  for(const it of arr){
+    const badgeClass = it.status === "ready" ? "ready" : "fermenting";
 
     const card = document.createElement("div");
     card.className = "card";
-
     card.innerHTML = `
-      ${limited ? `<div class="ribbon"><span>Limited</span></div>` : ""}
+      ${it.limited ? `<div class="ribbon"><span>Limited</span></div>` : ""}
 
       <div class="cardHead">
         <div class="headRow">
           <div class="leftTitle">
-            <div class="tankNo">${no || ""}</div>
+            <div class="tankNo">${escapeHtml(it.no || "")}</div>
             <div class="nameWrap">
-              <div class="beerName" title="${escapeHtml(beerName)}">${escapeHtml(beerName)}</div>
-              <div class="beerStyle" title="${escapeHtml(style)}">${escapeHtml(style)}</div>
+              <div class="beerName" title="${escapeHtml(it.beer)}">${escapeHtml(it.beer)}</div>
+              <div class="beerStyle" title="${escapeHtml(it.style)}">${escapeHtml(it.style)}</div>
             </div>
           </div>
 
           <div class="badge ${badgeClass}">
-            <div class="b1">${badgeCN}</div>
-            <div class="b2">${dayText}</div>
+            <div class="b1">${escapeHtml(it.badgeCN)}</div>
+            <div class="b2">${escapeHtml(it.dayText)}</div>
           </div>
         </div>
       </div>
 
       <div class="cardBody">
         <div class="metrics" aria-label="metrics">
-          <span>ABV ${escapeHtml(abv)}</span>
+          <span>ABV ${escapeHtml(it.abv)}</span>
           <span class="dot">·</span>
-          <span>IBU ${escapeHtml(ibu)}</span>
+          <span>IBU ${escapeHtml(it.ibu)}</span>
           <span class="dot">·</span>
-          <span>${escapeHtml(cap)}</span>
+          <span>${escapeHtml(it.capacity)}</span>
           <span class="dot">·</span>
-          <span id="temp-${escapeHtml(id)}">${escapeHtml(tempText)}</span>
+          <span>${escapeHtml(it.temp)}</span>
         </div>
 
         <div class="progressRow">
-          <div class="date">${start}</div>
+          <div class="date">${escapeHtml(it.start_md)}</div>
           <div class="progressBar" aria-label="progress">
-            <i style="width:${progress}%"></i>
-            <b>${progress}%</b>
+            <i style="width:${Number(it.progress||0)}%"></i>
+            <b>${Number(it.progress||0)}%</b>
           </div>
-          <div class="date">${end}</div>
+          <div class="date">${escapeHtml(it.end_md)}</div>
         </div>
       </div>
     `;
-
     list.appendChild(card);
-  }
-}
-
-function tickTemps(){
-  const entries = Object.entries(lastDataCache || {})
-    .map(([id, row]) => ({ id, ...(row||{}) }))
-    .filter(x => x.show === true);
-
-  for(const item of entries){
-    const id = item.id;
-    ensureTemp(id, item.temp);
-    bumpTemp(id);
-
-    const el = document.getElementById(`temp-${id}`);
-    if(el){
-      el.textContent = fmtTemp(tempState.get(id));
-    }
   }
 }
 
@@ -552,18 +407,17 @@ async function load(){
   try{
     const res = await fetch(LOAD_URL, { cache:"no-store" });
     const data = await res.json();
-    render(data || {});
+    if(!res.ok || data.ok === false) return renderItems([]);
+    renderItems(data.items || []);
   }catch(e){
-    render({});
+    renderItems([]);
   }
 }
 
 tickClock();
 setInterval(tickClock, 1000);
-
 load();
 setInterval(load, POLL_MS);
-setInterval(tickTemps, TEMP_TICK_MS);
 </script>
 </body>
 </html>
