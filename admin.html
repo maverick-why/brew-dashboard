@@ -260,7 +260,6 @@
   }
 
   function nextId(){
-    // 找到最大 Fxx + 1
     const keys = Object.keys(state || {});
     let max = 0;
     for(const k of keys){
@@ -305,7 +304,6 @@
 
     const ids = sortIds(Object.keys(state || {}));
     if(ids.length === 0){
-      // 默认给一行
       state["F1"] = normalizeRow({show:true, capacity:"150L", status:"auto"});
       return render();
     }
@@ -400,10 +398,26 @@
   // ====== load/save
   async function apiLoad(){
     try{
-      const res = await fetch(LOAD_URL, { cache:"no-store" });
-      const data = await res.json();
+      if(!ADMIN_PASS){
+        toast("未登录：请刷新页面重新输入密码", false);
+        return;
+      }
+
+      const res = await fetch(LOAD_URL, {
+        cache:"no-store",
+        headers:{ "x-admin-pass": ADMIN_PASS }
+      });
+
+      const data = await res.json().catch(()=> ({}));
+      if(!res.ok || data.ok === false){
+        setAuthUI(false);
+        toast("加载失败：密码错误或无权限（Unauthorized）", false);
+        return;
+      }
+
       state = data || {};
       render();
+      setAuthUI(true);
       toast("已从共享数据源加载", true);
     }catch(err){
       toast("加载失败：/api/load", false);
@@ -416,7 +430,7 @@
         toast("未登录：请刷新页面重新输入密码", false);
         return;
       }
-      // 写回前做一次 normalize
+
       const out = {};
       for(const [id, row] of Object.entries(state || {})){
         out[id] = normalizeRow(row);
@@ -433,82 +447,4 @@
 
       const j = await res.json().catch(()=> ({}));
       if(!res.ok || j.ok === false){
-        setAuthUI(false);
-        toast("保存失败：密码错误或无权限（Unauthorized）", false);
-        return;
-      }
-      setAuthUI(true);
-      toast("已保存到共享数据源", true);
-    }catch(err){
-      toast("保存失败：/api/save", false);
-    }
-  }
-
-  // ====== add
-  function addTank(){
-    const id = nextId();
-    state[id] = normalizeRow({
-      show:true,
-      beer:"",
-      style:"",
-      abv:"",
-      ibu:"",
-      capacity:"150L",
-      temp:"",
-      start:"",
-      end:"",
-      status:"auto",
-      limited:false
-    });
-    render();
-    toast(`已新增 ${id}`, true);
-    // 滚动到最底
-    const wrap = document.querySelector(".tableWrap");
-    if(wrap) wrap.scrollTop = wrap.scrollHeight;
-  }
-
-  // ====== date helpers
-  function toDateInput(v){
-    if(!v) return "";
-    // 支持 "YYYY/MM/DD" 或 "YYYY-MM-DD"
-    const s = String(v).trim();
-    const m1 = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/.exec(s);
-    if(m1){
-      const y = m1[1];
-      const mo = String(m1[2]).padStart(2,"0");
-      const d  = String(m1[3]).padStart(2,"0");
-      return `${y}-${mo}-${d}`;
-    }
-    // 其它格式尝试 Date
-    const d = new Date(s);
-    if(isNaN(d)) return "";
-    const y = d.getFullYear();
-    const mo = String(d.getMonth()+1).padStart(2,"0");
-    const da = String(d.getDate()).padStart(2,"0");
-    return `${y}-${mo}-${da}`;
-  }
-
-  function escapeHtml(str){
-    return String(str || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  // ====== wire buttons
-  document.getElementById("btnLoad").addEventListener("click", apiLoad);
-  document.getElementById("btnSave").addEventListener("click", apiSave);
-  document.getElementById("btnAdd").addEventListener("click", addTank);
-
-  // ====== login on entry
-  (function init(){
-    ADMIN_PASS = prompt("请输入后台写入密码（用于保存）") || "";
-    setAuthUI(!!ADMIN_PASS);
-    // 页面进来先加载一次
-    apiLoad();
-  })();
-</script>
-</body>
-</html>
+        s
