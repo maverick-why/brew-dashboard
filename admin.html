@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title> 后台管理 · 时光酿造所 </title>
+  <title>后台管理 · 时光酿造所</title>
   <style>
     :root{
       --bg0:#070b12; --bg1:#0b1220;
@@ -137,7 +137,6 @@
 
     .wBeer{min-width: 220px}
     .wStyle{min-width: 170px}
-    .wNum{min-width: 110px}
     .wDate{min-width: 160px}
     .wSel{min-width: 120px}
     .wSmall{min-width: 90px}
@@ -313,7 +312,6 @@
       state[id] = row;
 
       const tr = document.createElement("tr");
-
       tr.innerHTML = `
         <td class="idCell">${id}</td>
 
@@ -354,7 +352,6 @@
           </div>
         </td>
       `;
-
       tbody.appendChild(tr);
     }
   }
@@ -397,39 +394,76 @@
 
   // ====== load/save
   async function apiLoad(){
-  try{
-    if(!ADMIN_PASS){
-      toast("未登录：请刷新页面重新输入密码", false);
-      return;
-    }
+    try{
+      if(!ADMIN_PASS){
+        toast("未登录：请刷新页面重新输入密码", false);
+        return;
+      }
 
-    const res = await fetch(LOAD_URL, {
-      cache: "no-store",
-      headers: { "x-admin-pass": ADMIN_PASS }   // ✅ 关键：带上密码
-    });
+      const res = await fetch(LOAD_URL, {
+        cache: "no-store",
+        headers: { "x-admin-pass": ADMIN_PASS }
+      });
 
-    // 用 text -> JSON 的方式，避免接口偶尔返回非 JSON 导致直接崩
-    const text = await res.text();
-    let data = {};
-    try { data = JSON.parse(text || "{}"); } catch { data = {}; }
+      const text = await res.text();
+      let data = {};
+      try { data = JSON.parse(text || "{}"); } catch { data = {}; }
 
-    // ✅ 如果后端明确返回 Unauthorized / 其它错误，给出明确提示
-    if(!res.ok || data.ok === false){
+      if(!res.ok || data.ok === false){
+        setAuthUI(false);
+        toast(`加载失败：${res.status} ${data.error || ""}`.trim(), false);
+        return;
+      }
+
+      state = data || {};
+      render();
+      setAuthUI(true);
+      toast("已从共享数据源加载", true);
+    }catch(err){
       setAuthUI(false);
-      toast(`加载失败：${res.status} ${data.error || ""}`.trim(), false);
-      return;
+      toast("加载失败：网络异常或接口异常", false);
     }
-
-    state = data || {};
-    render();
-    setAuthUI(true);
-    toast("已从共享数据源加载", true);
-  }catch(err){
-    setAuthUI(false);
-    toast("加载失败：网络异常或接口异常", false);
   }
-}
 
+  async function apiSave(){
+    try{
+      if(!ADMIN_PASS){
+        toast("未登录：请刷新页面重新输入密码", false);
+        return;
+      }
+
+      // 写回前做一次 normalize
+      const out = {};
+      for(const [id, row] of Object.entries(state || {})){
+        out[id] = normalizeRow(row);
+      }
+
+      const res = await fetch(SAVE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-pass": ADMIN_PASS
+        },
+        body: JSON.stringify(out)
+      });
+
+      const text = await res.text();
+      let j = {};
+      try { j = JSON.parse(text || "{}"); } catch { j = {}; }
+
+      if(!res.ok || j.ok === false){
+        setAuthUI(false);
+        toast(`保存失败：${res.status} ${j.error || "Unauthorized"}`.trim(), false);
+        return;
+      }
+
+      setAuthUI(true);
+      toast("已保存到共享数据源", true);
+    }catch(err){
+      setAuthUI(false);
+      toast("保存失败：网络异常或接口异常", false);
+    }
+  }
 
   // ====== add
   function addTank(){
@@ -488,9 +522,18 @@
 
   // ====== login on entry
   (function init(){
+    // 初始先显示未登录（避免“乱输也显示已登录”）
+    setAuthUI(false);
+
     ADMIN_PASS = (prompt("请输入后台写入密码（用于加载/保存）") || "").trim();
-    setAuthUI(!!ADMIN_PASS);
-    if(ADMIN_PASS) apiLoad();
+
+    if(!ADMIN_PASS){
+      toast("未输入密码：无法加载/保存", false);
+      return;
+    }
+
+    // 输入密码后立刻尝试加载一次，成功才算登录
+    apiLoad();
   })();
 </script>
 </body>
