@@ -2,6 +2,10 @@
 const Redis = require("ioredis");
 
 const KEY = "brew_dash_records_v1";
+const TEMP_KEY = "brew_dash_temps_v1"; // 后端温度状态
+
+const TEMP_MIN = 18.0;
+const TEMP_MAX = 19.9;
 
 let redis;
 function getRedis() {
@@ -23,6 +27,20 @@ function readBody(req) {
     req.on("end", () => resolve(body));
     req.on("error", reject);
   });
+}
+
+function parseTempNumber(v) {
+  if (v === undefined || v === null || v === "") return null;
+  const t = String(v).trim().replace("℃", "").replace("°C", "").replace("°", "").trim();
+  const n = Number(t);
+  if (Number.isNaN(n)) return null;
+  return n;
+}
+function clampTemp(x) {
+  return Math.max(TEMP_MIN, Math.min(TEMP_MAX, x));
+}
+function round1(x) {
+  return Math.round(x * 10) / 10;
 }
 
 module.exports = async (req, res) => {
@@ -50,6 +68,20 @@ module.exports = async (req, res) => {
 
     const r = getRedis();
     await r.set(KEY, JSON.stringify(obj || {}));
+
+    // ✅ 同步/重置后端温度状态：以“后台输入的温度”为起点
+    // 这样你在后台填 18，前端/接口看到的一定从 18.0 起步，不会莫名其妙变 3.4℃
+    const temps = {};
+    for (const [id, row] of Object.entries(obj || {})) {
+      const n = parseTempNumber(row && row.temp);
+      const init = round1(clampTemp(n ?? TEMP_MIN));
+      temps[id] = init;
+    }
+
+    const tick = Math.floor(Date.now() / 5000); // 5 秒一个 tick
+    const tempState = { lastTick: tick, temps };
+    // 给一个较长过期（可选），防止 Redis 长期堆积
+    await r.set(TEMP_KEY, JSON.stringify(tempState), "EX", 60 * 60 * 24 * 30);
 
     return res.status(200).end(JSON.stringify({ ok: true }));
   } catch (e) {
