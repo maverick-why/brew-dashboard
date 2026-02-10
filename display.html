@@ -262,13 +262,23 @@ main{
 .metrics{
   display:flex;
   align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
+   justify-content:space-between;
+  gap:12px;
+
   font-weight:900;
   font-size:13px;
   color:rgba(234,240,255,.90);
   margin: 2px 0 8px;
 }
+    .metrics-left, .metrics-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .metrics span{ white-space:nowrap; color:rgba(234,240,255,.88); }
+  .metrics .dot{ color:rgba(234,240,255,.35); font-weight:900; }
+
+
 .metrics span{ white-space:nowrap; color:rgba(234,240,255,.88); }
 .metrics .dot{ color:rgba(234,240,255,.35); font-weight:900; }
 
@@ -419,15 +429,18 @@ function renderItems(items){
       </div>
 
       <div class="cardBody">
-        <div class="metrics" aria-label="metrics">
-          <span>ABV ${escapeHtml(it.abv)}</span>
-          <span class="dot">·</span>
-          <span>IBU ${escapeHtml(it.ibu)}</span>
-          <span class="dot">·</span>
-          <span>${escapeHtml(it.capacity)}</span>
-          <span class="dot">·</span>
-          <span>${escapeHtml(it.temp)}</span>
-        </div>
+<div class="metrics" aria-label="metrics">
+    <div class="metrics-left">
+      <span>ABV ~${escapeHtml(it.abv)}</span>
+      <span class="dot">·</span>
+      <span>IBU ~${escapeHtml(it.ibu)}</span>
+    </div>
+    <div class="metrics-right">
+      <span>${escapeHtml(it.capacity)}</span>
+      <span class="dot">·</span>
+      <span>${escapeHtml(it.temp)}</span>
+    </div>
+  </div>
 
         <div class="progressRow">
           <div class="date">${escapeHtml(it.start_md)}</div>
