@@ -16,15 +16,9 @@
     }
 
     /* ── 固定画布 1920×1080，JS 负责缩放 ── */
-    /* ──
-       --gap  : 卡片间距，同时决定拼屏缝隙视觉宽度
-       --edge : 页面左右外边距 = gap/2（另一半由显示器 bezel 补齐）
-       如果两块屏拼合后缝隙偏宽/偏窄，只需调整 --gap 这一个值
-    ── */
     :root {
-      --gap:  20px;
-      --edge: 10px;   /* = --gap / 2 */
-      --pad-v: 16px;  /* 上下内边距 */
+      --gap:  20px;   /* 卡片间距，等电视到了量好 bezel 后调整 */
+      --edge: 0px;    /* 左右外边距，目前贴边；量好 bezel 后改为 gap/2 */
     }
 
     #root {
@@ -35,7 +29,7 @@
       transform-origin: top left;
       background: #1c1c1c;
       font-family: 'Noto Sans SC', sans-serif;
-      padding: var(--pad-v) var(--edge);
+      padding: 0 var(--edge);   /* 上下0，左右等 bezel 测量后再填 */
       display: flex;
       flex-direction: column;
     }
