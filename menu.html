@@ -38,6 +38,36 @@
       gap: 6px;
     }
 
+    /* ── 预览翻页按钮 ── */
+    .preview-nav {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 0 4px;
+    }
+    .preview-nav.show { display: flex }
+    .nav-btn {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      padding: 8px 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 1px;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,.25) }
+    .nav-label {
+      color: rgba(255,255,255,.6);
+      font-size: 18px;
+      letter-spacing: 1px;
+      min-width: 120px;
+      text-align: center;
+    }
+
     /* ── 卡片 ── */
     .card {
       background: #fff;
@@ -181,6 +211,11 @@
 
 <div id="root">
   <div class="grid" id="grid"></div>
+  <div class="preview-nav" id="previewNav">
+    <button class="nav-btn" id="btnPrev">← 上一页</button>
+    <div class="nav-label" id="navLabel">第 1 页 / 共 2 页</div>
+    <button class="nav-btn" id="btnNext">下一页 →</button>
+  </div>
 </div>
 
 <script>
@@ -192,9 +227,34 @@ const DEFAULT_COLORS = [
   'yellow','red','brown','yellow','dark','orange','yellow','dark'
 ];
 
-// ?page=1 → 第1-8，?page=2 → 第9-16，无参数 → 1-8（默认）
-const PAGE = parseInt(new URLSearchParams(location.search).get("page") || "1", 10);
-const OFFSET = (PAGE === 2) ? 8 : 0;
+// ?page=1 → 第1-8 TV模式，?page=2 → 第9-16 TV模式，无参数 → 预览翻页
+const rawPage  = new URLSearchParams(location.search).get("page");
+const IS_TV    = !!rawPage;
+const TV_PAGE  = IS_TV ? parseInt(rawPage, 10) : 1;
+const TV_OFFSET = TV_PAGE === 2 ? 8 : 0;
+
+let previewPage = 1; // 预览模式当前页
+let allItems    = [];
+
+// 预览模式显示翻页按钮
+if (!IS_TV) {
+  document.getElementById("previewNav").classList.add("show");
+  document.getElementById("btnPrev").addEventListener("click", () => {
+    if (previewPage > 1) { previewPage--; renderPreview(); }
+  });
+  document.getElementById("btnNext").addEventListener("click", () => {
+    if (previewPage < 2) { previewPage++; renderPreview(); }
+  });
+}
+
+function renderPreview() {
+  const offset = (previewPage - 1) * 8;
+  const slice  = allItems.slice(offset, offset + 8);
+  document.getElementById("grid").innerHTML =
+    slice.map((it, i) => makeCard(it, offset + i)).join("");
+  document.getElementById("navLabel").textContent =
+    `第 ${previewPage} 页 / 共 2 页`;
+}
 
 function esc(s) {
   return String(s || "")
@@ -248,10 +308,17 @@ async function load() {
     const res  = await fetch(API, { cache: "no-store" });
     const data = await res.json();
     if (!data.ok) return;
+    allItems = data.items;
 
-    const slice = data.items.slice(OFFSET, OFFSET + 8);
-    document.getElementById("grid").innerHTML =
-      slice.map((it, i) => makeCard(it, OFFSET + i)).join("");
+    if (IS_TV) {
+      // TV 模式：直接渲染对应页
+      const slice = allItems.slice(TV_OFFSET, TV_OFFSET + 8);
+      document.getElementById("grid").innerHTML =
+        slice.map((it, i) => makeCard(it, TV_OFFSET + i)).join("");
+    } else {
+      // 预览模式：翻页渲染
+      renderPreview();
+    }
   } catch(e) {
     console.warn("menu load error", e);
   }
