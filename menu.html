@@ -17,8 +17,8 @@
 
     /* ── 固定画布 1920×1080，JS 负责缩放 ── */
     :root {
-      --gap:  20px;   /* 卡片间距，等电视到了量好 bezel 后调整 */
-      --edge: 0px;    /* 左右外边距，目前贴边；量好 bezel 后改为 gap/2 */
+      --bezel: 20px;  /* 电视边框宽度（像素），到货后量好改这一个值 */
+      --gap: calc(var(--bezel) * 2); /* 卡片间距 = 2×bezel，与拼接缝视觉等宽 */
     }
 
     #root {
@@ -28,11 +28,17 @@
       height: 1080px;
       transform-origin: top left;
       background: #1c1c1c;
-      font-family: 'Noto Sans SC', sans-serif; /* 中文默认 */
-      padding: 0 var(--edge);
+      font-family: 'Noto Sans SC', sans-serif;
+      padding: 0;
       display: flex;
       flex-direction: column;
     }
+
+    /* TV 第一页（左屏）：上左下留 bezel，右边贴边 */
+    #root.tv-page-1 { padding: var(--bezel) 0 var(--bezel) var(--bezel); }
+
+    /* TV 第二页（右屏）：上右下留 bezel，左边贴边 */
+    #root.tv-page-2 { padding: var(--bezel) var(--bezel) var(--bezel) 0; }
 
     /* ── 卡片网格：2列×4行 ── */
     .grid {
@@ -251,6 +257,11 @@ const rawPage  = new URLSearchParams(location.search).get("page");
 const IS_TV    = !!rawPage;
 const TV_PAGE  = IS_TV ? parseInt(rawPage, 10) : 1;
 const TV_OFFSET = TV_PAGE === 2 ? 8 : 0;
+
+// TV 模式：给 root 加边框 class
+if (IS_TV) {
+  document.getElementById("root").classList.add(`tv-page-${TV_PAGE}`);
+}
 
 let previewPage = 1; // 预览模式当前页
 let allItems    = [];
