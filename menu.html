@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>酒单 · 时光酿造所</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0a0a0a;
+      --sub:#555;
+      --muted:#999;
+      --border:#e8e8e8;
+      --card-bg:#fafafa;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      width:100%;height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family: "PingFang SC","Noto Sans SC",ui-sans-serif,system-ui,sans-serif;
+    }
+
+    body{
+      display:flex;
+      flex-direction:column;
+      padding:28px 32px 20px;
+      gap:20px;
+    }
+
+    /* ── Header ── */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding-bottom:16px;
+      border-bottom:2px solid var(--text);
+    }
+    .header-left{display:flex;align-items:baseline;gap:16px}
+    .logo-text{
+      font-size:28px;font-weight:900;letter-spacing:2px;text-transform:uppercase;
+    }
+    .logo-cn{font-size:20px;font-weight:700;color:var(--sub);letter-spacing:1px}
+    .header-right{
+      font-size:13px;color:var(--muted);letter-spacing:1px;text-align:right;
+      font-variant-numeric:tabular-nums;
+    }
+
+    /* ── Grid ── */
+    .grid{
+      flex:1;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      grid-template-rows:repeat(4,1fr);
+      gap:10px;
+    }
+
+    /* ── Beer Card ── */
+    .card{
+      background:var(--card-bg);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      overflow:hidden;
+    }
+    .card:hover{background:#f3f3f3}
+
+    /* 顶部：编号 + 酒厂 */
+    .card-top{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .no{
+      width:32px;height:32px;
+      border-radius:6px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:15px;font-weight:900;
+      color:#fff;
+      flex:0 0 auto;
+    }
+    .brewery{
+      font-size:11px;color:var(--muted);
+      letter-spacing:.5px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+
+    /* 酒名 */
+    .name-cn{
+      font-size:20px;font-weight:900;
+      line-height:1.1;
+      letter-spacing:.3px;
+    }
+    .name-en{
+      font-size:11px;color:var(--sub);
+      letter-spacing:.5px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+
+    /* 风格 + 参数 */
+    .meta{
+      display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+      margin-top:2px;
+    }
+    .style-tag{
+      font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+      padding:2px 7px;border-radius:4px;
+      background:rgba(0,0,0,.07);color:var(--text);
+    }
+    .param{
+      font-size:10px;color:var(--muted);letter-spacing:.5px;
+      font-variant-numeric:tabular-nums;
+    }
+    .dot{color:#ccc}
+
+    /* 分割线 */
+    .divider{height:1px;background:var(--border)}
+
+    /* 价格区 */
+    .prices{
+      display:flex;gap:8px;margin-top:auto;
+    }
+    .price-item{
+      flex:1;
+      display:flex;flex-direction:column;gap:2px;
+    }
+    .price-label{
+      font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+      color:var(--muted);font-weight:800;
+    }
+    .price-row{
+      display:flex;align-items:baseline;gap:4px;
+    }
+    .price-amt{
+      font-size:20px;font-weight:900;
+      font-variant-numeric:tabular-nums;
+      line-height:1;
+    }
+    .price-unit{font-size:11px;color:var(--sub)}
+    .price-size{font-size:10px;color:var(--muted)}
+
+    /* 空卡片 */
+    .card.empty{
+      background:transparent;
+      border:1px dashed #e0e0e0;
+      align-items:center;justify-content:center;
+    }
+    .card.empty .no{background:#ddd!important}
+    .card.empty .name-cn{color:#ccc;font-size:14px;font-weight:400}
+
+    /* 底部 */
+    .footer{
+      text-align:center;
+      font-size:11px;color:var(--muted);
+      letter-spacing:1px;
+      padding-top:8px;
+      border-top:1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-text">CHRONOBREWERY</div>
+    <div class="logo-cn">时光酿造所</div>
+  </div>
+  <div class="header-right">
+    <div id="clock">--:--</div>
+    <div style="margin-top:3px">CRAFT BEER MENU</div>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="footer">所有价格含税 · All prices inclusive · <span id="updated">--</span></div>
+
+<script>
+const API = "/api/menu-public";
+const REFRESH_MS = 30000;
+
+// 根据风格返回色块颜色
+function styleColor(style) {
+  const s = (style || "").toLowerCase();
+  if (/\bipa\b|neipa|hazy|pale ale|apa/.test(s)) return "#e07b39";  // 橙
+  if (/stout|porter|黑/.test(s))                 return "#1f2937";  // 深灰
+  if (/lager|pilsner|helles|pils|拉格/.test(s))  return "#b8860b";  // 金
+  if (/wheat|weizen|wit|小麦/.test(s))            return "#4a7fcb";  // 蓝
+  if (/sour|gose|berliner|酸/.test(s))            return "#c0446a";  // 粉红
+  if (/saison|farmhouse|季节/.test(s))            return "#3a8f6e";  // 绿
+  if (/abbey|dubbel|tripel|quad/.test(s))         return "#7c5cbf";  // 紫
+  return "#555555"; // 默认灰
+}
+
+function escHtml(s) {
+  return String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function renderCard(item) {
+  const isEmpty = !item.name && !item.name_en;
+  const color = styleColor(item.style || item.style_en);
+
+  if (isEmpty) {
+    return `
+      <div class="card empty">
+        <div class="no" style="background:${color}">${item.no}</div>
+        <div class="name-cn">待上新</div>
+      </div>`;
+  }
+
+  const abv  = item.abv  ? `ABV ${escHtml(item.abv)}%`  : "";
+  const ibu  = item.ibu  ? `IBU ${escHtml(item.ibu)}`   : "";
+  const params = [abv, ibu].filter(Boolean).join('<span class="dot"> · </span>');
+
+  const styleLabel = item.style || item.style_en || "";
+
+  const lp = item.large_price  ? `<div class="price-item">
+    <div class="price-label">大杯${item.large_size ? " · "+escHtml(item.large_size) : ""}</div>
+    <div class="price-row">
+      <div class="price-amt">¥${escHtml(item.large_price)}</div>
+    </div>
+  </div>` : "";
+
+  const sp = item.small_price ? `<div class="price-item">
+    <div class="price-label">小杯${item.small_size ? " · "+escHtml(item.small_size) : ""}</div>
+    <div class="price-row">
+      <div class="price-amt">¥${escHtml(item.small_price)}</div>
+    </div>
+  </div>` : "";
+
+  return `
+    <div class="card">
+      <div class="card-top">
+        <div class="no" style="background:${color}">${item.no}</div>
+        <div class="brewery">${escHtml(item.brewery)}</div>
+      </div>
+
+      <div class="name-cn">${escHtml(item.name || item.name_en)}</div>
+      ${item.name_en && item.name ? `<div class="name-en">${escHtml(item.name_en)}</div>` : ""}
+
+      <div class="meta">
+        ${styleLabel ? `<span class="style-tag">${escHtml(styleLabel)}</span>` : ""}
+        ${params ? `<span class="param">${params}</span>` : ""}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="prices">${lp}${sp}</div>
+    </div>`;
+}
+
+async function load() {
+  try {
+    const res = await fetch(API, { cache: "no-store" });
+    const data = await res.json();
+    if (!data.ok) return;
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = data.items.map(renderCard).join("");
+
+    const now = new Date();
+    document.getElementById("updated").textContent =
+      `更新于 ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  } catch(e) {
+    console.warn("menu load error", e);
+  }
+}
+
+// 时钟
+function tick() {
+  const d = new Date();
+  document.getElementById("clock").textContent =
+    `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+tick();
+setInterval(tick, 1000);
+
+// 标签页隐藏时暂停刷新
+let timer;
+function startPoll() { timer = setInterval(load, REFRESH_MS); }
+function stopPoll()  { clearInterval(timer); }
+document.addEventListener("visibilitychange", () =>
+  document.hidden ? stopPoll() : (load(), startPoll())
+);
+
+load();
+startPoll();
+</script>
+</body>
+</html>
