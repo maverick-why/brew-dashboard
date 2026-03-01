@@ -283,8 +283,8 @@ function esc(s) {
 
 function makeCard(item, idx) {
   const no    = String(item.no).padStart(2, "0");
-  const color = empty ? "gray" : (item.color || DEFAULT_COLORS[idx] || "dark");
   const empty = !item.name && !item.name_en;
+  const color = empty ? "gray" : (item.color || DEFAULT_COLORS[idx] || "dark");
 
   const priceL = item.large_price
     ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? " / "+esc(item.large_size) : ""}</div>` : "";
