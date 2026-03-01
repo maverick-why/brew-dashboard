@@ -611,7 +611,7 @@
     const mk = t.dataset?.menuK;
     if(no && mk){
       if(!menuState[no]) menuState[no] = {};
-      menuState[no][mk] = t.value;
+      menuState[no][mk] = t.type === "checkbox" ? !!t.checked : t.value;
       markDirty();
     }
   });
