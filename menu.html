@@ -7,165 +7,194 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Anton&display=swap" rel="stylesheet"/>
   <style>
-    *{ margin:0; padding:0; box-sizing:border-box }
+    * { margin:0; padding:0; box-sizing:border-box }
 
-    body{
-      background:#1c1c1c;
-      font-family:'Noto Sans SC',sans-serif;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      min-height:100vh;
-      padding:6px;
-    }
-
-    .menu-container{
-      display:flex;
-      gap:5px;
-      width:100%;
-    }
-
-    /* 单页模式（?page=1 或 ?page=2）撑满整屏 */
-    .menu-container.single .panel{
-      flex:1;
-    }
-
-    .panel{
-      flex:1;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:3px;
-    }
-
-    /* ── 卡片 ── */
-    .card{
-      background:#fff;
-      display:flex;
-      flex-direction:row;
-      height:88px;
+    html, body {
+      width:100%; height:100%;
+      background:#111;
       overflow:hidden;
     }
 
-    .card-num{
-      width:48px;
-      flex-shrink:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .num{
-      font-family:'Anton',sans-serif;
-      font-size:30px;
-      color:#fff;
-      letter-spacing:-1px;
-      line-height:1;
+    /* ── 固定画布 1920×1080，JS 负责缩放 ── */
+    #root {
+      position: fixed;
+      top: 0; left: 0;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: top left;
+      background: #1c1c1c;
+      font-family: 'Noto Sans SC', sans-serif;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
     }
 
-    .card-body{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      min-width:0;
+    /* ── 卡片网格：2列×4行 ── */
+    .grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    /* ── 卡片 ── */
+    .card {
+      background: #fff;
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+    }
+
+    /* 左侧彩色编号竖条 */
+    .card-num {
+      width: 84px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .num {
+      font-family: 'Anton', sans-serif;
+      font-size: 54px;
+      color: #fff;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    /* 右侧内容 */
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
     }
 
     /* 上半 */
-    .row-top{
-      flex:1;
-      display:flex;
-      flex-direction:row;
-      align-items:center;
-      padding:6px 10px 4px 10px;
-      gap:8px;
+    .row-top {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 14px 20px 10px 16px;
+      gap: 12px;
     }
-    .info-left{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      min-width:0;
+    .info-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
     }
-    .xx-tag{
-      font-size:7.5px; font-weight:700;
-      color:#555; letter-spacing:.3px; white-space:nowrap;
+    .brewery-tag {
+      font-size: 15px;
+      font-weight: 700;
+      color: #666;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .beer-name{
-      font-weight:900; font-size:20px;
-      color:#111; letter-spacing:1px;
-      line-height:1.1; white-space:nowrap;
+    .beer-name {
+      font-weight: 900;
+      font-size: 46px;
+      color: #111;
+      letter-spacing: 1px;
+      line-height: 1.05;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .beer-sub{
-      font-size:7px; color:#888;
-      letter-spacing:.3px; white-space:nowrap; margin-top:1px;
+    .beer-style {
+      font-size: 18px;
+      color: #888;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      margin-top: 2px;
     }
 
     /* 价格 */
-    .price-block{ flex-shrink:0; text-align:right }
-    .price-line{
-      font-size:11.5px; font-weight:700;
-      color:#222; line-height:1.6; white-space:nowrap;
+    .price-block {
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .price-line {
+      font-size: 24px;
+      font-weight: 900;
+      color: #222;
+      line-height: 1.6;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
     /* 分隔线 */
-    .divider{ height:1px; background:#ddd; margin:0 10px }
+    .divider { height: 1px; background: #e0e0e0; margin: 0 16px }
 
     /* 下半 */
-    .row-bottom{
-      display:flex; flex-direction:row;
-      align-items:center;
-      padding:4px 10px 5px 10px; gap:8px;
+    .row-bottom {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 8px 20px 12px 16px;
+      gap: 12px;
     }
-    .info-en{ flex:1; min-width:0 }
-    .en-name{
-      font-size:8.5px; font-weight:700;
-      color:#444; letter-spacing:.3px; white-space:nowrap;
+    .info-en { flex: 1; min-width: 0 }
+    .en-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #444;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .en-style{
-      font-size:7.5px; color:#888;
-      margin-top:1px; white-space:nowrap;
+    .en-style {
+      font-size: 15px;
+      color: #999;
+      margin-top: 2px;
+      white-space: nowrap;
     }
-    .alc-info{
-      flex-shrink:0; font-size:8px;
-      font-weight:700; color:#888;
-      text-align:right; white-space:nowrap;
+    .alc-info {
+      flex-shrink: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #aaa;
+      text-align: right;
+      white-space: nowrap;
     }
 
     /* 空卡片 */
-    .card.empty .beer-name{ color:#ccc; font-size:13px; font-weight:400 }
+    .card.empty .beer-name { color: #ddd; font-size: 28px; font-weight: 400 }
 
     /* 编号色块 */
-    .c-yellow{ background:#F5C400 }
-    .c-red   { background:#C8252A }
-    .c-orange{ background:#E0621A }
-    .c-dark  { background:#2B2B2B }
-    .c-brown { background:#5A3018 }
-    .c-green { background:#2E7D32 }
-    .c-blue  { background:#1565C0 }
-    .c-purple{ background:#6A1B9A }
-
-    .footer{ display:none }
+    .c-yellow { background: #F5C400 }
+    .c-red    { background: #C8252A }
+    .c-orange { background: #E0621A }
+    .c-dark   { background: #2B2B2B }
+    .c-brown  { background: #5A3018 }
+    .c-green  { background: #2E7D32 }
+    .c-blue   { background: #1565C0 }
+    .c-purple { background: #6A1B9A }
   </style>
 </head>
 <body>
 
-<div class="menu-container" id="container">
-  <div class="panel" id="left-panel"></div>
-  <div class="panel" id="right-panel"></div>
+<div id="root">
+  <div class="grid" id="grid"></div>
 </div>
 
 <script>
-const API      = "/api/menu-public";
-const REFRESH  = 30000;
+const API     = "/api/menu-public";
+const REFRESH = 30000;
 
-// 默认颜色顺序（如后台未设置颜色时 fallback）
 const DEFAULT_COLORS = [
   'yellow','red','orange','dark','yellow','orange','red','dark',
   'yellow','red','brown','yellow','dark','orange','yellow','dark'
 ];
 
-const PAGE = (() => {
-  const p = new URLSearchParams(location.search).get("page");
-  return p === "1" ? 1 : p === "2" ? 2 : 0; // 0 = 双屏预览
-})();
+// ?page=1 → 第1-8，?page=2 → 第9-16，无参数 → 1-8（默认）
+const PAGE = parseInt(new URLSearchParams(location.search).get("page") || "1", 10);
+const OFFSET = (PAGE === 2) ? 8 : 0;
 
 function esc(s) {
   return String(s || "")
@@ -174,31 +203,31 @@ function esc(s) {
 }
 
 function makeCard(item, idx) {
-  const no    = String(item.no).padStart(2,"0");
+  const no    = String(item.no).padStart(2, "0");
   const color = item.color || DEFAULT_COLORS[idx] || "dark";
   const empty = !item.name && !item.name_en;
 
   const priceL = item.large_price
-    ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? "/"+esc(item.large_size) : ""}</div>` : "";
+    ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? " / "+esc(item.large_size) : ""}</div>` : "";
   const priceS = item.small_price
-    ? `<div class="price-line">¥${esc(item.small_price)}${item.small_size ? "/"+esc(item.small_size) : ""}</div>` : "";
+    ? `<div class="price-line">¥${esc(item.small_price)}${item.small_size ? " / "+esc(item.small_size) : ""}</div>` : "";
 
   const abvIbu = [
-    item.abv ? `ALC/${esc(item.abv)}%` : "",
-    item.ibu ? `IBU${esc(item.ibu)}`   : ""
-  ].filter(Boolean).join(" ");
+    item.abv ? `ALC ${esc(item.abv)}%` : "",
+    item.ibu ? `IBU ${esc(item.ibu)}` : ""
+  ].filter(Boolean).join("  ·  ");
 
   return `
-<div class="card${empty?" empty":""}">
+<div class="card${empty ? " empty" : ""}">
   <div class="card-num c-${esc(color)}">
     <span class="num">${no}</span>
   </div>
   <div class="card-body">
     <div class="row-top">
       <div class="info-left">
-        <div class="xx-tag">${esc(item.brewery)}</div>
+        <div class="brewery-tag">${esc(item.brewery)}</div>
         <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
-        <div class="beer-sub">${esc(item.style)}</div>
+        <div class="beer-style">${esc(item.style)}</div>
       </div>
       <div class="price-block">${priceL}${priceS}</div>
     </div>
@@ -216,41 +245,37 @@ function makeCard(item, idx) {
 
 async function load() {
   try {
-    const res  = await fetch(API, { cache:"no-store" });
+    const res  = await fetch(API, { cache: "no-store" });
     const data = await res.json();
     if (!data.ok) return;
 
-    const items = data.items; // 1-16
-
-    const left  = document.getElementById("left-panel");
-    const right = document.getElementById("right-panel");
-
-    // page=1: 只渲染 1-8，page=2: 只渲染 9-16，0: 两边都渲染
-    if (PAGE === 1 || PAGE === 0) {
-      left.innerHTML = items.slice(0,8).map((it,i) => makeCard(it,i)).join("");
-    }
-    if (PAGE === 2 || PAGE === 0) {
-      right.innerHTML = items.slice(8,16).map((it,i) => makeCard(it,i+8)).join("");
-    }
+    const slice = data.items.slice(OFFSET, OFFSET + 8);
+    document.getElementById("grid").innerHTML =
+      slice.map((it, i) => makeCard(it, OFFSET + i)).join("");
   } catch(e) {
     console.warn("menu load error", e);
   }
 }
 
-// 单页模式：隐藏另一个面板，容器撑满
-if (PAGE === 1) {
-  document.getElementById("right-panel").style.display = "none";
-  document.getElementById("container").classList.add("single");
+// ── 缩放：将 1920×1080 的画布等比缩放铺满屏幕 ──
+function scaleToFit() {
+  const root   = document.getElementById("root");
+  const scaleX = window.innerWidth  / 1920;
+  const scaleY = window.innerHeight / 1080;
+  const scale  = Math.min(scaleX, scaleY);
+  const offsetX = (window.innerWidth  - 1920 * scale) / 2;
+  const offsetY = (window.innerHeight - 1080 * scale) / 2;
+  root.style.transform = `scale(${scale})`;
+  root.style.left = offsetX + "px";
+  root.style.top  = offsetY + "px";
 }
-if (PAGE === 2) {
-  document.getElementById("left-panel").style.display  = "none";
-  document.getElementById("container").classList.add("single");
-}
+window.addEventListener("resize", scaleToFit);
+scaleToFit();
 
-// 刷新
+// ── 自动刷新 ──
 let timer;
 document.addEventListener("visibilitychange", () =>
-  document.hidden ? clearInterval(timer) : (load(), timer = setInterval(load,REFRESH))
+  document.hidden ? clearInterval(timer) : (load(), timer = setInterval(load, REFRESH))
 );
 load();
 timer = setInterval(load, REFRESH);
