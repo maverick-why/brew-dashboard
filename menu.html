@@ -16,8 +16,7 @@
       flex-direction:column;
       justify-content:center;
       min-height:100vh;
-      padding:28px 36px 18px;
-      gap:0;
+      padding:6px;
     }
 
     .menu-container{
@@ -143,12 +142,7 @@
     .c-blue  { background:#1565C0 }
     .c-purple{ background:#6A1B9A }
 
-    .footer{
-      color:rgba(255,255,255,.28);
-      font-size:11px; margin-top:14px;
-      letter-spacing:1px;
-      display:flex; justify-content:space-between;
-    }
+    .footer{ display:none }
   </style>
 </head>
 <body>
@@ -156,11 +150,6 @@
 <div class="menu-container" id="container">
   <div class="panel" id="left-panel"></div>
   <div class="panel" id="right-panel"></div>
-</div>
-
-<div class="footer">
-  <span>时光酿造所 · CHRONOBREWERY</span>
-  <span id="clock">--:--</span>
 </div>
 
 <script>
@@ -257,14 +246,6 @@ if (PAGE === 2) {
   document.getElementById("left-panel").style.display  = "none";
   document.getElementById("container").classList.add("single");
 }
-
-// 时钟
-function tick(){
-  const d = new Date();
-  document.getElementById("clock").textContent =
-    `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
-}
-tick(); setInterval(tick,1000);
 
 // 刷新
 let timer;
