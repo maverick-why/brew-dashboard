@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>酒单 · 时光酿造所</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Anton&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     * { margin:0; padding:0; box-sizing:border-box }
 
@@ -28,8 +28,8 @@
       height: 1080px;
       transform-origin: top left;
       background: #1c1c1c;
-      font-family: 'Noto Sans SC', sans-serif;
-      padding: 0 var(--edge);   /* 上下0，左右等 bezel 测量后再填 */
+      font-family: 'Noto Sans SC', sans-serif; /* 中文默认 */
+      padding: 0 var(--edge);
       display: flex;
       flex-direction: column;
     }
@@ -90,10 +90,11 @@
       justify-content: center;
     }
     .num {
-      font-family: 'Anton', sans-serif;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 900;
       font-size: 54px;
       color: #fff;
-      letter-spacing: -2px;
+      letter-spacing: -1px;
       line-height: 1;
     }
 
@@ -122,15 +123,18 @@
       min-width: 0;
     }
     .brewery-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 500;
       font-size: 15px;
-      font-weight: 700;
       color: #666;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .beer-name {
+      font-family: 'Noto Sans SC', sans-serif;
       font-weight: 900;
       font-size: 46px;
       color: #111;
@@ -141,6 +145,8 @@
       text-overflow: ellipsis;
     }
     .beer-style {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 400;
       font-size: 18px;
       color: #888;
       letter-spacing: 0.5px;
@@ -154,8 +160,9 @@
       text-align: right;
     }
     .price-line {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
       font-size: 24px;
-      font-weight: 900;
       color: #222;
       line-height: 1.6;
       white-space: nowrap;
@@ -175,27 +182,34 @@
     }
     .info-en { flex: 1; min-width: 0 }
     .en-name {
-      font-size: 18px;
+      font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
+      font-size: 18px;
       color: #444;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .en-style {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 500;
       font-size: 15px;
       color: #999;
+      letter-spacing: 0.5px;
       margin-top: 2px;
       white-space: nowrap;
     }
     .alc-info {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
       flex-shrink: 0;
       font-size: 16px;
-      font-weight: 700;
       color: #aaa;
       text-align: right;
       white-space: nowrap;
+      letter-spacing: 0.5px;
     }
 
     /* 空卡片 */
