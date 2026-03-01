@@ -296,9 +296,6 @@
     .w-size{min-width:70px}
     .w-abv{min-width:60px}
     .w-flag{min-width:52px}
-    .menu-row2 td { border-bottom: 3px solid rgba(123,211,255,.35); }
-    tr.menu-odd td, tr.menu-odd-2 td { background: rgba(255,255,255,.03); }
-    tr.menu-even td, tr.menu-even-2 td { background: rgba(0,0,0,.12); }
 
     @media (max-width: 560px){
       header{padding:8px 12px}
@@ -400,16 +397,14 @@
         <table class="menu-table">
           <thead>
             <tr>
-              <th style="width:36px" rowspan="2">#</th>
-              <th style="width:72px" rowspan="2">颜色</th>
+              <th style="width:36px">#</th>
+              <th style="width:72px">颜色</th>
               <th class="w-brewery">酒厂</th>
               <th class="w-flag">国旗</th>
               <th class="w-name">酒名（中）</th>
               <th class="w-name">酒名（英）</th>
               <th class="w-style">风格（中）</th>
               <th class="w-style">风格（英）</th>
-            </tr>
-            <tr>
               <th class="w-abv">酒精度</th>
               <th class="w-abv">苦度</th>
               <th class="w-price">大杯价</th>
@@ -814,12 +809,12 @@
     { k: "name_en",     cls: "w-name",    ph: "Hong Kong Girl" },
     { k: "style",       cls: "w-style",   ph: "HAZY IPA" },
     { k: "style_en",    cls: "w-style",   ph: "Hazy India Pale Ale" },
-    { k: "abv",         cls: "w-abv",     ph: "6.5",   row: 2 },
-    { k: "ibu",         cls: "w-abv",     ph: "35",    row: 2 },
-    { k: "large_price", cls: "w-price",   ph: "68",    row: 2 },
-    { k: "large_size",  cls: "w-size",    ph: "500ml", row: 2 },
-    { k: "small_price", cls: "w-price",   ph: "45",    row: 2 },
-    { k: "small_size",  cls: "w-size",    ph: "330ml", row: 2 },
+    { k: "abv",         cls: "w-abv",     ph: "6.5" },
+    { k: "ibu",         cls: "w-abv",     ph: "35" },
+    { k: "large_price", cls: "w-price",   ph: "68" },
+    { k: "large_size",  cls: "w-size",    ph: "500ml" },
+    { k: "small_price", cls: "w-price",   ph: "45" },
+    { k: "small_size",  cls: "w-size",    ph: "330ml" },
   ];
 
   const FLAG_OPTIONS = [
@@ -870,8 +865,6 @@
   function renderMenu() {
     const tbody = document.getElementById("menuTbody");
     tbody.innerHTML = "";
-    const fields1 = MENU_FIELDS.filter(f => !f.row || f.row === 1);
-    const fields2 = MENU_FIELDS.filter(f => f.row === 2);
 
     for (let i = 1; i <= 16; i++) {
       const row = menuState[String(i)] || {};
@@ -880,22 +873,13 @@
         `<option value="${o.v}" ${curColor===o.v?"selected":""}>${o.label}</option>`
       ).join("");
 
-      const isOdd = i % 2 === 1;
-      const tr1 = document.createElement("tr");
-      tr1.className = isOdd ? "menu-odd" : "menu-even";
-      tr1.innerHTML =
-        `<td class="no-cell" rowspan="2">${String(i).padStart(2,"0")}</td>` +
-        `<td rowspan="2"><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>` +
-        fields1.map(f => renderFieldCell(f, i, row)).join("");
-
-      const tr2 = document.createElement("tr");
-      tr2.className = `menu-row2 ${isOdd ? "menu-odd-2" : "menu-even-2"}`;
-      tr2.innerHTML =
-        fields2.map(f => renderFieldCell(f, i, row)).join("") +
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        `<td class="no-cell">${String(i).padStart(2,"0")}</td>` +
+        `<td><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>` +
+        MENU_FIELDS.map(f => renderFieldCell(f, i, row)).join("") +
         `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="sold_out" ${row.sold_out ? "checked" : ""}/></td>`;
-
-      tbody.appendChild(tr1);
-      tbody.appendChild(tr2);
+      tbody.appendChild(tr);
     }
   }
 
