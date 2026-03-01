@@ -45,7 +45,7 @@
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: repeat(4, 1fr);
+      grid-auto-rows: 1fr;
       gap: var(--gap);
     }
 
@@ -227,6 +227,8 @@
 
     /* 空卡片 */
     .card.empty .beer-name { color: #ddd; font-size: 28px; font-weight: 400 }
+    /* 奇数最后一张：跨两列 */
+    .card.span2 { grid-column: span 2 }
 
     /* 编号色块 */
     .c-yellow { background: #F5C400 }
@@ -284,11 +286,18 @@ if (!IS_TV) {
   });
 }
 
+function renderSlice(slice) {
+  return slice.map((it, i) => {
+    const isLast = i === slice.length - 1;
+    const span2  = isLast && slice.length % 2 === 1;
+    return makeCard(it, span2);
+  }).join("");
+}
+
 function renderPreview() {
   const offset = (previewPage - 1) * 8;
   const slice  = allItems.slice(offset, offset + 8);
-  document.getElementById("grid").innerHTML =
-    slice.map((it, i) => makeCard(it, offset + i)).join("");
+  document.getElementById("grid").innerHTML = renderSlice(slice);
   document.getElementById("navLabel").textContent =
     `第 ${previewPage} 页 / 共 2 页`;
 }
@@ -299,10 +308,9 @@ function esc(s) {
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-function makeCard(item, idx) {
+function makeCard(item, span2 = false) {
   const no    = String(item.no).padStart(2, "0");
-  const empty = !item.name && !item.name_en;
-  const color = empty ? "gray" : (item.color || DEFAULT_COLORS[idx] || "dark");
+  const color = item.color || DEFAULT_COLORS[item.no - 1] || "dark";
 
   const priceL = item.large_price
     ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? " / "+esc(item.large_size) : ""}</div>` : "";
@@ -315,7 +323,7 @@ function makeCard(item, idx) {
   ].filter(Boolean).join("  ·  ");
 
   return `
-<div class="card${empty ? " empty" : ""}">
+<div class="card${span2 ? " span2" : ""}">
   <div class="card-num c-${esc(color)}">
     <span class="num">${no}</span>
   </div>
@@ -345,13 +353,12 @@ async function load() {
     const res  = await fetch(API, { cache: "no-store" });
     const data = await res.json();
     if (!data.ok) return;
-    allItems = data.items;
+    allItems = data.items.filter(it => it.name || it.name_en);
 
     if (IS_TV) {
       // TV 模式：直接渲染对应页
       const slice = allItems.slice(TV_OFFSET, TV_OFFSET + 8);
-      document.getElementById("grid").innerHTML =
-        slice.map((it, i) => makeCard(it, TV_OFFSET + i)).join("");
+      document.getElementById("grid").innerHTML = renderSlice(slice);
     } else {
       // 预览模式：翻页渲染
       renderPreview();
