@@ -295,6 +295,7 @@
     .w-price{min-width:70px}
     .w-size{min-width:70px}
     .w-abv{min-width:60px}
+    .w-flag{min-width:52px}
 
     @media (max-width: 560px){
       header{padding:8px 12px}
@@ -395,6 +396,7 @@
               <th style="width:36px">#</th>
               <th style="width:72px">颜色</th>
               <th class="w-brewery">酒厂</th>
+              <th class="w-flag">国旗</th>
               <th class="w-name">酒名（中）</th>
               <th class="w-name">酒名（英）</th>
               <th class="w-style">风格（中）</th>
@@ -797,6 +799,7 @@
 
   const MENU_FIELDS = [
     { k: "brewery",     cls: "w-brewery", ph: "时光酿造所" },
+    { k: "flag",        cls: "w-flag",    ph: "🇧🇪" },
     { k: "name",        cls: "w-name",    ph: "港岛妹妹" },
     { k: "name_en",     cls: "w-name",    ph: "Hong Kong Girl" },
     { k: "style",       cls: "w-style",   ph: "HAZY IPA" },
