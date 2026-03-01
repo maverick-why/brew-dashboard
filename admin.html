@@ -296,7 +296,9 @@
     .w-size{min-width:70px}
     .w-abv{min-width:60px}
     .w-flag{min-width:52px}
-    .menu-row2 td { border-bottom: 2px solid rgba(255,255,255,.18); }
+    .menu-row2 td { border-bottom: 3px solid rgba(123,211,255,.35); }
+    tr.menu-odd td, tr.menu-odd-2 td { background: rgba(255,255,255,.03); }
+    tr.menu-even td, tr.menu-even-2 td { background: rgba(0,0,0,.12); }
 
     @media (max-width: 560px){
       header{padding:8px 12px}
@@ -878,14 +880,16 @@
         `<option value="${o.v}" ${curColor===o.v?"selected":""}>${o.label}</option>`
       ).join("");
 
+      const isOdd = i % 2 === 1;
       const tr1 = document.createElement("tr");
+      tr1.className = isOdd ? "menu-odd" : "menu-even";
       tr1.innerHTML =
         `<td class="no-cell" rowspan="2">${String(i).padStart(2,"0")}</td>` +
         `<td rowspan="2"><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>` +
         fields1.map(f => renderFieldCell(f, i, row)).join("");
 
       const tr2 = document.createElement("tr");
-      tr2.className = "menu-row2";
+      tr2.className = `menu-row2 ${isOdd ? "menu-odd-2" : "menu-even-2"}`;
       tr2.innerHTML =
         fields2.map(f => renderFieldCell(f, i, row)).join("") +
         `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="sold_out" ${row.sold_out ? "checked" : ""}/></td>`;
