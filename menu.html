@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>酒单 · 时光酿造所</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Bebas+Neue&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     * { margin:0; padding:0; box-sizing:border-box }
 
@@ -90,8 +90,8 @@
       justify-content: center;
     }
     .num {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 900;
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
       font-size: 54px;
       color: #fff;
       letter-spacing: -1px;
@@ -223,7 +223,7 @@
     .c-brown  { background: #5A3018 }
     .c-green  { background: #2E7D32 }
     .c-blue   { background: #1565C0 }
-    .c-purple { background: #6A1B9A }
+    .c-gray   { background: #C8C8C8 }
   </style>
 </head>
 <body>
@@ -283,7 +283,7 @@ function esc(s) {
 
 function makeCard(item, idx) {
   const no    = String(item.no).padStart(2, "0");
-  const color = item.color || DEFAULT_COLORS[idx] || "dark";
+  const color = empty ? "gray" : (item.color || DEFAULT_COLORS[idx] || "dark");
   const empty = !item.name && !item.name_en;
 
   const priceL = item.large_price
