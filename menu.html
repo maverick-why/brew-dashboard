@@ -16,6 +16,17 @@
     }
 
     /* ── 固定画布 1920×1080，JS 负责缩放 ── */
+    /* ──
+       --gap  : 卡片间距，同时决定拼屏缝隙视觉宽度
+       --edge : 页面左右外边距 = gap/2（另一半由显示器 bezel 补齐）
+       如果两块屏拼合后缝隙偏宽/偏窄，只需调整 --gap 这一个值
+    ── */
+    :root {
+      --gap:  20px;
+      --edge: 10px;   /* = --gap / 2 */
+      --pad-v: 16px;  /* 上下内边距 */
+    }
+
     #root {
       position: fixed;
       top: 0; left: 0;
@@ -24,7 +35,7 @@
       transform-origin: top left;
       background: #1c1c1c;
       font-family: 'Noto Sans SC', sans-serif;
-      padding: 16px;
+      padding: var(--pad-v) var(--edge);
       display: flex;
       flex-direction: column;
     }
@@ -35,7 +46,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: repeat(4, 1fr);
-      gap: 6px;
+      gap: var(--gap);
     }
 
     /* ── 预览翻页按钮 ── */
