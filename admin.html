@@ -277,7 +277,19 @@
       font-weight:900; font-size:13px;
       text-align:center; color:#9fd1ff; width:36px;
     }
-    .w-brewery{min-width:110px}
+    /* 颜色选择器 */
+    .color-sel{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:6px 4px;
+      border-radius:10px;
+      outline:none;
+      font-size:12px;
+      font-family:inherit;
+    }
+    .w-color{min-width:72px}
     .w-name{min-width:130px}
     .w-style{min-width:110px}
     .w-price{min-width:70px}
@@ -380,6 +392,7 @@
           <thead>
             <tr>
               <th style="width:36px">#</th>
+              <th style="width:72px">颜色</th>
               <th class="w-brewery">酒厂</th>
               <th class="w-name">酒名（中）</th>
               <th class="w-name">酒名（英）</th>
@@ -584,10 +597,19 @@
     const t = e.target;
     const id = t.dataset?.id;
     const k  = t.dataset?.k;
-    if(!id || !k) return;
-    if(!state[id]) state[id] = normalizeRow({});
-    state[id][k] = t.type === "checkbox" ? !!t.checked : t.value;
-    markDirty();
+    if(id && k){
+      if(!state[id]) state[id] = normalizeRow({});
+      state[id][k] = t.type === "checkbox" ? !!t.checked : t.value;
+      markDirty();
+    }
+    // 酒单颜色下拉
+    const no = t.dataset?.menuNo;
+    const mk = t.dataset?.menuK;
+    if(no && mk){
+      if(!menuState[no]) menuState[no] = {};
+      menuState[no][mk] = t.value;
+      markDirty();
+    }
   });
 
   document.addEventListener("input", e => {
@@ -786,13 +808,32 @@
     { k: "small_size",  cls: "w-size",    ph: "330ml" },
   ];
 
+  const COLOR_OPTIONS = [
+    { v:"yellow", label:"🟡 黄", bg:"#F5C400" },
+    { v:"red",    label:"🔴 红", bg:"#C8252A" },
+    { v:"orange", label:"🟠 橙", bg:"#E0621A" },
+    { v:"dark",   label:"⬛ 深灰", bg:"#2B2B2B" },
+    { v:"brown",  label:"🟤 棕",  bg:"#5A3018" },
+    { v:"green",  label:"🟢 绿",  bg:"#2E7D32" },
+    { v:"blue",   label:"🔵 蓝",  bg:"#1565C0" },
+    { v:"purple", label:"🟣 紫",  bg:"#6A1B9A" },
+  ];
+
   function renderMenu() {
     const tbody = document.getElementById("menuTbody");
     tbody.innerHTML = "";
     for (let i = 1; i <= 16; i++) {
       const row = menuState[String(i)] || {};
       const tr = document.createElement("tr");
-      let cells = `<td class="no-cell">${i}</td>`;
+      const curColor = row.color || "dark";
+
+      const colorOpts = COLOR_OPTIONS.map(o =>
+        `<option value="${o.v}" ${curColor===o.v?"selected":""}>${o.label}</option>`
+      ).join("");
+
+      let cells = `<td class="no-cell">${String(i).padStart(2,"0")}</td>`;
+      cells += `<td><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>`;
+
       for (const f of MENU_FIELDS) {
         const val = escapeHtml(String(row[f.k] || ""));
         cells += `<td><input class="${f.cls}" type="text" placeholder="${f.ph}"
