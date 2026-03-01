@@ -227,8 +227,6 @@
 
     /* 空卡片 */
     .card.empty .beer-name { color: #ddd; font-size: 28px; font-weight: 400 }
-    /* 奇数最后一张：跨两列 */
-    .card.span2 { grid-column: span 2 }
 
     /* 编号色块 */
     .c-yellow { background: #F5C400 }
@@ -287,11 +285,7 @@ if (!IS_TV) {
 }
 
 function renderSlice(slice) {
-  return slice.map((it, i) => {
-    const isLast = i === slice.length - 1;
-    const span2  = isLast && slice.length % 2 === 1;
-    return makeCard(it, span2);
-  }).join("");
+  return slice.map(it => makeCard(it)).join("");
 }
 
 function renderPreview() {
@@ -308,7 +302,7 @@ function esc(s) {
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-function makeCard(item, span2 = false) {
+function makeCard(item) {
   const no    = String(item.no).padStart(2, "0");
   const color = item.color || DEFAULT_COLORS[item.no - 1] || "dark";
 
@@ -323,7 +317,7 @@ function makeCard(item, span2 = false) {
   ].filter(Boolean).join("  ·  ");
 
   return `
-<div class="card${span2 ? " span2" : ""}">
+<div class="card">
   <div class="card-num c-${esc(color)}">
     <span class="num">${no}</span>
   </div>
