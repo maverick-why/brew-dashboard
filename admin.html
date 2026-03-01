@@ -384,6 +384,7 @@
           <button id="btnMenuLoad">加载酒单</button>
           <button class="primary" id="btnMenuSave">保存酒单</button>
           <button class="blue" onclick="window.open('/menu.html','_blank')">预览酒单 ↗</button>
+          <button id="btnMenuSeed">加载示例数据</button>
         </div>
         <div class="muted">编号 1–16 固定，留空的格子在前台显示「待上新」。Ctrl+S 快捷保存。</div>
       </div>
@@ -906,6 +907,34 @@
     }
   }
 
+  // ====== 示例数据
+  const SEED_DATA = {
+    "1":  { color:"orange", brewery:"时光酿造所", name:"港岛妹妹",   name_en:"Hong Kong Girl",      style:"浑浊双倍IPA",    style_en:"Double Hazy IPA",        abv:"7.2", ibu:"45", large_price:"68", large_size:"500ml", small_price:"45", small_size:"330ml" },
+    "2":  { color:"yellow", brewery:"时光酿造所", name:"时光金艾尔", name_en:"Golden Hour Ale",     style:"金色艾尔",      style_en:"Golden Ale",             abv:"5.0", ibu:"18", large_price:"58", large_size:"500ml", small_price:"38", small_size:"330ml" },
+    "3":  { color:"dark",   brewery:"时光酿造所", name:"南山黑金",   name_en:"Nanshan Black Gold",  style:"帝国世涛",      style_en:"Imperial Stout",         abv:"9.5", ibu:"60", large_price:"88", large_size:"500ml", small_price:"58", small_size:"330ml" },
+    "4":  { color:"orange", brewery:"时光酿造所", name:"深圳日落",   name_en:"Shenzhen Sunset",     style:"新英格兰IPA",   style_en:"New England IPA",        abv:"6.5", ibu:"40", large_price:"68", large_size:"500ml", small_price:"45", small_size:"330ml" },
+    "5":  { color:"yellow", brewery:"时光酿造所", name:"愉景湾白啤", name_en:"Discovery Bay Weiss", style:"小麦白啤",      style_en:"Hefeweizen",             abv:"5.2", ibu:"14", large_price:"58", large_size:"500ml", small_price:"38", small_size:"330ml" },
+    "6":  { color:"red",    brewery:"时光酿造所", name:"荔枝酸波",   name_en:"Lychee Gose",         style:"荔枝果味酸啤",  style_en:"Lychee Gose",            abv:"4.5", ibu:"8",  large_price:"65", large_size:"500ml", small_price:"42", small_size:"330ml" },
+    "7":  { color:"orange", brewery:"拾捌精酿",   name:"西海岸炸弹", name_en:"West Coast Bomb",     style:"西海岸IPA",     style_en:"West Coast IPA",         abv:"6.8", ibu:"65", large_price:"68", large_size:"500ml", small_price:"45", small_size:"330ml" },
+    "8":  { color:"brown",  brewery:"拾捌精酿",   name:"夜班波特",   name_en:"Night Shift Porter",  style:"烟熏波特",      style_en:"Smoked Porter",          abv:"6.2", ibu:"30", large_price:"65", large_size:"500ml", small_price:"42", small_size:"330ml" },
+    "9":  { color:"yellow", brewery:"熊猫精酿",   name:"熊猫淡啤",   name_en:"Panda Pale",          style:"美式淡色艾尔",  style_en:"American Pale Ale",      abv:"5.5", ibu:"35", large_price:"62", large_size:"500ml", small_price:"40", small_size:"330ml" },
+    "10": { color:"green",  brewery:"熊猫精酿",   name:"竹林赛松",   name_en:"Bamboo Saison",       style:"比利时赛松",    style_en:"Belgian Saison",         abv:"6.0", ibu:"22", large_price:"65", large_size:"500ml", small_price:"42", small_size:"330ml" },
+    "11": { color:"red",    brewery:"大理苍山",   name:"草莓红酸",   name_en:"Strawberry Sour Red", style:"草莓果味酸艾尔",style_en:"Strawberry Sour Ale",    abv:"4.8", ibu:"10", large_price:"65", large_size:"500ml", small_price:"42", small_size:"330ml" },
+    "12": { color:"yellow", brewery:"大理苍山",   name:"龙井拉格",   name_en:"Dragon Well Lager",   style:"绿茶拉格",      style_en:"Green Tea Lager",        abv:"4.2", ibu:"12", large_price:"55", large_size:"500ml", small_price:"36", small_size:"330ml" },
+    "13": { color:"dark",   brewery:"北京燕京",   name:"京城黑麦",   name_en:"Beijing Rye Stout",   style:"黑麦世涛",      style_en:"Rye Stout",              abv:"7.8", ibu:"42", large_price:"75", large_size:"500ml", small_price:"50", small_size:"330ml" },
+    "14": { color:"orange", brewery:"北京燕京",   name:"血橙麦芽",   name_en:"Blood Orange Malt",   style:"血橙艾尔",      style_en:"Blood Orange Ale",       abv:"5.8", ibu:"25", large_price:"65", large_size:"500ml", small_price:"42", small_size:"330ml" },
+    "15": { color:"yellow", brewery:"成都道酿",   name:"辣椒赛松",   name_en:"Chili Saison",        style:"四川辣椒赛松",  style_en:"Sichuan Chili Saison",   abv:"6.3", ibu:"20", large_price:"68", large_size:"500ml", small_price:"45", small_size:"330ml" },
+    "16": { color:"dark",   brewery:"成都道酿",   name:"燕麦牛奶世涛",name_en:"Oat Milk Stout",     style:"牛奶世涛",      style_en:"Oatmeal Milk Stout",     abv:"6.5", ibu:"28", large_price:"68", large_size:"500ml", small_price:"45", small_size:"330ml" },
+  };
+
+  function loadSeedData() {
+    menuState = JSON.parse(JSON.stringify(SEED_DATA));
+    renderMenu();
+    markDirty();
+    toast("示例数据已填入，点「保存酒单」推送到前台");
+  }
+
+  document.getElementById("btnMenuSeed").addEventListener("click", loadSeedData);
   document.getElementById("btnMenuLoad").addEventListener("click", menuLoad);
   document.getElementById("btnMenuSave").addEventListener("click", menuSave);
 
