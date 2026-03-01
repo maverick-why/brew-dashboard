@@ -407,6 +407,7 @@
               <th class="w-size">大杯容量</th>
               <th class="w-price">小杯价</th>
               <th class="w-size">小杯容量</th>
+              <th style="width:52px">售罄</th>
             </tr>
           </thead>
           <tbody id="menuTbody"></tbody>
@@ -872,7 +873,8 @@
             data-menu-no="${i}" data-menu-k="${f.k}" value="${val}"/></td>`;
         }
       }
-      tr.innerHTML = cells;
+      tr.innerHTML = cells +
+        `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="sold_out" ${row.sold_out ? "checked" : ""}/></td>`;
       tbody.appendChild(tr);
     }
   }

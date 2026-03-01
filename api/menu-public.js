@@ -49,6 +49,7 @@ module.exports = async (req, res) => {
         small_size:  safe(row.small_size),
         color:       safe(row.color, "dark"),
         flag:        safe(row.flag),
+        sold_out:    !!row.sold_out,
       });
     }
 
