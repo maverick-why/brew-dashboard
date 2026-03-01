@@ -129,7 +129,8 @@
       min-width: 0;
     }
     .brewery-tag .flag {
-      margin-right: 6px;
+      margin-left: 6px;
+      margin-right: 0;
       font-style: normal;
     }
     .brewery-tag {
@@ -321,7 +322,7 @@ function makeCard(item, idx) {
   <div class="card-body">
     <div class="row-top">
       <div class="info-left">
-        <div class="brewery-tag"><span class="flag">${esc(item.flag || "🇨🇳")}</span>${esc(item.brewery)}</div>
+        <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
         <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
         <div class="beer-style">${esc(item.style)}</div>
       </div>
