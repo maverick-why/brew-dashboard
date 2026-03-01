@@ -71,21 +71,22 @@
     /* ── Header ── */
     header{
       position:sticky; top:0; z-index:20;
-      padding:18px 18px 14px;
+      padding:10px 16px;
       backdrop-filter: blur(10px);
       background: linear-gradient(180deg, rgba(10,16,28,.86), rgba(10,16,28,.62));
       border-bottom:1px solid var(--line);
     }
-    .h-row{display:flex; align-items:flex-end; justify-content:space-between; gap:14px}
-    .h-title{font-weight:900; letter-spacing:.5px; line-height:1.08; font-size: clamp(20px, 3.6vw, 34px)}
-    .h-sub{margin-top:6px; color:var(--sub); font-size:12px; letter-spacing:.2px}
-    .h-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .h-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .h-title{font-weight:900; letter-spacing:.5px; line-height:1.08; font-size:clamp(15px, 2vw, 20px)}
+    .h-sub{margin-top:3px; color:var(--sub); font-size:11px; letter-spacing:.2px}
+    .h-right{display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end}
     .pill{
       white-space:nowrap;
       font-variant-numeric: tabular-nums;
       color:rgba(234,240,255,.78);
       font-weight:700;
-      padding:10px 12px;
+      padding:5px 10px;
+      font-size:12px;
       border:1px solid var(--line);
       border-radius:999px;
       background:rgba(255,255,255,.03);
@@ -96,32 +97,33 @@
     /* 未保存提示 */
     .pill.dirty{border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.08); color:rgba(251,191,36,.9)}
 
-    main{max-width: 1500px; margin: 0 auto; padding: 18px 14px 28px}
+    main{max-width: 1500px; margin: 0 auto; padding: 10px 12px 20px}
 
     .panel{
-      border-radius: 22px;
+      border-radius: 16px;
       background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--card);
       border:1px solid rgba(255,255,255,.08);
       box-shadow: var(--shadow);
       overflow:hidden;
     }
     .toolbar{
-      padding:14px;
+      padding:10px 12px;
       display:flex;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
       border-bottom:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
     }
-    .btns{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btns{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
     button{
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
       color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
+      padding:7px 10px;
+      font-size:13px;
+      border-radius:10px;
       font-weight:800;
       cursor:pointer;
       box-shadow: var(--inset);
@@ -141,23 +143,23 @@
       width:100%;
       border-collapse:separate;
       border-spacing:0;
-      min-width: 1180px;
+      min-width: 1020px;
     }
     thead th{
       position:sticky; top:0;
       background: rgba(10,16,28,.92);
       backdrop-filter: blur(8px);
       z-index:5;
-      font-size:12px;
+      font-size:11px;
       color:rgba(234,240,255,.78);
       text-align:left;
-      padding:12px 10px;
+      padding:8px 8px;
       border-bottom:1px solid var(--line);
       letter-spacing:.2px;
       font-weight:900;
     }
     tbody td{
-      padding:10px 10px;
+      padding:5px 6px;
       border-bottom:1px solid rgba(255,255,255,.06);
       vertical-align:middle;
     }
@@ -171,11 +173,12 @@
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
       color:var(--text);
-      padding:10px 10px;
-      border-radius:12px;
+      padding:6px 8px;
+      border-radius:10px;
       outline:none;
       box-shadow: var(--inset);
       font-weight:750;
+      font-size:13px;
       font-variant-numeric: tabular-nums;
       font-family:inherit;
     }
@@ -191,16 +194,16 @@
       pointer-events:none; font-weight:900;
     }
 
-    .wBeer{min-width: 220px}
-    .wStyle{min-width: 170px}
-    .wDate{min-width: 160px}
-    .wSel{min-width: 120px}
-    .wSmall{min-width: 90px}
+    .wBeer{min-width: 180px}
+    .wStyle{min-width: 140px}
+    .wDate{min-width: 130px}
+    .wSel{min-width: 110px}
+    .wSmall{min-width: 72px}
 
-    .rowActions{display:flex; gap:8px; justify-content:flex-start}
+    .rowActions{display:flex; gap:6px; justify-content:flex-start}
     .mini{
-      padding:8px 10px;
-      border-radius:10px;
+      padding:5px 8px;
+      border-radius:8px;
       font-weight:900;
       font-size:12px;
     }
@@ -225,8 +228,8 @@
     .toast.bad{border-color: rgba(239,68,68,.28)}
 
     @media (max-width: 560px){
-      header{padding:14px 14px 12px}
-      .pill{padding:8px 10px; font-size:12px}
+      header{padding:8px 12px}
+      .pill{padding:4px 8px; font-size:11px}
     }
   </style>
 </head>
