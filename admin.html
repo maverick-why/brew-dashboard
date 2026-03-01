@@ -28,6 +28,47 @@
         linear-gradient(180deg, var(--bg1), var(--bg0));
     }
 
+    /* ── Login Modal ── */
+    .login-mask{
+      position:fixed; inset:0; z-index:200;
+      background:rgba(7,11,18,.92);
+      backdrop-filter:blur(12px);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .login-card{
+      width:320px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), var(--card);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:22px;
+      padding:28px 24px;
+      box-shadow:var(--shadow);
+      display:flex; flex-direction:column; gap:16px;
+    }
+    .login-title{font-weight:900; font-size:20px; letter-spacing:.5px}
+    .login-sub{font-size:13px; color:var(--sub)}
+    .login-input{
+      width:100%;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      outline:none;
+      font-size:15px;
+      font-family:inherit;
+      box-shadow:var(--inset);
+    }
+    .login-input:focus{border-color:rgba(123,211,255,.40); background:rgba(255,255,255,.07)}
+    .login-btn{
+      width:100%; height:46px; border-radius:14px;
+      background:rgba(74,222,128,.22); border:1px solid rgba(74,222,128,.40);
+      color:var(--text); font-weight:900; font-size:15px; cursor:pointer;
+      box-shadow:var(--inset);
+    }
+    .login-btn:hover{filter:brightness(1.08)}
+    .login-err{font-size:12px; color:#ef4444; display:none}
+
+    /* ── Header ── */
     header{
       position:sticky; top:0; z-index:20;
       padding:18px 18px 14px;
@@ -52,6 +93,8 @@
     .pill b{color:#fff}
     .pill.ok{border-color:rgba(74,222,128,.28); background:rgba(74,222,128,.08)}
     .pill.bad{border-color:rgba(239,68,68,.28); background:rgba(239,68,68,.08)}
+    /* 未保存提示 */
+    .pill.dirty{border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.08); color:rgba(251,191,36,.9)}
 
     main{max-width: 1500px; margin: 0 auto; padding: 18px 14px 28px}
 
@@ -82,9 +125,12 @@
       font-weight:800;
       cursor:pointer;
       box-shadow: var(--inset);
+      font-family:inherit;
+      transition: opacity .15s;
     }
     button:hover{filter:brightness(1.06)}
     button:active{transform: translateY(1px)}
+    button:disabled{opacity:.45; cursor:not-allowed; transform:none; filter:none}
     .primary{background: rgba(74,222,128,.20); border-color: rgba(74,222,128,.35)}
     .blue{background: rgba(59,130,246,.20); border-color: rgba(59,130,246,.35)}
     .danger{background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.35)}
@@ -131,9 +177,19 @@
       box-shadow: var(--inset);
       font-weight:750;
       font-variant-numeric: tabular-nums;
+      font-family:inherit;
     }
     input::placeholder{color:rgba(234,240,255,.35)}
     input:focus, select:focus{border-color: rgba(123,211,255,.35); background: rgba(255,255,255,.06)}
+
+    /* 温度字段：标注「手动」，未来探头接入后会变只读 */
+    .temp-wrap{position:relative}
+    .temp-wrap input{padding-right:42px}
+    .temp-tag{
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      font-size:10px; letter-spacing:1px; color:rgba(234,240,255,.35);
+      pointer-events:none; font-weight:900;
+    }
 
     .wBeer{min-width: 220px}
     .wStyle{min-width: 170px}
@@ -176,6 +232,17 @@
 </head>
 <body>
 
+<!-- ── 登录蒙层（替代 prompt） ── -->
+<div class="login-mask" id="loginMask">
+  <div class="login-card">
+    <div class="login-title">后台登录</div>
+    <div class="login-sub">时光酿造所 · 数据管理</div>
+    <input class="login-input" id="loginInput" type="password" placeholder="输入后台密码" autocomplete="current-password"/>
+    <div class="login-err" id="loginErr">密码错误，请重试</div>
+    <button class="login-btn" id="loginBtn">进入</button>
+  </div>
+</div>
+
 <header>
   <div class="h-row">
     <div>
@@ -183,7 +250,7 @@
       <div class="h-sub">保存会写入共享数据源（Redis），前台 <b>display.html</b> 会自动刷新展示。</div>
     </div>
     <div class="h-right">
-      <div class="pill" id="apiPill">API: <b>/api/load</b> &amp; <b>/api/save</b></div>
+      <div class="pill dirty" id="dirtyPill" style="display:none">⚠ 有未保存修改</div>
       <div class="pill" id="authPill">登录：<b id="authText">未登录</b></div>
     </div>
   </div>
@@ -197,7 +264,11 @@
         <button class="primary" id="btnSave">保存到共享数据源</button>
         <button class="blue" id="btnAdd">新增发酵罐</button>
       </div>
-      <div class="muted" id="hint">提示：勾选“展示”= 前台可见。限量版会在前台显示斜标 <b>Limited</b>。</div>
+      <div class="muted" id="hint">
+        提示：勾选"展示"= 前台可见。限量版会显示斜标 <b>Limited</b>。
+        <b>auto</b> = 根据入罐/开罐日期自动计算状态。
+        <span style="color:rgba(234,240,255,.4)">Ctrl+S 快捷保存</span>
+      </div>
     </div>
 
     <div class="tableWrap">
@@ -211,10 +282,10 @@
             <th class="wSmall">ABV</th>
             <th class="wSmall">IBU</th>
             <th class="wSmall">容量</th>
-            <th class="wSmall">温度</th>
+            <th class="wSmall">温度 ①</th>
             <th class="wDate">入罐时间</th>
             <th class="wDate">预计开罐</th>
-            <th class="wSel">状态</th>
+            <th class="wSel" title="auto = 根据日期自动判断；fermenting = 强制发酵中；ready = 强制可开罐">状态</th>
             <th style="width:90px">限量版</th>
             <th style="width:110px">操作</th>
           </tr>
@@ -222,46 +293,76 @@
         <tbody id="tbody"></tbody>
       </table>
     </div>
+    <div style="padding:10px 14px; font-size:11px; color:rgba(234,240,255,.35); border-top:1px solid var(--line)">
+      ① 温度目前为手动填写。接入温度探头后将自动更新，此列变为只读。
+    </div>
   </div>
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  const LOAD_URL = "/api/load";
-  const SAVE_URL = "/api/save";
+  const LOAD_URL  = "/api/load";
+  const SAVE_URL  = "/api/save";
   const KEY_PREFIX = "F";
 
   let ADMIN_PASS = "";
-  let state = {}; // { F1: {...}, F2: {...} }
+  let state = {};
+  let isDirty = false;
+  let saveController = null;
+  let loadController = null;
+
+  // ====== dirty tracking
+  function markDirty(val = true){
+    isDirty = val;
+    document.getElementById("dirtyPill").style.display = val ? "" : "none";
+  }
+
+  window.addEventListener("beforeunload", e => {
+    if(isDirty) e.preventDefault();
+  });
+
+  // Ctrl+S 快捷保存
+  document.addEventListener("keydown", e => {
+    if((e.ctrlKey || e.metaKey) && e.key === "s"){
+      e.preventDefault();
+      apiSave();
+    }
+  });
 
   // ====== helpers
-  function toast(msg, ok=true){
+  function toast(msg, ok = true){
     const el = document.getElementById("toast");
     el.textContent = msg;
     el.className = "toast " + (ok ? "ok" : "bad");
     el.style.display = "block";
     clearTimeout(el._t);
-    el._t = setTimeout(()=> el.style.display="none", 2400);
+    el._t = setTimeout(() => el.style.display = "none", 2400);
   }
 
   function setAuthUI(ok){
     const pill = document.getElementById("authPill");
-    const txt = document.getElementById("authText");
+    const txt  = document.getElementById("authText");
     txt.textContent = ok ? "已登录" : "未登录";
     pill.classList.toggle("ok", ok);
     pill.classList.toggle("bad", !ok);
   }
 
-  function safe(v, fallback=""){
-    if (v === undefined || v === null) return fallback;
+  function setBusy(ids, busy){
+    for(const id of ids){
+      const el = document.getElementById(id);
+      if(el) el.disabled = busy;
+    }
+  }
+
+  function safe(v, fallback = ""){
+    if(v === undefined || v === null) return fallback;
     return String(v);
   }
 
   function nextId(){
-    const keys = Object.keys(state || {});
     let max = 0;
-    for(const k of keys){
+    for(const k of Object.keys(state || {})){
       const m = /^F(\d+)$/i.exec(k);
       if(m) max = Math.max(max, Number(m[1]));
     }
@@ -271,43 +372,61 @@
   function normalizeRow(row){
     const r = row || {};
     return {
-      show: !!r.show,
-      beer: safe(r.beer, ""),
-      style: safe(r.style, ""),
-      abv: safe(r.abv, ""),
-      ibu: safe(r.ibu, ""),
+      show:     !!r.show,
+      beer:     safe(r.beer, ""),
+      style:    safe(r.style, ""),
+      abv:      safe(r.abv, ""),
+      ibu:      safe(r.ibu, ""),
       capacity: safe(r.capacity, "150L"),
-      temp: safe(r.temp, ""),
-      start: safe(r.start, ""),
-      end: safe(r.end, ""),
-      status: safe(r.status, "auto"), // auto | fermenting | ready
-      limited: !!r.limited
+      temp:     safe(r.temp, ""),
+      start:    safe(r.start, ""),
+      end:      safe(r.end, ""),
+      status:   safe(r.status, "auto"),
+      limited:  !!r.limited
     };
   }
 
   function sortIds(ids){
-    return ids.sort((a,b)=>{
-      const ma = /^F(\d+)$/i.exec(a||"");
-      const mb = /^F(\d+)$/i.exec(b||"");
+    return [...ids].sort((a, b) => {
+      const ma = /^F(\d+)$/i.exec(a || "");
+      const mb = /^F(\d+)$/i.exec(b || "");
       if(ma && mb) return Number(ma[1]) - Number(mb[1]);
       if(ma) return -1;
       if(mb) return 1;
-      return (a||"").localeCompare(b||"");
+      return (a || "").localeCompare(b || "");
     });
   }
 
-  // ====== render
+  // ====== date helpers（不用 new Date，避免时区问题）
+  function toDateInput(v){
+    if(!v) return "";
+    const m = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/.exec(String(v).trim());
+    if(!m) return "";
+    return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+  }
+
+  function escapeHtml(str){
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  // ====== render（不再在内部改 state）
+  function initStateIfEmpty(){
+    if(Object.keys(state).length === 0){
+      state["F1"] = normalizeRow({ show: true, capacity: "150L", status: "auto" });
+    }
+  }
+
   function render(){
+    initStateIfEmpty();
     const tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
 
-    const ids = sortIds(Object.keys(state || {}));
-    if(ids.length === 0){
-      state["F1"] = normalizeRow({show:true, capacity:"150L", status:"auto"});
-      return render();
-    }
-
-    for(const id of ids){
+    for(const id of sortIds(Object.keys(state))){
       const row = normalizeRow(state[id]);
       state[id] = row;
 
@@ -317,32 +436,40 @@
 
         <td>
           <div class="center">
-            <input class="chk" type="checkbox" data-id="${id}" data-k="show" ${row.show ? "checked":""}/>
+            <input class="chk" type="checkbox" data-id="${id}" data-k="show" ${row.show ? "checked" : ""}/>
           </div>
         </td>
 
         <td><input class="wBeer"  type="text" placeholder="例如：港岛妹妹" data-id="${id}" data-k="beer"  value="${escapeHtml(row.beer)}"/></td>
         <td><input class="wStyle" type="text" placeholder="例如：HAZY IPA" data-id="${id}" data-k="style" value="${escapeHtml(row.style)}"/></td>
 
-        <td><input class="wSmall" type="text" placeholder="6" data-id="${id}" data-k="abv" value="${escapeHtml(row.abv)}"/></td>
-        <td><input class="wSmall" type="text" placeholder="30" data-id="${id}" data-k="ibu" value="${escapeHtml(row.ibu)}"/></td>
+        <td><input class="wSmall" type="text" placeholder="6.0"  data-id="${id}" data-k="abv" value="${escapeHtml(row.abv)}"/></td>
+        <td><input class="wSmall" type="text" placeholder="30"   data-id="${id}" data-k="ibu" value="${escapeHtml(row.ibu)}"/></td>
         <td><input class="wSmall" type="text" placeholder="150L" data-id="${id}" data-k="capacity" value="${escapeHtml(row.capacity)}"/></td>
-        <td><input class="wSmall" type="text" placeholder="18.2" data-id="${id}" data-k="temp" value="${escapeHtml(row.temp)}"/></td>
+
+        <td>
+          <div class="temp-wrap">
+            <input class="wSmall" type="text" placeholder="18.2" data-id="${id}" data-k="temp" value="${escapeHtml(row.temp)}"/>
+            <span class="temp-tag">手动</span>
+          </div>
+        </td>
 
         <td><input class="wDate" type="date" data-id="${id}" data-k="start" value="${toDateInput(row.start)}"/></td>
         <td><input class="wDate" type="date" data-id="${id}" data-k="end"   value="${toDateInput(row.end)}"/></td>
 
         <td>
-          <select class="wSel" data-id="${id}" data-k="status">
-            <option value="auto" ${row.status==="auto"?"selected":""}>auto</option>
-            <option value="fermenting" ${row.status==="fermenting"?"selected":""}>fermenting</option>
-            <option value="ready" ${row.status==="ready"?"selected":""}>ready</option>
+          <select class="wSel" data-id="${id}" data-k="status"
+            title="auto = 根据日期自动判断；fermenting = 强制发酵中；ready = 强制可开罐">
+            <option value="auto"       ${row.status === "auto"       ? "selected" : ""}>auto（自动）</option>
+            <option value="fermenting" ${row.status === "fermenting" ? "selected" : ""}>fermenting</option>
+            <option value="cooling"    ${row.status === "cooling"    ? "selected" : ""}>cooling</option>
+            <option value="ready"      ${row.status === "ready"      ? "selected" : ""}>ready</option>
           </select>
         </td>
 
         <td>
           <div class="center">
-            <input class="chk" type="checkbox" data-id="${id}" data-k="limited" ${row.limited ? "checked":""}/>
+            <input class="chk" type="checkbox" data-id="${id}" data-k="limited" ${row.limited ? "checked" : ""}/>
           </div>
         </td>
 
@@ -356,55 +483,54 @@
     }
   }
 
-  // ====== events
-  document.addEventListener("input", (e)=>{
+  // ====== events（合并 input / change，按类型分流）
+  document.addEventListener("change", e => {
     const t = e.target;
-    if(!t || !t.dataset) return;
-    const id = t.dataset.id;
-    const k  = t.dataset.k;
+    const id = t.dataset?.id;
+    const k  = t.dataset?.k;
     if(!id || !k) return;
+    if(!state[id]) state[id] = normalizeRow({});
+    state[id][k] = t.type === "checkbox" ? !!t.checked : t.value;
+    markDirty();
+  });
+
+  document.addEventListener("input", e => {
+    const t = e.target;
+    const id = t.dataset?.id;
+    const k  = t.dataset?.k;
+    if(!id || !k || t.type === "checkbox") return;
     if(!state[id]) state[id] = normalizeRow({});
     state[id][k] = t.value;
+    markDirty();
   });
 
-  document.addEventListener("change", (e)=>{
-    const t = e.target;
-    if(!t || !t.dataset) return;
-    const id = t.dataset.id;
-    const k  = t.dataset.k;
-    if(!id || !k) return;
-    if(!state[id]) state[id] = normalizeRow({});
-    if(t.type === "checkbox") state[id][k] = !!t.checked;
-    else state[id][k] = t.value;
-  });
-
-  document.addEventListener("click", (e)=>{
+  document.addEventListener("click", e => {
     const btn = e.target.closest("button[data-act]");
     if(!btn) return;
-    const act = btn.dataset.act;
-    const id  = btn.dataset.id;
-    if(act === "del"){
-      if(!id) return;
-      if(!confirm(`删除 ${id} ？`)) return;
+    const { act, id } = btn.dataset;
+    if(act === "del" && id){
+      if(!confirm(`删除 ${id}？此操作不可撤销。`)) return;
       delete state[id];
       render();
-      toast(`已删除 ${id}`, true);
+      markDirty();
+      toast(`已删除 ${id}`);
     }
   });
 
-  // ====== load/save
+  // ====== load / save
   async function apiLoad(){
-    try{
-      if(!ADMIN_PASS){
-        toast("未登录：请刷新页面重新输入密码", false);
-        return;
-      }
+    if(!ADMIN_PASS){ toast("未登录", false); return; }
+    loadController?.abort();
+    loadController = new AbortController();
 
+    setBusy(["btnLoad", "btnSave"], true);
+    document.getElementById("btnLoad").textContent = "加载中…";
+    try{
       const res = await fetch(LOAD_URL, {
         cache: "no-store",
+        signal: loadController.signal,
         headers: { "x-admin-pass": ADMIN_PASS }
       });
-
       const text = await res.text();
       let data = {};
       try { data = JSON.parse(text || "{}"); } catch { data = {}; }
@@ -414,39 +540,39 @@
         toast(`加载失败：${res.status} ${data.error || ""}`.trim(), false);
         return;
       }
-
       state = data || {};
       render();
       setAuthUI(true);
-      toast("已从共享数据源加载", true);
+      markDirty(false);
+      toast("已从共享数据源加载");
     }catch(err){
+      if(err.name === "AbortError") return;
       setAuthUI(false);
-      toast("加载失败：网络异常或接口异常", false);
+      toast("加载失败：网络异常", false);
+    }finally{
+      setBusy(["btnLoad", "btnSave"], false);
+      document.getElementById("btnLoad").textContent = "从共享数据源加载";
     }
   }
 
   async function apiSave(){
-    try{
-      if(!ADMIN_PASS){
-        toast("未登录：请刷新页面重新输入密码", false);
-        return;
-      }
+    if(!ADMIN_PASS){ toast("未登录", false); return; }
+    saveController?.abort();
+    saveController = new AbortController();
 
-      // 写回前做一次 normalize
+    setBusy(["btnLoad", "btnSave"], true);
+    document.getElementById("btnSave").textContent = "保存中…";
+    try{
       const out = {};
       for(const [id, row] of Object.entries(state || {})){
         out[id] = normalizeRow(row);
       }
-
       const res = await fetch(SAVE_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-pass": ADMIN_PASS
-        },
+        signal: saveController.signal,
+        headers: { "Content-Type": "application/json", "x-admin-pass": ADMIN_PASS },
         body: JSON.stringify(out)
       });
-
       const text = await res.text();
       let j = {};
       try { j = JSON.parse(text || "{}"); } catch { j = {}; }
@@ -456,85 +582,97 @@
         toast(`保存失败：${res.status} ${j.error || "Unauthorized"}`.trim(), false);
         return;
       }
-
       setAuthUI(true);
-      toast("已保存到共享数据源", true);
+      markDirty(false);
+      toast("已保存到共享数据源 ✓");
     }catch(err){
+      if(err.name === "AbortError") return;
       setAuthUI(false);
-      toast("保存失败：网络异常或接口异常", false);
+      toast("保存失败：网络异常", false);
+    }finally{
+      setBusy(["btnLoad", "btnSave"], false);
+      document.getElementById("btnSave").textContent = "保存到共享数据源";
     }
   }
 
-  // ====== add
+  // ====== add tank
   function addTank(){
     const id = nextId();
-    state[id] = normalizeRow({
-      show:true,
-      beer:"",
-      style:"",
-      abv:"",
-      ibu:"",
-      capacity:"150L",
-      temp:"",
-      start:"",
-      end:"",
-      status:"auto",
-      limited:false
-    });
+    state[id] = normalizeRow({ show: true, capacity: "150L", status: "auto" });
     render();
-    toast(`已新增 ${id}`, true);
-    const wrap = document.querySelector(".tableWrap");
-    if(wrap) wrap.scrollTop = wrap.scrollHeight;
+    markDirty();
+    toast(`已新增 ${id}`);
+    requestAnimationFrame(() => {
+      document.querySelector(".tableWrap").scrollTop = 999999;
+    });
   }
 
-  // ====== date helpers
-  function toDateInput(v){
-    if(!v) return "";
-    const s = String(v).trim();
-    const m1 = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/.exec(s);
-    if(m1){
-      const y = m1[1];
-      const mo = String(m1[2]).padStart(2,"0");
-      const d  = String(m1[3]).padStart(2,"0");
-      return `${y}-${mo}-${d}`;
+  // ====== login modal
+  function doLogin(){
+    const pass = document.getElementById("loginInput").value.trim();
+    if(!pass){
+      document.getElementById("loginErr").style.display = "block";
+      document.getElementById("loginErr").textContent = "请输入密码";
+      return;
     }
-    const d = new Date(s);
-    if(isNaN(d)) return "";
-    const y = d.getFullYear();
-    const mo = String(d.getMonth()+1).padStart(2,"0");
-    const da = String(d.getDate()).padStart(2,"0");
-    return `${y}-${mo}-${da}`;
+    ADMIN_PASS = pass;
+    document.getElementById("loginErr").style.display = "none";
+    document.getElementById("loginBtn").disabled = true;
+    document.getElementById("loginBtn").textContent = "验证中…";
+
+    // 尝试 load，成功则关闭蒙层
+    apiLoadWithLogin();
   }
 
-  function escapeHtml(str){
-    return String(str || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  async function apiLoadWithLogin(){
+    try{
+      const res = await fetch(LOAD_URL, {
+        cache: "no-store",
+        headers: { "x-admin-pass": ADMIN_PASS }
+      });
+      const text = await res.text();
+      let data = {};
+      try { data = JSON.parse(text || "{}"); } catch { data = {}; }
+
+      if(!res.ok || data.ok === false){
+        ADMIN_PASS = "";
+        setAuthUI(false);
+        const errEl = document.getElementById("loginErr");
+        errEl.textContent = res.status === 401 ? "密码错误，请重试" : `登录失败：${res.status}`;
+        errEl.style.display = "block";
+        document.getElementById("loginBtn").disabled = false;
+        document.getElementById("loginBtn").textContent = "进入";
+        return;
+      }
+
+      // 登录成功
+      document.getElementById("loginMask").style.display = "none";
+      state = data || {};
+      render();
+      setAuthUI(true);
+      markDirty(false);
+      toast("已登录并加载数据");
+    }catch(err){
+      ADMIN_PASS = "";
+      document.getElementById("loginErr").textContent = "网络异常，请重试";
+      document.getElementById("loginErr").style.display = "block";
+      document.getElementById("loginBtn").disabled = false;
+      document.getElementById("loginBtn").textContent = "进入";
+    }
   }
+
+  document.getElementById("loginBtn").addEventListener("click", doLogin);
+  document.getElementById("loginInput").addEventListener("keydown", e => {
+    if(e.key === "Enter") doLogin();
+  });
 
   // ====== wire buttons
   document.getElementById("btnLoad").addEventListener("click", apiLoad);
   document.getElementById("btnSave").addEventListener("click", apiSave);
   document.getElementById("btnAdd").addEventListener("click", addTank);
 
-  // ====== login on entry
-  (function init(){
-    // 初始先显示未登录（避免“乱输也显示已登录”）
-    setAuthUI(false);
-
-    ADMIN_PASS = (prompt("请输入后台写入密码（用于加载/保存）") || "").trim();
-
-    if(!ADMIN_PASS){
-      toast("未输入密码：无法加载/保存", false);
-      return;
-    }
-
-    // 输入密码后立刻尝试加载一次，成功才算登录
-    apiLoad();
-  })();
+  // 初始：显示未登录，等待登录蒙层操作
+  setAuthUI(false);
 </script>
 </body>
 </html>
