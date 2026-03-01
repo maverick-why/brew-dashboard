@@ -799,7 +799,7 @@
 
   const MENU_FIELDS = [
     { k: "brewery",     cls: "w-brewery", ph: "时光酿造所" },
-    { k: "flag",        cls: "w-flag",    ph: "🇧🇪" },
+    { k: "flag",        cls: "w-flag",    type: "select" },
     { k: "name",        cls: "w-name",    ph: "港岛妹妹" },
     { k: "name_en",     cls: "w-name",    ph: "Hong Kong Girl" },
     { k: "style",       cls: "w-style",   ph: "HAZY IPA" },
@@ -810,6 +810,27 @@
     { k: "large_size",  cls: "w-size",    ph: "500ml" },
     { k: "small_price", cls: "w-price",   ph: "45" },
     { k: "small_size",  cls: "w-size",    ph: "330ml" },
+  ];
+
+  const FLAG_OPTIONS = [
+    { v: "🇨🇳", label: "中国" },
+    { v: "",    label: "— 无 —" },
+    { v: "🇧🇪", label: "比利时" },
+    { v: "🇩🇪", label: "德国" },
+    { v: "🇺🇸", label: "美国" },
+    { v: "🇬🇧", label: "英国" },
+    { v: "🇨🇿", label: "捷克" },
+    { v: "🇯🇵", label: "日本" },
+    { v: "🇰🇷", label: "韩国" },
+    { v: "🇦🇺", label: "澳大利亚" },
+    { v: "🇨🇦", label: "加拿大" },
+    { v: "🇫🇷", label: "法国" },
+    { v: "🇳🇱", label: "荷兰" },
+    { v: "🇮🇪", label: "爱尔兰" },
+    { v: "🇩🇰", label: "丹麦" },
+    { v: "🇸🇪", label: "瑞典" },
+    { v: "🇳🇴", label: "挪威" },
+    { v: "🇮🇹", label: "意大利" },
   ];
 
   const COLOR_OPTIONS = [
@@ -839,9 +860,17 @@
       cells += `<td><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>`;
 
       for (const f of MENU_FIELDS) {
-        const val = escapeHtml(String(row[f.k] || ""));
-        cells += `<td><input class="${f.cls}" type="text" placeholder="${f.ph}"
-          data-menu-no="${i}" data-menu-k="${f.k}" value="${val}"/></td>`;
+        if (f.type === "select") {
+          const curVal = row[f.k] ?? "🇨🇳";
+          const opts = FLAG_OPTIONS.map(o =>
+            `<option value="${o.v}" ${curVal === o.v ? "selected" : ""}>${o.label}</option>`
+          ).join("");
+          cells += `<td><select class="color-sel ${f.cls}" data-menu-no="${i}" data-menu-k="${f.k}">${opts}</select></td>`;
+        } else {
+          const val = escapeHtml(String(row[f.k] || ""));
+          cells += `<td><input class="${f.cls}" type="text" placeholder="${f.ph}"
+            data-menu-no="${i}" data-menu-k="${f.k}" value="${val}"/></td>`;
+        }
       }
       tr.innerHTML = cells;
       tbody.appendChild(tr);
