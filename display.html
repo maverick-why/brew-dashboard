@@ -50,7 +50,7 @@ header{flex:0 0 auto;display:flex;align-items:stretch;height:64px;border-bottom:
 .ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
 .ticker::before{left:0;background:linear-gradient(90deg,#0d1a0a,transparent)}
 .ticker::after{right:0;background:linear-gradient(270deg,#0a1520,transparent)}
-.ticker-track{display:flex;gap:60px;animation:ticker-scroll 40s linear infinite;white-space:nowrap;padding-left:100%}
+.ticker-track{display:flex;gap:60px;animation:ticker-scroll 60s linear infinite;white-space:nowrap;padding-left:100%}
 @keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .ticker-item{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--sub)}
 .ticker-item .ti-dot{color:var(--amber)}
