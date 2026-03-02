@@ -30,10 +30,10 @@ body::before{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;
 header{flex:0 0 auto;display:flex;align-items:stretch;height:64px;border-bottom:1px solid var(--border2);background:rgba(10,14,22,.92);backdrop-filter:blur(18px);position:sticky;top:0;z-index:100}
 @media(max-width:639px){header{height:auto;flex-direction:column;padding-top:env(safe-area-inset-top)}}
 .h-brand{display:flex;align-items:center;gap:16px;padding:0 28px;border-right:1px solid var(--border2)}
-.h-brand-left{display:flex;align-items:center;gap:16px}
-.h-brand img{height:36px;width:auto;border-radius:6px}
-.brand-name{font-family:var(--font-display);font-size:26px;letter-spacing:3px;color:var(--gold);line-height:1;text-shadow:0 0 30px rgba(245,166,35,.4)}
-.brand-sub{font-size:10px;font-weight:700;letter-spacing:4px;color:var(--sub);margin-top:3px;text-transform:uppercase}
+.h-brand-left{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;min-width:0}
+.h-brand img{height:32px;width:auto;max-width:140px;object-fit:contain;border-radius:6px}
+.brand-name{font-family:var(--font-display);font-size:24px;letter-spacing:2.5px;color:var(--gold);line-height:.95;text-shadow:0 0 30px rgba(245,166,35,.4)}
+.brand-sub{font-size:10px;font-weight:800;letter-spacing:3px;color:var(--sub);margin-top:0;text-transform:uppercase;line-height:1;white-space:nowrap}
 .h-center{flex:1;display:flex;align-items:center;justify-content:center;gap:32px}
 .h-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
 .h-stat .sv{font-family:var(--font-display);font-size:26px;color:var(--amber);line-height:1;letter-spacing:2px}
@@ -100,7 +100,7 @@ footer .f-dot{color:var(--amber)}
   header{height:auto;flex-direction:column;padding-top:env(safe-area-inset-top)}
   .h-brand{border-right:none;border-bottom:1px solid var(--border);padding:10px 16px;justify-content:space-between}
   .h-brand-left{gap:10px}
-  .brand-sub{display:none}
+  .h-brand img{height:28px;max-width:120px}
   .brand-name{font-size:20px;letter-spacing:2px}
   .h-brand img{height:30px}
   .h-right-mobile{display:flex;border-left:none;padding:0;gap:8px}
@@ -139,10 +139,7 @@ footer .f-dot{color:var(--amber)}
     <div class="h-brand">
       <div class="h-brand-left">
         <img src="/logo.png" alt="时光酿造所 Logo" />
-        <div>
-          <div class="brand-name">时光酿造所</div>
-          <div class="brand-sub">ChronoBrewery · Live Fermentation</div>
-        </div>
+        <div class="brand-sub">Live Fermentation</div>
       </div>
       <div class="h-right h-right-mobile">
         <div class="h-status-dot"></div>
