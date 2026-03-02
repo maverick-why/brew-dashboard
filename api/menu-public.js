@@ -50,6 +50,7 @@ module.exports = async (req, res) => {
         color:       safe(row.color, "dark"),
         flag:        safe(row.flag),
         sold_out:    !!row.sold_out,
+        special:     !!row.special,
       });
     }
 

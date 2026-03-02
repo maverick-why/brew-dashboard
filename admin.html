@@ -412,6 +412,7 @@
               <th class="w-price">小杯价</th>
               <th class="w-size">小杯容量</th>
               <th style="width:52px">售罄</th>
+              <th style="width:52px">精选</th>
             </tr>
           </thead>
           <tbody id="menuTbody"></tbody>
@@ -878,7 +879,8 @@
         `<td class="no-cell">${String(i).padStart(2,"0")}</td>` +
         `<td><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>` +
         MENU_FIELDS.map(f => renderFieldCell(f, i, row)).join("") +
-        `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="sold_out" ${row.sold_out ? "checked" : ""}/></td>`;
+        `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="sold_out" ${row.sold_out ? "checked" : ""}/></td>` +
+        `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="special" ${row.special ? "checked" : ""}/></td>`;
       tbody.appendChild(tr);
     }
   }

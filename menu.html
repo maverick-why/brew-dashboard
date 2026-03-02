@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>酒单 · 时光酿造所</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Bebas+Neue&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Bebas+Neue&family=Noto+Sans+SC:wght@400;700;900&family=Noto+Serif+JP:wght@600&display=swap" rel="stylesheet"/>
   <style>
     * { margin:0; padding:0; box-sizing:border-box }
 
@@ -266,6 +266,63 @@
     /* 空卡片 */
     .card.empty .beer-name { color: #ddd; font-size: 28px; font-weight: 400 }
 
+    /* ── 精选 special ── */
+    .card.special { background: #fdf8f0; }
+    .card.special .beer-name  { color: #8a5f00; }
+    .card.special .price-line { color: #b07d00; }
+    .card.special .divider    { background: #e8d8b0; }
+
+    .trapez-badge {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(180deg, #f0c030 0%, #c8920a 100%);
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 38%, 0% 100%);
+      z-index: 3;
+    }
+    .seal {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      width: 52px;
+      height: 52px;
+    }
+    .seal-outer {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #f5d272, #c8920a);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,.7),
+        0 2px 8px rgba(0,0,0,.4),
+        inset 0 1px 2px rgba(255,255,255,.4);
+    }
+    .seal-inner {
+      position: absolute; inset: 5px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(120,70,0,.3);
+    }
+    .seal-char {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #5c3600;
+      text-shadow: 0 1px 0 rgba(255,220,100,.6);
+    }
+    .seal-dot {
+      position: absolute; width: 3px; height: 3px;
+      border-radius: 50%; background: rgba(120,70,0,.3);
+    }
+    .seal-dot.t { top: 8px;    left: 50%; transform: translateX(-50%); }
+    .seal-dot.b { bottom: 8px; left: 50%; transform: translateX(-50%); }
+    .seal-dot.l { left: 8px;   top: 50%;  transform: translateY(-50%); }
+    .seal-dot.r { right: 8px;  top: 50%;  transform: translateY(-50%); }
+    .card-num.has-badge .num { margin-top: 28px; }
+
     /* 编号色块 */
     .c-yellow { background: #F5C400 }
     .c-red    { background: #C8252A }
@@ -340,9 +397,22 @@ function esc(s) {
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
+const SEAL_HTML = `
+  <div class="trapez-badge"></div>
+  <div class="seal">
+    <div class="seal-outer"></div>
+    <div class="seal-inner"></div>
+    <div class="seal-dot t"></div>
+    <div class="seal-dot b"></div>
+    <div class="seal-dot l"></div>
+    <div class="seal-dot r"></div>
+    <div class="seal-char">荐</div>
+  </div>`;
+
 function makeCard(item) {
   const no    = String(item.no).padStart(2, "0");
   const color = item.color || DEFAULT_COLORS[item.no - 1] || "dark";
+  const badge = item.special ? SEAL_HTML : "";
 
   const priceL = item.large_price
     ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? " / "+esc(item.large_size) : ""}</div>` : "";
@@ -355,9 +425,10 @@ function makeCard(item) {
   ].filter(Boolean).join("  ·  ");
 
   return `
-<div class="card">
+<div class="card${item.special ? " special" : ""}">
   ${item.sold_out ? `<div class="sold-out-stamp"><div class="stamp-inner"><div class="stamp-cn">售罄</div><div class="stamp-en">SOLD OUT</div></div></div>` : ""}
-  <div class="card-num c-${esc(color)}">
+  <div class="card-num c-${esc(color)}${item.special ? " has-badge" : ""}">
+    ${badge}
     <span class="num">${no}</span>
   </div>
   <div class="card-body">
