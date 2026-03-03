@@ -978,9 +978,19 @@
   };
 
   function loadSeedData() {
-    const savedTapCount = menuState._tapCount;
-    menuState = JSON.parse(JSON.stringify(SEED_DATA));
-    if (savedTapCount) menuState._tapCount = savedTapCount;
+    const tapCount = Math.max(4, Math.min(64, Number(menuState._tapCount) || 16));
+
+    const seedKeys = Object.keys(SEED_DATA)
+      .filter(k => /^\d+$/.test(k))
+      .sort((a, b) => Number(a) - Number(b));
+    const seedLen = seedKeys.length;
+
+    menuState = { _tapCount: tapCount };
+    for (let i = 1; i <= tapCount; i++) {
+      const src = SEED_DATA[seedKeys[(i - 1) % seedLen]];
+      menuState[String(i)] = JSON.parse(JSON.stringify(src));
+    }
+
     renderMenu();
     markDirty();
     toast("示例数据已填入，点「保存酒单」推送到前台");
