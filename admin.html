@@ -386,8 +386,13 @@
           <button class="primary" id="btnMenuSave">保存酒单</button>
           <button class="blue" onclick="window.open('/menu.html','_blank')">预览酒单 ↗</button>
           <button id="btnMenuSeed">加载示例数据</button>
+          <label style="display:flex;align-items:center;gap:6px;margin-left:4px">
+            <span style="font-size:12px;color:rgba(234,240,255,.65);white-space:nowrap">总酒头数</span>
+            <input type="number" id="tapCountInput" min="4" max="64" step="1" value="16"
+              style="width:62px;text-align:center;padding:6px 4px"/>
+          </label>
         </div>
-        <div class="muted">编号 1–16 固定，留空的格子在前台显示「待上新」。Ctrl+S 快捷保存。</div>
+        <div class="muted">编号动态（取决于总酒头数），留空的格子在前台显示「待上新」。Ctrl+S 快捷保存。</div>
         <div class="muted" style="margin-top:6px;line-height:1.7">
           💡 <b>操作说明：</b>① 先点「加载酒单」读取现有数据 → ② 修改内容 → ③ 点「保存酒单」推送到前台（约5秒生效）。<br/>
           ⚠️ 未加载直接保存会覆盖现有数据，请先加载再改。
@@ -864,10 +869,15 @@
   }
 
   function renderMenu() {
+    const tapCount = Math.max(4, Math.min(64, Number(menuState._tapCount) || 16));
+    // 同步输入框
+    const tcInput = document.getElementById("tapCountInput");
+    if (tcInput) tcInput.value = tapCount;
+
     const tbody = document.getElementById("menuTbody");
     tbody.innerHTML = "";
 
-    for (let i = 1; i <= 16; i++) {
+    for (let i = 1; i <= tapCount; i++) {
       const row = menuState[String(i)] || {};
       const curColor = row.color || "dark";
       const colorOpts = COLOR_OPTIONS.map(o =>
@@ -977,6 +987,14 @@
   document.getElementById("btnMenuSeed").addEventListener("click", loadSeedData);
   document.getElementById("btnMenuLoad").addEventListener("click", menuLoad);
   document.getElementById("btnMenuSave").addEventListener("click", menuSave);
+
+  document.getElementById("tapCountInput").addEventListener("change", e => {
+    const n = Math.max(4, Math.min(64, Number(e.target.value) || 16));
+    e.target.value = n;
+    menuState._tapCount = n;
+    renderMenu();
+    markDirty();
+  });
 
   // Ctrl+S 同时覆盖酒单保存
   document.addEventListener("keydown", e => {

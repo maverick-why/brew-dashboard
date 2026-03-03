@@ -356,19 +356,19 @@ const DEFAULT_COLORS = [
   'yellow','red','brown','yellow','dark','orange','yellow','dark'
 ];
 
-// ?page=1 → 第1-8 TV模式，?page=2 → 第9-16 TV模式，无参数 → 预览翻页
+// ?page=1 → 第1台显示器（左），?page=2 → 第2台显示器（右），无参数 → 预览翻页
 const rawPage  = new URLSearchParams(location.search).get("page");
 const IS_TV    = !!rawPage;
 const TV_PAGE  = IS_TV ? parseInt(rawPage, 10) : 1;
-const TV_OFFSET = TV_PAGE === 2 ? 8 : 0;
 
 // TV 模式：给 root 加边框 class
 if (IS_TV) {
   document.getElementById("root").classList.add(`tv-page-${TV_PAGE}`);
 }
 
-let previewPage = 1; // 预览模式当前页
-let allItems    = [];
+let previewPage       = 1; // 预览模式当前页
+let allItems          = [];
+let currentItemsPerPage = 8; // 每台显示器显示的酒头数，由 tapCount 动态计算
 
 // 预览模式显示翻页按钮
 if (!IS_TV) {
@@ -386,8 +386,8 @@ function renderSlice(slice) {
 }
 
 function renderPreview() {
-  const offset = (previewPage - 1) * 8;
-  const slice  = allItems.slice(offset, offset + 8);
+  const offset = (previewPage - 1) * currentItemsPerPage;
+  const slice  = allItems.slice(offset, offset + currentItemsPerPage);
   document.getElementById("grid").innerHTML = renderSlice(slice);
   document.getElementById("navLabel").textContent =
     `第 ${previewPage} 页 / 共 2 页`;
@@ -459,11 +459,22 @@ async function load() {
     const res  = await fetch(API, { cache: "no-store" });
     const data = await res.json();
     if (!data.ok) return;
+
+    // 根据管理员设置的酒头数动态计算行数和每页项目数
+    // 4 个屏幕（2 台显示器 × 每台左右两列），每屏行数 = ceil(tapCount / 4)
+    const tapCount        = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
+    const rows            = Math.ceil(tapCount / 4);
+    currentItemsPerPage   = rows * 2;
+
+    // 动态设置网格行数
+    document.getElementById("grid").style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
     allItems = data.items.filter(it => it.name || it.name_en);
 
     if (IS_TV) {
-      // TV 模式：直接渲染对应页
-      const slice = allItems.slice(TV_OFFSET, TV_OFFSET + 8);
+      // TV 模式：直接渲染对应页（page=1 → 前半，page=2 → 后半）
+      const offset = TV_PAGE === 2 ? currentItemsPerPage : 0;
+      const slice  = allItems.slice(offset, offset + currentItemsPerPage);
       document.getElementById("grid").innerHTML = renderSlice(slice);
     } else {
       // 预览模式：翻页渲染

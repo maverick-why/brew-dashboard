@@ -30,9 +30,12 @@ module.exports = async (req, res) => {
     const val = await r.get(KEY);
     const raw = val ? JSON.parse(val) : {};
 
-    // 整理成有序数组，编号 1-16
+    // 读取酒头数（管理员设置的 _tapCount，默认 16，范围 4–64）
+    const tapCount = Math.max(4, Math.min(64, Number(raw._tapCount) || 16));
+
+    // 整理成有序数组，编号 1-tapCount
     const items = [];
-    for (let i = 1; i <= 16; i++) {
+    for (let i = 1; i <= tapCount; i++) {
       const row = raw[String(i)] || {};
       items.push({
         no:          i,
@@ -54,7 +57,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    return res.status(200).end(JSON.stringify({ ok: true, items }));
+    return res.status(200).end(JSON.stringify({ ok: true, tapCount, items }));
   } catch (e) {
     return res.status(500).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
   }
