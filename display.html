@@ -327,7 +327,7 @@ main {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.limited-icon { font-size: 18px; vertical-align: middle; margin-left: 6px; line-height: 1; }
+.limited-icon { display: inline-block; vertical-align: middle; margin-left: 7px; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 900; letter-spacing: 2px; line-height: 1.6; background: linear-gradient(90deg, #ff3b6b, #c72050); color: #fff; box-shadow: 0 2px 8px rgba(199,32,80,.4); }
 
 /* ─── Card Head ───────────────────────────────────── */
 .card-head {
@@ -873,7 +873,7 @@ function cardHTML(it, badge, pc, pct){
         <div class="tank-no">${esc(it.no||"")}</div>
       </div>
       <div class="card-meta">
-        <div class="beer-name" title="${esc(it.beer)}">${esc(it.beer)}${it.limited ? ` <span class="limited-icon" title="限量版">🔥</span>` : ""}</div>
+        <div class="beer-name" title="${esc(it.beer)}">${esc(it.beer)}${it.limited ? ` <span class="limited-icon">LAB</span>` : ""}</div>
         <div class="beer-style">${esc(it.style)}</div>
       </div>
       <div class="status-pill ${pc}">
