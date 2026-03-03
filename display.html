@@ -285,7 +285,7 @@ header {
   letter-spacing: 1px;
   color: var(--sub);
 }
-.ticker-item .ti-dot { color: var(--amber); }
+.ticker-item .ti-dot { color: rgba(232,237,248,.38); }
 .ticker-item .ti-val { color: var(--text); }
 
 /* ─── Main grid ───────────────────────────────────── */
@@ -386,7 +386,7 @@ main {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 2.5px;
-  color: var(--amber);
+  color: rgba(232,237,248,.5);
   text-transform: uppercase;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -595,14 +595,14 @@ footer .f-dot { color: var(--amber); }
   /* Header stacks vertically */
   header { height: auto; flex-direction: column; padding-top: env(safe-area-inset-top); }
 
-  /* Brand row: logo left, clock right */
-  .h-brand { flex-direction: row; justify-content: space-between; }
+  /* Brand row: logo centered, clock absolute right */
+  .h-brand { flex-direction: row; justify-content: center; position: relative; }
   .h-brand-left { gap: 10px; }
   .h-brand .brand-sub { display: none; }
   .h-brand img { height: 30px; }
 
   /* Show mobile clock, hide desktop clock panel */
-  .h-right-mobile { display: flex; border-left: none; padding: 0; gap: 8px; }
+  .h-right-mobile { display: flex; border-left: none; padding: 0; gap: 8px; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); }
   .h-right-desktop { display: none; }
 
   /* Status dots smaller on mobile */
