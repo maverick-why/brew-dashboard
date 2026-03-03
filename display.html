@@ -763,7 +763,7 @@ function buildTicker(items){
   const snippets = items.map(it=>
     `<span class="ticker-item">
        <span class="ti-dot">◆</span>
-       <span>${esc(it.no||"")} ${esc(it.beer)}</span>
+       <span>${esc(it.no||"")} ${esc(it.beer)}${it.limited ? ` <span class="limited-icon">LAB</span>` : ""}</span>
        <span class="ti-dot">·</span>
        <span class="ti-val">${esc(it.style)}</span>
        <span class="ti-dot">·</span>
