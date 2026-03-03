@@ -978,7 +978,9 @@
   };
 
   function loadSeedData() {
+    const savedTapCount = menuState._tapCount;
     menuState = JSON.parse(JSON.stringify(SEED_DATA));
+    if (savedTapCount) menuState._tapCount = savedTapCount;
     renderMenu();
     markDirty();
     toast("示例数据已填入，点「保存酒单」推送到前台");
