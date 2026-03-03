@@ -19,6 +19,7 @@
     :root {
       --bezel: 20px;  /* 电视边框宽度（像素），到货后量好改这一个值 */
       --gap: calc(var(--bezel) * 2); /* 卡片间距 = 2×bezel，与拼接缝视觉等宽 */
+      --rs: 1;        /* row-scale：JS 根据行数动态设置，4行=1，5行=0.8，以此类推 */
     }
 
     #root {
@@ -99,7 +100,7 @@
 
     /* 左侧彩色编号竖条 */
     .card-num {
-      width: 84px;
+      width: calc(84px * var(--rs));
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -110,7 +111,7 @@
     .num {
       font-family: 'Bebas Neue', sans-serif;
       font-weight: 400;
-      font-size: 72px;
+      font-size: calc(72px * var(--rs));
       color: #fff;
       letter-spacing: -1px;
       line-height: 1;
@@ -133,8 +134,8 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: 14px 20px 10px 16px;
-      gap: 12px;
+      padding: calc(14px * var(--rs)) 20px calc(10px * var(--rs)) 16px;
+      gap: calc(12px * var(--rs));
     }
     .info-left {
       flex: 1;
@@ -151,7 +152,7 @@
     .brewery-tag {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 500;
-      font-size: 30px;
+      font-size: calc(30px * var(--rs));
       color: #666;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -162,7 +163,7 @@
     .beer-name {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 900;
-      font-size: 46px;
+      font-size: calc(46px * var(--rs));
       color: #111;
       letter-spacing: 8px;
       line-height: 1.05;
@@ -173,11 +174,11 @@
     .beer-style {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 400;
-      font-size: 20px;
+      font-size: calc(20px * var(--rs));
       color: #888;
       letter-spacing: 0.5px;
       white-space: nowrap;
-      margin-top: 8px;
+      margin-top: calc(8px * var(--rs));
     }
 
     /* 价格 */
@@ -188,7 +189,7 @@
     .price-line {
       font-family: 'Barlow', sans-serif;
       font-weight: 700;
-      font-size: 41px;
+      font-size: calc(41px * var(--rs));
       color: #222;
       line-height: 1.6;
       white-space: nowrap;
@@ -203,14 +204,14 @@
       display: flex;
       flex-direction: row;
       align-items: flex-end;
-      padding: 8px 20px 12px 16px;
+      padding: calc(8px * var(--rs)) 20px calc(12px * var(--rs)) 16px;
       gap: 12px;
     }
     .info-en { flex: 1; min-width: 0 }
     .en-name {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
-      font-size: 20px;
+      font-size: calc(20px * var(--rs));
       color: #444;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -222,7 +223,7 @@
     .en-style {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 500;
-      font-size: 20px;
+      font-size: calc(20px * var(--rs));
       color: #999;
       letter-spacing: 0.5px;
       white-space: nowrap;
@@ -232,7 +233,7 @@
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 400;
       flex-shrink: 0;
-      font-size: 39px;
+      font-size: calc(39px * var(--rs));
       color: #aaa;
       text-align: right;
       white-space: nowrap;
@@ -262,7 +263,7 @@
     .stamp-cn {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 900;
-      font-size: 52px;
+      font-size: calc(52px * var(--rs));
       color: #C8252A;
       letter-spacing: 8px;
       line-height: 1.1;
@@ -270,14 +271,14 @@
     .stamp-en {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
-      font-size: 22px;
+      font-size: calc(22px * var(--rs));
       color: #C8252A;
       letter-spacing: 4px;
       text-transform: uppercase;
     }
 
     /* 空卡片 */
-    .card.empty .beer-name { color: #ddd; font-size: 28px; font-weight: 400 }
+    .card.empty .beer-name { color: #ddd; font-size: calc(28px * var(--rs)); font-weight: 400 }
 
     /* ── 精选 special ── */
     .card.special { background: #fdf8f0; }
@@ -289,7 +290,7 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%;
-      height: 80px;
+      height: calc(80px * var(--rs));
       background: linear-gradient(180deg, #f0c030 0%, #c8920a 100%);
       clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 38%, 0% 100%);
       z-index: 3;
@@ -300,8 +301,8 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 4;
-      width: 52px;
-      height: 52px;
+      width: calc(52px * var(--rs));
+      height: calc(52px * var(--rs));
     }
     .seal-outer {
       position: absolute; inset: 0;
@@ -322,7 +323,7 @@
       display: flex; align-items: center; justify-content: center;
       font-family: 'Noto Serif JP', serif;
       font-weight: 600;
-      font-size: 20px;
+      font-size: calc(20px * var(--rs));
       color: #5c3600;
       text-shadow: 0 1px 0 rgba(255,220,100,.6);
     }
@@ -334,7 +335,7 @@
     .seal-dot.b { bottom: 8px; left: 50%; transform: translateX(-50%); }
     .seal-dot.l { left: 8px;   top: 50%;  transform: translateY(-50%); }
     .seal-dot.r { right: 8px;  top: 50%;  transform: translateY(-50%); }
-    .card-num.has-badge .num { margin-top: 28px; }
+    .card-num.has-badge .num { margin-top: calc(28px * var(--rs)); }
 
     /* 编号色块 */
     .c-yellow { background: #F5C400 }
@@ -478,8 +479,9 @@ async function load() {
     const rows            = Math.ceil(tapCount / 4);
     currentItemsPerPage   = rows * 2;
 
-    // 动态设置网格行数
+    // 动态设置网格行数 & 字体缩放比例（基准：4行 = 1.0）
     document.getElementById("grid").style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+    document.getElementById("root").style.setProperty("--rs", Math.min(1, 4 / rows));
 
     allItems = data.items.filter(it => it.name || it.name_en);
 
