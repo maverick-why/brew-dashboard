@@ -134,7 +134,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: calc(14px * var(--rs)) 20px calc(10px * var(--rs)) 16px;
+      padding: calc(14px * var(--rs)) 20px max(10px, calc(10px * var(--rs))) 16px;
       gap: calc(12px * var(--rs));
     }
     .info-left {
@@ -204,7 +204,7 @@
       display: flex;
       flex-direction: row;
       align-items: flex-end;
-      padding: calc(8px * var(--rs)) 20px calc(12px * var(--rs)) 16px;
+      padding: max(8px, calc(8px * var(--rs))) 20px calc(12px * var(--rs)) 16px;
       gap: 12px;
     }
     .info-en { flex: 1; min-width: 0 }
