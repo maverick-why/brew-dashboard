@@ -434,15 +434,15 @@ main {
 
 /* cooling */
 .status-pill.cooling {
-  background: linear-gradient(160deg, var(--cool), var(--cool2));
-  box-shadow: 0 0 18px rgba(63,169,255,.30), inset 0 1px 0 rgba(255,255,255,.20);
+  background: linear-gradient(160deg, #a8c8e8, #6a9ab8);
+  box-shadow: 0 0 18px rgba(106,154,184,.25), inset 0 1px 0 rgba(255,255,255,.20);
   animation: cool-glow 2.4s ease-in-out infinite;
 }
 @keyframes cool-glow {
-  0%,100% { box-shadow: 0 0 14px rgba(63,169,255,.25); }
-  50%      { box-shadow: 0 0 28px rgba(63,169,255,.50); }
+  0%,100% { box-shadow: 0 0 12px rgba(106,154,184,.20); }
+  50%      { box-shadow: 0 0 24px rgba(106,154,184,.40); }
 }
-.status-pill.cooling .sp-label, .status-pill.cooling .sp-days { color: #fff; }
+.status-pill.cooling .sp-label, .status-pill.cooling .sp-days { color: #1a2e3d; }
 
 /* ready */
 .status-pill.ready {
