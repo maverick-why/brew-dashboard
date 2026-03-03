@@ -130,14 +130,6 @@ header {
   width: auto;
   border-radius: 6px;
 }
-.h-brand .brand-name {
-  font-family: var(--font-display);
-  font-size: 26px;
-  letter-spacing: 3px;
-  color: var(--gold);
-  line-height: 1;
-  text-shadow: 0 0 30px rgba(245,166,35,.4);
-}
 .h-brand .brand-sub {
   font-size: 10px;
   font-weight: 700;
@@ -156,7 +148,6 @@ header {
     gap: 10px;
   }
   .h-brand .brand-sub { display: none; }
-  .h-brand .brand-name { font-size: 22px; letter-spacing: 2px; }
 }
 
 .h-center {
@@ -585,8 +576,9 @@ footer .f-dot { color: var(--amber); }
 /* ─── Brand layout helpers ────────────────────────── */
 .h-brand-left {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 /* Desktop: show right clock panel, hide mobile clock */
@@ -606,7 +598,6 @@ footer .f-dot { color: var(--amber); }
   .h-brand { flex-direction: row; justify-content: space-between; }
   .h-brand-left { gap: 10px; }
   .h-brand .brand-sub { display: none; }
-  .h-brand .brand-name { font-size: 20px; letter-spacing: 2px; }
   .h-brand img { height: 30px; }
 
   /* Show mobile clock, hide desktop clock panel */
@@ -666,10 +657,7 @@ footer .f-dot { color: var(--amber); }
     <div class="h-brand">
       <div class="h-brand-left">
         <img src="/logo.png" alt="logo" onerror="this.style.display='none'" />
-        <div>
-          <div class="brand-name">时光酿造所</div>
-          <div class="brand-sub">ChronoBrewery · Live Fermentation</div>
-        </div>
+        <div class="brand-sub">Live Fermentation</div>
       </div>
       <!-- clock shown inline with brand on mobile; hidden on desktop (shown in h-right) -->
       <div class="h-right h-right-mobile">
