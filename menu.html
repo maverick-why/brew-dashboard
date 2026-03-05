@@ -201,11 +201,13 @@
       justify-content: center;
     }
     .beer-tags.single-tag .beer-tag {
-      height: calc(50px * var(--rs));  /* 单标签高度 = 双标签总高度 */
+      height: calc(50px * var(--rs));
       display: flex;
       align-items: center;
       justify-content: flex-start;
       padding-left: calc(8px * var(--rs));
+      font-size: calc(16px * var(--rs));  /* 单标签字号放大 */
+      font-weight: 600;
     }
     /* 双标签：每个标签正常高度，上下紧凑排列 */
     .beer-tags.dual-tag {
@@ -214,10 +216,11 @@
       align-self: flex-start;
     }
     .beer-tags.dual-tag .beer-tag {
-      height: calc(23px * var(--rs));  /* 双标签每个高度 */
+      height: calc(23px * var(--rs));
       display: flex;
       align-items: center;
       padding: 0 calc(8px * var(--rs));
+      font-size: calc(12px * var(--rs));  /* 双标签保持原字号 */
     }
     .beer-tag {
       border-radius: calc(3px * var(--rs));
