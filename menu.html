@@ -271,7 +271,7 @@
     .row-bottom {
       display: flex;
       flex-direction: row;
-      align-items: flex-end;
+      align-items: flex-start;
       padding: max(8px, calc(8px * var(--rs))) 20px calc(12px * var(--rs)) 16px;
       gap: 12px;
     }
@@ -296,6 +296,13 @@
       letter-spacing: 0.5px;
       white-space: nowrap;
       line-height: 1.05;
+    }
+    .comment-tags {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: calc(4px * var(--rs));
+      max-width: 45%;
     }
     .alc-info {
       font-family: 'Barlow Condensed', sans-serif;
@@ -552,8 +559,8 @@ function makeCard(item) {
       <div class="info-en">
         <div class="en-name">${esc(item.name_en)}</div>
         <div class="en-style">${esc(item.style_en)}</div>
-        ${commentTagsHtml ? `<div class="comment-tag-row">${commentTagsHtml}</div>` : ""}
       </div>
+      ${commentTagsHtml ? `<div class="comment-tags">${commentTagsHtml}</div>` : ""}
       <div class="alc-info">${abvIbu}</div>
     </div>
   </div>
