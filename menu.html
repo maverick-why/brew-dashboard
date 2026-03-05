@@ -170,6 +170,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      flex-shrink: 1;
     }
     .beer-style {
       font-family: 'Noto Sans SC', sans-serif;
@@ -179,6 +180,37 @@
       letter-spacing: 0.5px;
       white-space: nowrap;
       margin-top: calc(8px * var(--rs));
+    }
+
+    /* 特色标签（酒名右侧） */
+    .beer-name-row {
+      display: flex;
+      align-items: center;
+      gap: calc(8px * var(--rs));
+      min-width: 0;
+    }
+    .beer-tags {
+      display: flex;
+      gap: calc(6px * var(--rs));
+      flex-shrink: 0;
+    }
+    .beer-tag {
+      display: inline-block;
+      padding: calc(2px * var(--rs)) calc(7px * var(--rs));
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: calc(3px * var(--rs));
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: calc(12px * var(--rs));
+      font-weight: 500;
+      color: #555;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+    .card.special .beer-tag {
+      background: rgba(138,95,0,.08);
+      border-color: rgba(138,95,0,.15);
+      color: #8a5f00;
     }
 
     /* 价格 */
@@ -439,6 +471,10 @@ function makeCard(item) {
     item.ibu ? `IBU ${esc(item.ibu)}` : ""
   ].filter(Boolean).join("  ·  ");
 
+  const tags = [item.tag1, item.tag2].filter(t => t && t.trim()).map(t =>
+    `<span class="beer-tag">${esc(t)}</span>`
+  ).join("");
+
   return `
 <div class="card${item.special ? " special" : ""}">
   ${item.sold_out ? `<div class="sold-out-stamp"><div class="stamp-inner"><div class="stamp-cn">售罄</div><div class="stamp-en">SOLD OUT</div></div></div>` : ""}
@@ -450,7 +486,10 @@ function makeCard(item) {
     <div class="row-top">
       <div class="info-left">
         <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
-        <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
+        <div class="beer-name-row">
+          <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
+          ${tags ? `<div class="beer-tags">${tags}</div>` : ""}
+        </div>
         <div class="beer-style">${esc(item.style)}</div>
       </div>
       <div class="price-block">${priceL}${priceS}</div>

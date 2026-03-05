@@ -44,6 +44,8 @@ module.exports = async (req, res) => {
         name_en:     safe(row.name_en),
         style:       safe(row.style),
         style_en:    safe(row.style_en),
+        tag1:        safe(row.tag1),
+        tag2:        safe(row.tag2),
         abv:         safe(row.abv),
         ibu:         safe(row.ibu),
         large_price: safe(row.large_price),
