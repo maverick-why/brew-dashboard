@@ -289,14 +289,43 @@
       font-size:12px;
       font-family:inherit;
     }
+    .w-brewery{min-width:130px}
     .w-color{min-width:72px}
-    .w-name{min-width:130px}
-    .w-style{min-width:110px}
-    .w-tag{min-width:140px}
-    .w-price{min-width:48px}
-    .w-size{min-width:52px}
-    .w-abv{min-width:42px}
+    .w-name{min-width:120px}
+    .w-style{min-width:100px}
+    .w-tag{min-width:110px}
+    .w-price{min-width:46px}
+    .w-size{min-width:48px}
+    .w-abv{min-width:40px}
     .w-flag{min-width:52px}
+
+    /* # 列横向固定，横向滚动时始终可见 */
+    .menu-table th:first-child {
+      position: sticky; left: 0; z-index: 7;
+      background: rgba(10,16,28,.96);
+    }
+    .menu-table td.no-cell {
+      position: sticky; left: 0; z-index: 2;
+      background: var(--card);
+    }
+    .menu-table tr:hover td.no-cell { background: rgba(15,23,38,.98); }
+
+    /* 标签 emoji 图例 */
+    .tag-legend {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 6px;
+    }
+    .tl-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 12px; font-weight: 700; cursor: default;
+      user-select: all;
+    }
+    .tl-gold   { background:#f9e79f; border:1px solid #d4af37; color:#7d6608; }
+    .tl-silver { background:#e8e8e8; border:1px solid #a8a8a8; color:#505050; }
+    .tl-bronze { background:#f5d5b8; border:1px solid #cd7f32; color:#6b4423; }
+    .tl-green  { background:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32; }
+    .tl-dark   { background:#37474f; border:1px solid #263238; color:#eceff1; font-style:italic; }
 
     @media (max-width: 560px){
       header{padding:8px 12px}
@@ -397,6 +426,14 @@
         <div class="muted" style="margin-top:6px;line-height:1.7">
           💡 <b>操作说明：</b>① 先点「加载酒单」读取现有数据 → ② 修改内容 → ③ 点「保存酒单」推送到前台（约5秒生效）。<br/>
           ⚠️ 未加载直接保存会覆盖现有数据，请先加载再改。
+        </div>
+        <div class="muted" style="margin-top:4px">特色标签前缀（点击可选中复制）：</div>
+        <div class="tag-legend">
+          <span class="tl-chip tl-gold"   title="点击选中复制">🥇 金奖</span>
+          <span class="tl-chip tl-silver" title="点击选中复制">🥈 银奖</span>
+          <span class="tl-chip tl-bronze" title="点击选中复制">🥉 铜奖</span>
+          <span class="tl-chip tl-green"  title="点击选中复制">无前缀 = 原料/酒花</span>
+          <span class="tl-chip tl-dark"   title="点击选中复制">💬 裁判评语</span>
         </div>
       </div>
       <div class="menu-table-wrap">
