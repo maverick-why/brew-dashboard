@@ -185,30 +185,41 @@
     /* 特色标签（酒名右侧，上下排列） */
     .beer-name-row {
       display: flex;
-      align-items: center;  /* 单标签时与酒名居中对齐 */
+      align-items: center;
       gap: calc(10px * var(--rs));
       min-width: 0;
     }
     .beer-tags {
-      width: calc(160px * var(--rs));  /* 固定宽度区域 */
+      width: calc(160px * var(--rs));
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;  /* 标签靠左 */
+      align-items: flex-start;
     }
-    /* 单标签：与酒名居中对齐（由父容器 align-items:center 控制） */
+    /* 单标签：高度 2 倍，垂直居中文字 */
     .beer-tags.single-tag {
       justify-content: center;
     }
-    /* 双标签：上下均分，自身顶部对齐 */
+    .beer-tags.single-tag .beer-tag {
+      height: calc(50px * var(--rs));  /* 单标签高度 = 双标签总高度 */
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: calc(8px * var(--rs));
+    }
+    /* 双标签：每个标签正常高度，上下紧凑排列 */
     .beer-tags.dual-tag {
       justify-content: flex-start;
       gap: calc(4px * var(--rs));
-      align-self: flex-start;  /* 覆盖父容器的 center，改为顶部对齐 */
+      align-self: flex-start;
+    }
+    .beer-tags.dual-tag .beer-tag {
+      height: calc(23px * var(--rs));  /* 双标签每个高度 */
+      display: flex;
+      align-items: center;
+      padding: 0 calc(8px * var(--rs));
     }
     .beer-tag {
-      display: inline-block;
-      padding: calc(3px * var(--rs)) calc(8px * var(--rs));
       border-radius: calc(3px * var(--rs));
       font-family: 'Noto Sans SC', sans-serif;
       font-size: calc(12px * var(--rs));
