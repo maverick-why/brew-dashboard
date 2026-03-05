@@ -194,6 +194,16 @@
       flex-direction: column;
       gap: calc(4px * var(--rs));
       flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+    }
+    /* 单标签：宽度 2 倍 */
+    .beer-tags.single-tag .beer-tag {
+      min-width: calc(160px * var(--rs));
+    }
+    /* 双标签：均分宽度 */
+    .beer-tags.dual-tag .beer-tag {
+      min-width: calc(80px * var(--rs));
     }
     .beer-tag {
       display: inline-block;
@@ -204,6 +214,7 @@
       font-weight: 500;
       line-height: 1.3;
       white-space: nowrap;
+      text-align: center;
     }
     /* 🥇 金奖 */
     .beer-tag.award-gold {
@@ -506,6 +517,7 @@ function makeCard(item) {
   const inlineTags   = allTags.filter(t => !t.startsWith("💬"));
   const commentTags  = allTags.filter(t =>  t.startsWith("💬"));
 
+  const inlineTagClass = inlineTags.length === 1 ? "single-tag" : inlineTags.length === 2 ? "dual-tag" : "";
   const inlineTagsHtml  = inlineTags.map(t =>
     `<span class="beer-tag ${getTagClass(t)}">${esc(t)}</span>`
   ).join("");
@@ -526,7 +538,7 @@ function makeCard(item) {
         <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
         <div class="beer-name-row">
           <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
-          ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
+          ${inlineTagsHtml ? `<div class="beer-tags ${inlineTagClass}">${inlineTagsHtml}</div>` : ""}
         </div>
         <div class="beer-style">${esc(item.style)}</div>
       </div>
@@ -534,11 +546,11 @@ function makeCard(item) {
     </div>
     <div class="divider"></div>
     <div class="row-bottom">
-      ${commentTagsHtml ? `<div class="comment-tags">${commentTagsHtml}</div>` : ""}
       <div class="info-en">
         <div class="en-name">${esc(item.name_en)}</div>
         <div class="en-style">${esc(item.style_en)}</div>
       </div>
+      ${commentTagsHtml ? `<div class="comment-tags">${commentTagsHtml}</div>` : ""}
       <div class="alc-info">${abvIbu}</div>
     </div>
   </div>
