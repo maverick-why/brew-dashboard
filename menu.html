@@ -236,6 +236,12 @@
       color: #eceff1;
       font-style: italic;
       font-weight: 400;
+      white-space: normal;   /* 允许换行 */
+      line-height: 1.5;
+      display: block;
+    }
+    .comment-tag-row {
+      margin-top: calc(5px * var(--rs));
     }
     .card.special .beer-tag.ingredient {
       background: rgba(138,95,0,.08);
@@ -501,18 +507,25 @@ function makeCard(item) {
     item.ibu ? `IBU ${esc(item.ibu)}` : ""
   ].filter(Boolean).join("  ·  ");
 
-  // 标签类型识别：根据 emoji 前缀自动分类
+  // 标签分流：💬 评语 → 下栏换行展示；其余 → 酒名右侧
   function getTagClass(text) {
     if (!text) return "ingredient";
     if (text.startsWith("🥇")) return "award-gold";
     if (text.startsWith("🥈")) return "award-silver";
     if (text.startsWith("🥉")) return "award-bronze";
     if (text.startsWith("💬")) return "comment";
-    return "ingredient"; // 默认绿色（酒花/原料）
+    return "ingredient";
   }
 
-  const tags = [item.tag1, item.tag2].filter(t => t && t.trim()).map(t =>
+  const allTags      = [item.tag1, item.tag2].filter(t => t && t.trim());
+  const inlineTags   = allTags.filter(t => !t.startsWith("💬"));
+  const commentTags  = allTags.filter(t =>  t.startsWith("💬"));
+
+  const inlineTagsHtml  = inlineTags.map(t =>
     `<span class="beer-tag ${getTagClass(t)}">${esc(t)}</span>`
+  ).join("");
+  const commentTagsHtml = commentTags.map(t =>
+    `<span class="beer-tag comment">${esc(t)}</span>`
   ).join("");
 
   return `
@@ -528,7 +541,7 @@ function makeCard(item) {
         <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
         <div class="beer-name-row">
           <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
-          ${tags ? `<div class="beer-tags">${tags}</div>` : ""}
+          ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
         </div>
         <div class="beer-style">${esc(item.style)}</div>
       </div>
@@ -539,6 +552,7 @@ function makeCard(item) {
       <div class="info-en">
         <div class="en-name">${esc(item.name_en)}</div>
         <div class="en-style">${esc(item.style_en)}</div>
+        ${commentTagsHtml ? `<div class="comment-tag-row">${commentTagsHtml}</div>` : ""}
       </div>
       <div class="alc-info">${abvIbu}</div>
     </div>
