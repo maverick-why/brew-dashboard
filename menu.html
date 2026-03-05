@@ -190,20 +190,20 @@
       min-width: 0;
     }
     .beer-tags {
+      width: calc(160px * var(--rs));  /* 固定宽度区域 */
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      gap: calc(4px * var(--rs));
-      flex-shrink: 0;
-      align-items: center;
+      align-items: flex-start;  /* 标签靠左 */
+    }
+    /* 单标签：垂直居中 */
+    .beer-tags.single-tag {
       justify-content: center;
     }
-    /* 单标签：宽度 2 倍 */
-    .beer-tags.single-tag .beer-tag {
-      min-width: calc(160px * var(--rs));
-    }
-    /* 双标签：均分宽度 */
-    .beer-tags.dual-tag .beer-tag {
-      min-width: calc(80px * var(--rs));
+    /* 双标签：上下均分 */
+    .beer-tags.dual-tag {
+      justify-content: space-between;
+      gap: calc(4px * var(--rs));
     }
     .beer-tag {
       display: inline-block;
@@ -214,7 +214,6 @@
       font-weight: 500;
       line-height: 1.3;
       white-space: nowrap;
-      text-align: center;
     }
     /* 🥇 金奖 */
     .beer-tag.award-gold {
