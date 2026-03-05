@@ -185,7 +185,7 @@
     /* 特色标签（酒名右侧，上下排列） */
     .beer-name-row {
       display: flex;
-      align-items: flex-start;
+      align-items: center;  /* 单标签时与酒名居中对齐 */
       gap: calc(10px * var(--rs));
       min-width: 0;
     }
@@ -196,14 +196,15 @@
       flex-direction: column;
       align-items: flex-start;  /* 标签靠左 */
     }
-    /* 单标签：垂直居中 */
+    /* 单标签：与酒名居中对齐（由父容器 align-items:center 控制） */
     .beer-tags.single-tag {
       justify-content: center;
     }
-    /* 双标签：上下均分 */
+    /* 双标签：上下均分，自身顶部对齐 */
     .beer-tags.dual-tag {
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: calc(4px * var(--rs));
+      align-self: flex-start;  /* 覆盖父容器的 center，改为顶部对齐 */
     }
     .beer-tag {
       display: inline-block;
