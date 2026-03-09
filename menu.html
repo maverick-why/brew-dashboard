@@ -288,6 +288,10 @@
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
     }
+    .price-block.single .price-line {
+      font-size: calc(52px * var(--rs));
+      line-height: 1.3;
+    }
 
     /* 分隔线 */
     .divider { height: 1px; background: #e0e0e0; margin: 0 16px }
@@ -508,10 +512,14 @@ function makeCard(item) {
   const color = item.color || DEFAULT_COLORS[item.no - 1] || "dark";
   const badge = item.special ? SEAL_HTML : "";
 
-  const priceL = item.large_price
+  const hasLarge = item.large_price && item.large_price.trim();
+  const hasSmall = item.small_price && item.small_price.trim();
+  const priceL = hasLarge
     ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? " / "+esc(item.large_size) : ""}</div>` : "";
-  const priceS = item.small_price
+  const priceS = hasSmall
     ? `<div class="price-line">¥${esc(item.small_price)}${item.small_size ? " / "+esc(item.small_size) : ""}</div>` : "";
+  const singlePrice = !!hasLarge !== !!hasSmall;
+  console.log(`🍺 #${item.no}:`, {large: item.large_price, small: item.small_price, hasL: !!hasLarge, hasS: !!hasSmall, single: singlePrice});
 
   const abvIbu = [
     item.abv ? `ALC ${esc(item.abv)}%` : "",
@@ -557,7 +565,7 @@ function makeCard(item) {
         </div>
         <div class="beer-style">${esc(item.style)}</div>
       </div>
-      <div class="price-block">${priceL}${priceS}</div>
+      <div class="price-block${singlePrice ? " single" : ""}">${priceL}${priceS}</div>
     </div>
     <div class="divider"></div>
     <div class="row-bottom">
