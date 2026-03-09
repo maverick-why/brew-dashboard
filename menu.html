@@ -519,7 +519,6 @@ function makeCard(item) {
   const priceS = hasSmall
     ? `<div class="price-line">¥${esc(item.small_price)}${item.small_size ? " / "+esc(item.small_size) : ""}</div>` : "";
   const singlePrice = !!hasLarge !== !!hasSmall;
-  console.log(`🍺 #${item.no}:`, {large: item.large_price, small: item.small_price, hasL: !!hasLarge, hasS: !!hasSmall, single: singlePrice});
 
   const abvIbu = [
     item.abv ? `ALC ${esc(item.abv)}%` : "",
