@@ -238,6 +238,7 @@
         elCursor.style.animation  = 'none';
         elCursor.style.transition = 'opacity 0.4s ease';
         elCursor.style.opacity    = '0';
+        setTimeout(() => { elCursor.style.display = 'none'; }, 400);
         setTimeout(startStage4, 450);   // stage 4 begins once cursor is gone
       }, 300);
       return;
