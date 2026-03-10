@@ -181,8 +181,8 @@
 <script>
   // ── text definition ─────────────────────────────────────────────────────────
   // "Something's " is cream (normal), "Brewing." is italic gold
-  const FULL_TEXT = "Something's Brewing.";
-  const SPLIT_AT  = 12; // indices 0-11 → normal · 12-19 → italic
+  const FULL_TEXT = "Something's Brewing";
+  const SPLIT_AT  = 12; // indices 0-11 → normal · 12-18 → italic
 
   const elNormal   = document.getElementById('titleNormal');
   const elItalic   = document.getElementById('titleItalic');
@@ -238,12 +238,17 @@
       return;
     }
 
-    const ch = FULL_TEXT[index];
-    if (index < SPLIT_AT) {
-      elNormal.textContent += ch;
-    } else {
-      elItalic.textContent += ch;
-    }
+    const ch     = FULL_TEXT[index];
+    const parent = index < SPLIT_AT ? elNormal : elItalic;
+
+    // create a span so each character fades in softly
+    const span = document.createElement('span');
+    span.textContent    = ch;
+    span.style.opacity  = '0';
+    span.style.transition = 'opacity 0.35s ease';
+    parent.appendChild(span);
+    // double-rAF ensures browser paints opacity:0 before transitioning
+    requestAnimationFrame(() => requestAnimationFrame(() => { span.style.opacity = '1'; }));
 
     setTimeout(() => typeChar(index + 1), getDelay(ch));
   }
