@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>时光酿造所 · Coming Soon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Noto+Sans+SC:wght@300&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -84,7 +84,7 @@
 
     /* ── gold divider ── */
     .divider {
-      width: clamp(80px, 11vw, 100px);
+      width: 0;   /* set by JS to match title width */
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold) 25%, var(--gold) 75%, transparent);
       opacity: 0;
@@ -99,14 +99,14 @@
     }
     .sub-cn {
       font-family: 'Noto Sans SC', sans-serif;
-      font-weight: 300;
+      font-weight: 400;
       font-size: clamp(16px, 2.2vw, 22px);
       color: rgba(237,232,219,.48);
       letter-spacing: 8px;
     }
     .sub-en {
       font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
+      font-weight: 400;
       font-style: italic;
       font-size: clamp(14px, 1.8vw, 18px);
       color: rgba(200,169,110,.45);
@@ -214,6 +214,10 @@
 
   // ── stage 4: sequential reveals ─────────────────────────────────────────────
   function startStage4() {
+    // match divider width to the rendered title width
+    const titleWrap = document.querySelector('.title-wrap');
+    elDivider.style.width = titleWrap.offsetWidth + 'px';
+
     setTimeout(() => fadeIn(elDivider,  0.8),  500);   // divider  @ +500 ms
     setTimeout(() => fadeIn(elSubtitle, 0.8), 1200);   // subtitle @ +1200 ms
     setTimeout(() => fadeIn(elFooter,   0.8), 1800);   // footer   @ +1800 ms
