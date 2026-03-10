@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>时光酿造所 · Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Bebas+Neue&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #c8a96e;
+      --gold-dim: rgba(200,169,110,.18);
+      --cream: #f0ead8;
+      --dark: #0d0c0a;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--dark);
+      overflow: hidden;
+      font-family: 'Noto Sans SC', sans-serif;
+    }
+
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(90,60,20,.55) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 50% 85%,  rgba(60,40,10,.4)  0%, transparent 60%),
+        linear-gradient(180deg, #0a0908 0%, #1a1510 40%, #0f0d09 100%);
+    }
+
+    .noise {
+      position: fixed; inset: 0; z-index: 1;
+      opacity: .045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+
+    .center-line {
+      position: fixed; left: 50%; top: 0; bottom: 0; z-index: 2;
+      width: 1px;
+      background: linear-gradient(180deg, transparent 0%, var(--gold-dim) 30%, var(--gold-dim) 70%, transparent 100%);
+      transform: translateX(-50%);
+      opacity: 0;
+      animation: fadeIn 2s ease 1.8s forwards;
+    }
+
+    .stage {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0 40px;
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(18px, 2.4vw, 28px);
+      color: var(--gold);
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: slideUp .9s cubic-bezier(.22,1,.36,1) 1.0s forwards;
+      margin-top: clamp(16px, 3vh, 32px);
+    }
+
+    .headline {
+      text-align: center;
+      opacity: 0;
+      animation: slideDown 1s cubic-bezier(.22,1,.36,1) .6s forwards;
+    }
+    .headline-en {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(42px, 7.5vw, 96px);
+      color: var(--cream);
+      letter-spacing: .02em;
+      line-height: 1.0;
+      display: block;
+    }
+    .headline-en em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .rule {
+      width: clamp(60px, 10vw, 120px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: clamp(20px, 4vh, 40px) auto;
+      opacity: 0;
+      animation: fadeIn .8s ease 1.1s forwards;
+    }
+
+    .sub {
+      text-align: center;
+      opacity: 0;
+      animation: slideUp .9s cubic-bezier(.22,1,.36,1) .9s forwards;
+    }
+    .sub-cn {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 300;
+      font-size: clamp(16px, 2.2vw, 26px);
+      color: rgba(240,234,216,.55);
+      letter-spacing: 6px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .sub-coming {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(14px, 1.6vw, 20px);
+      color: rgba(200,169,110,.5);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .footer {
+      position: fixed; bottom: clamp(24px, 5vh, 48px); left: 0; right: 0;
+      display: flex; justify-content: center; align-items: center; gap: 24px;
+      z-index: 10;
+      opacity: 0;
+      animation: fadeIn 1s ease 2.2s forwards;
+    }
+    .footer-dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--gold); opacity: .4;
+    }
+    .footer-text {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 11px; font-weight: 300;
+      color: rgba(200,169,110,.35);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .glow {
+      position: fixed; bottom: -20%; left: 50%; z-index: 1;
+      width: clamp(300px, 60vw, 800px);
+      height: clamp(300px, 60vw, 800px);
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(140,90,20,.12) 0%, transparent 70%);
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: .6; transform: translateX(-50%) scale(1); }
+      50%       { opacity: 1;  transform: translateX(-50%) scale(1.08); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="noise"></div>
+<div class="glow"></div>
+<div class="center-line"></div>
+
+<main class="stage">
+  <div class="headline">
+    <span class="headline-en">Something's <em>Brewing.</em></span>
+  </div>
+
+  <div class="brand">Chrono Brewery &nbsp;·&nbsp; 时光酿造所</div>
+
+  <div class="rule"></div>
+
+  <div class="sub">
+    <span class="sub-cn">正&nbsp;在&nbsp;酝&nbsp;酿</span>
+    <span class="sub-coming">Coming Soon</span>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-dot"></div>
+  <span class="footer-text">时光酿造所</span>
+  <div class="footer-dot"></div>
+</footer>
+
+</body>
+</html>
