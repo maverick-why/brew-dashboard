@@ -51,14 +51,6 @@
     .stage {
       position: fixed; inset: 0; z-index: 10;
       display: flex; flex-direction: column;
-      align-items: center;
-      padding: clamp(24px, 5vh, 48px) 32px clamp(20px, 5vh, 44px);
-    }
-
-    /* center group: fills remaining space, vertically centers its children */
-    .center-group {
-      flex: 1;
-      display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: clamp(18px, 3.5vw, 38px);
     }
@@ -124,8 +116,14 @@
 
     /* ── logo (压轴) ── */
     .logo {
+      position: fixed;
+      top: clamp(16px, 3vh, 32px);
+      left: 50%;
+      transform: translateX(-50%);
       width: clamp(360px, 88vw, 720px);
-      flex-shrink: 0;
+      max-height: 18vh;
+      object-fit: contain;
+      z-index: 10;
       opacity: 0;
     }
 
@@ -163,25 +161,21 @@
 <div class="noise"></div>
 
 <main class="stage">
-  <img class="logo" id="logo" src="/logo.png" alt="时光酿造所"/>
+  <div class="title-wrap">
+    <span class="title-normal" id="titleNormal"></span><span
+          class="title-italic"  id="titleItalic"></span><span
+          class="cursor"        id="cursor"></span>
+  </div>
 
-  <div class="center-group">
-    <!-- title: normal + italic parts share a single line so cursor follows naturally -->
-    <div class="title-wrap">
-      <span class="title-normal" id="titleNormal"></span><span
-            class="title-italic"  id="titleItalic"></span><span
-            class="cursor"        id="cursor"></span>
-    </div>
+  <div class="divider"  id="divider"></div>
 
-    <div class="divider"  id="divider"></div>
-
-    <div class="subtitle" id="subtitle">
-      <span class="sub-cn">正 在 酝 酿</span>
-      <span class="sub-en">Coming Soon</span>
-    </div>
+  <div class="subtitle" id="subtitle">
+    <span class="sub-cn">正 在 酝 酿</span>
+    <span class="sub-en">Coming Soon</span>
   </div>
 </main>
 
+<img class="logo" id="logo" src="/logo.png" alt="时光酿造所"/>
 <footer class="footer" id="footer">· 时光酿造所 ·</footer>
 
 <script>
