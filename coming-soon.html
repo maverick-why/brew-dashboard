@@ -47,18 +47,27 @@
       animation: fadeIn 2s ease 1.8s forwards;
     }
 
+    /* logo 固定在上方，主内容填满剩余空间居中 */
     .stage {
       position: fixed; inset: 0; z-index: 10;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 0 32px 12vh;
-      gap: clamp(20px, 5vw, 40px);
+      align-items: center;
+      padding: 10vh 32px 10vh;
     }
 
     .logo {
-      width: clamp(140px, 40vw, 280px);
+      width: clamp(120px, 32vw, 220px);
       opacity: 0;
       animation: fadeIn 1s ease 0.3s forwards;
+    }
+
+    /* 主内容区：撑满 logo 以下空间，垂直居中 */
+    .main-content {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: clamp(28px, 7vw, 56px);
+      width: 100%;
     }
 
     .headline {
@@ -69,7 +78,7 @@
     .headline-en {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
-      font-size: clamp(28px, 7.5vw, 96px);
+      font-size: clamp(26px, 7vw, 96px);
       color: var(--cream);
       letter-spacing: .02em;
       line-height: 1.0;
@@ -101,7 +110,7 @@
       color: rgba(240,234,216,.55);
       letter-spacing: 6px;
       display: block;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .sub-coming {
       font-family: 'Cormorant Garamond', serif;
@@ -169,13 +178,15 @@
 
 <main class="stage">
   <img class="logo" src="/logo.png" alt="时光酿造所"/>
-  <div class="headline">
-    <span class="headline-en">Something's <em>Brewing.</em></span>
-  </div>
-  <div class="rule"></div>
-  <div class="sub">
-    <span class="sub-cn">正&nbsp;在&nbsp;酝&nbsp;酿</span>
-    <span class="sub-coming">Coming Soon</span>
+  <div class="main-content">
+    <div class="headline">
+      <span class="headline-en">Something's <em>Brewing.</em></span>
+    </div>
+    <div class="rule"></div>
+    <div class="sub">
+      <span class="sub-cn">正&nbsp;在&nbsp;酝&nbsp;酿</span>
+      <span class="sub-coming">Coming Soon</span>
+    </div>
   </div>
 </main>
 
