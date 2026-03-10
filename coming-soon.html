@@ -143,6 +143,11 @@
     }
 
     /* ── keyframes ── */
+    @keyframes char-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
     @keyframes blink {
       0%,  49% { opacity: 1; }
       50%, 100% { opacity: 0; }
@@ -241,14 +246,10 @@
     const ch     = FULL_TEXT[index];
     const parent = index < SPLIT_AT ? elNormal : elItalic;
 
-    // create a span so each character fades in softly
     const span = document.createElement('span');
-    span.textContent    = ch;
-    span.style.opacity  = '0';
-    span.style.transition = 'opacity 0.35s ease';
+    span.textContent = ch;
+    span.style.animation = 'char-in 0.2s ease-in forwards';
     parent.appendChild(span);
-    // double-rAF ensures browser paints opacity:0 before transitioning
-    requestAnimationFrame(() => requestAnimationFrame(() => { span.style.opacity = '1'; }));
 
     setTimeout(() => typeChar(index + 1), getDelay(ch));
   }
