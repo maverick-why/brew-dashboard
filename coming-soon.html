@@ -256,6 +256,19 @@
 
   // ── stage 1: cursor flashes alone for 4 blink-cycles (4 × 0.6 s = 2.4 s) ──
   setTimeout(() => typeChar(0), 2400);
+
+  // ── analytics: log page view ─────────────────────────────────────────────
+  (function () {
+    const URL  = 'https://kbjndsrllqpuaedotdng.supabase.co';
+    const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtiam5kc3JsbHFwdWFlZG90ZG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4Mjg2NDAsImV4cCI6MjA4NzQwNDY0MH0.gSdKU54sAAAdDoqEhczuj4TxmcNzghMe9WN84zLOaAY';
+    let vid = localStorage.getItem('_vid');
+    if (!vid) { vid = crypto.randomUUID(); localStorage.setItem('_vid', vid); }
+    fetch(URL + '/rest/v1/page_views', {
+      method: 'POST',
+      headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: 'coming-soon', visitor_id: vid })
+    });
+  })();
 </script>
 
 </body>
