@@ -195,32 +195,28 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-    }
-    /* 单标签：高度 2 倍，垂直居中文字 */
-    .beer-tags.single-tag {
       justify-content: center;
+      gap: calc(4px * var(--rs));
+      /* 固定总高度 = 两个标签 + gap，让单标签也占同样空间 */
+      min-height: calc((23px * 2 + 4px) * var(--rs));
     }
+    /* 单标签：垂直居中，字号放大 */
     .beer-tags.single-tag .beer-tag {
-      height: calc(50px * var(--rs));
+      height: calc(28px * var(--rs));
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      padding-left: calc(8px * var(--rs));
-      font-size: calc(16px * var(--rs));  /* 单标签字号放大 */
+      padding: 0 calc(10px * var(--rs));
+      font-size: calc(14px * var(--rs));
       font-weight: 600;
     }
-    /* 双标签：每个标签正常高度，上下紧凑排列 */
-    .beer-tags.dual-tag {
-      justify-content: flex-start;
-      gap: calc(4px * var(--rs));
-      align-self: flex-start;
-    }
+    /* 双标签：正常高度 */
     .beer-tags.dual-tag .beer-tag {
       height: calc(23px * var(--rs));
       display: flex;
       align-items: center;
       padding: 0 calc(8px * var(--rs));
-      font-size: calc(12px * var(--rs));  /* 双标签保持原字号 */
+      font-size: calc(12px * var(--rs));
     }
     .beer-tag {
       border-radius: calc(4px * var(--rs));
