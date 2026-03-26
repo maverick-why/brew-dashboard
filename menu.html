@@ -33,11 +33,14 @@
       padding: 0;
     }
 
-    /* TV 第一页（左屏）：上左下留 bezel，右边贴边 */
+    /* TV 左屏：上左下留 bezel，右边贴边（拼缝） */
     #root.tv-page-1 { padding: var(--bezel) 0 var(--bezel) var(--bezel); }
 
-    /* TV 第二页（右屏）：上右下留 bezel，左边贴边 */
-    #root.tv-page-2 { padding: var(--bezel) var(--bezel) var(--bezel) 0; }
+    /* TV 中屏（三屏时）：上下留 bezel，左右贴边 */
+    #root.tv-page-2-mid { padding: var(--bezel) 0 var(--bezel) 0; }
+
+    /* TV 右屏：上右下留 bezel，左边贴边（拼缝） */
+    #root.tv-page-2, #root.tv-page-3 { padding: var(--bezel) var(--bezel) var(--bezel) 0; }
 
     /* ── 卡片网格：2列×N行 ── */
     .grid {
@@ -423,19 +426,20 @@ const DEFAULT_COLORS = [
   'yellow','red','brown','yellow','dark','orange','yellow','dark'
 ];
 
-// ?page=1 → 第1台显示器（左），?page=2 → 第2台显示器（右），无参数 → 预览翻页
+// ?page=1 → 左屏，?page=2 → 中屏（三屏时）或右屏（两屏时），?page=3 → 右屏（三屏时），无参数 → 预览翻页
 const rawPage  = new URLSearchParams(location.search).get("page");
 const IS_TV    = !!rawPage;
 const TV_PAGE  = IS_TV ? parseInt(rawPage, 10) : 1;
 
-// TV 模式：给 root 加边框 class
+let previewPage         = 1;
+let allItems            = [];
+let currentItemsPerPage = 8;
+let screenCount         = 2; // 由 load() 根据 tapCount 动态更新
+
+// TV 模式：给 root 加边框 class（具体屏幕位置在 load() 里确认 screenCount 后再微调）
 if (IS_TV) {
   document.getElementById("root").classList.add(`tv-page-${TV_PAGE}`);
 }
-
-let previewPage       = 1; // 预览模式当前页
-let allItems          = [];
-let currentItemsPerPage = 8; // 每台显示器显示的酒头数，由 tapCount 动态计算
 
 // 预览模式显示翻页按钮
 if (!IS_TV) {
@@ -444,7 +448,7 @@ if (!IS_TV) {
     if (previewPage > 1) { previewPage--; renderPreview(); }
   });
   document.getElementById("btnNext").addEventListener("click", () => {
-    if (previewPage < 2) { previewPage++; renderPreview(); }
+    if (previewPage < screenCount) { previewPage++; renderPreview(); }
   });
 }
 
@@ -457,7 +461,7 @@ function renderPreview() {
   const slice  = allItems.slice(offset, offset + currentItemsPerPage);
   document.getElementById("grid").innerHTML = renderSlice(slice);
   document.getElementById("navLabel").textContent =
-    `第 ${previewPage} 页 / 共 2 页`;
+    `第 ${previewPage} 页 / 共 ${screenCount} 页`;
 }
 
 function esc(s) {
@@ -565,11 +569,19 @@ async function load() {
     const data = await res.json();
     if (!data.ok) return;
 
-    // 根据管理员设置的酒头数动态计算行数和每页项目数
-    // 4 个屏幕（2 台显示器 × 每台左右两列），每屏行数 = ceil(tapCount / 4)
-    const tapCount        = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
-    const rows            = Math.ceil(tapCount / 4);
-    currentItemsPerPage   = rows * 2;
+    // 根据酒头数决定屏幕数：>20 启用第三屏，否则两屏
+    const tapCount      = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
+    screenCount         = tapCount > 20 ? 3 : 2;
+    const totalCols     = screenCount * 2;           // 每页2列
+    const rows          = Math.min(5, Math.ceil(tapCount / totalCols));
+    currentItemsPerPage = rows * 2;
+
+    // 三屏中间屏：page=2 时改 class 为 tv-page-2-mid
+    if (IS_TV && screenCount === 3 && TV_PAGE === 2) {
+      const root = document.getElementById("root");
+      root.classList.remove("tv-page-2");
+      root.classList.add("tv-page-2-mid");
+    }
 
     // 动态设置网格行数 & 字体缩放比例（基准：4行 = 1.0）
     document.getElementById("grid").style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -578,8 +590,8 @@ async function load() {
     allItems = data.items.filter(it => it.name || it.name_en);
 
     if (IS_TV) {
-      // TV 模式：直接渲染对应页（page=1 → 前半，page=2 → 后半）
-      const offset = TV_PAGE === 2 ? currentItemsPerPage : 0;
+      // TV 模式：按页码直接渲染对应区段
+      const offset = (TV_PAGE - 1) * currentItemsPerPage;
       const slice  = allItems.slice(offset, offset + currentItemsPerPage);
       document.getElementById("grid").innerHTML = renderSlice(slice);
     } else {
