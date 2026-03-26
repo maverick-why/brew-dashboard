@@ -33,14 +33,14 @@
       padding: 0;
     }
 
-    /* TV 左屏：上左下留 bezel，右边贴边（拼缝） */
-    #root.tv-page-1 { padding: var(--bezel) 0 var(--bezel) var(--bezel); }
+    /* TV 左屏：上下留 bezel，左外边留 gap（= 卡片间距），右贴边（拼缝） */
+    #root.tv-page-1 { padding: var(--bezel) 0 var(--bezel) var(--gap); }
 
     /* TV 中屏（三屏时）：上下留 bezel，左右贴边 */
     #root.tv-page-2-mid { padding: var(--bezel) 0 var(--bezel) 0; }
 
-    /* TV 右屏：上右下留 bezel，左边贴边（拼缝） */
-    #root.tv-page-2, #root.tv-page-3 { padding: var(--bezel) var(--bezel) var(--bezel) 0; }
+    /* TV 右屏：上下留 bezel，右外边留 gap（= 卡片间距），左贴边（拼缝） */
+    #root.tv-page-2, #root.tv-page-3 { padding: var(--bezel) var(--gap) var(--bezel) 0; }
 
     /* ── 卡片网格：2列×N行 ── */
     .grid {
