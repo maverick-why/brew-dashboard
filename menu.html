@@ -394,15 +394,7 @@
     /* trapez-badge / seal 全部隐藏 */
     .trapez-badge, .seal { display: none; }
 
-    /* 编号色块 */
-    .c-yellow { background: #F5C400 }
-    .c-red    { background: #C8252A }
-    .c-orange { background: #E0621A }
-    .c-dark   { background: #2B2B2B }
-    .c-brown  { background: #5A3018 }
-    .c-green  { background: #2E7D32 }
-    .c-blue   { background: #1565C0 }
-    .c-gray   { background: #C8C8C8 }
+    /* 编号色块颜色由 JS 根据风格自动注入 inline style，此处无需定义 */
   </style>
 </head>
 <body>
@@ -421,10 +413,39 @@
 const API     = "/api/menu-public";
 const REFRESH = 5000;
 
-const DEFAULT_COLORS = [
-  'yellow','red','orange','dark','yellow','orange','red','dark',
-  'yellow','red','brown','yellow','dark','orange','yellow','dark'
+const STYLE_COLORS = [
+  // 啤酒
+  { keywords: ["ipa", "pale ale"],                         color: "#E0621A" },
+  { keywords: ["stout", "世涛"],                            color: "#2B2B2B" },
+  { keywords: ["lager", "拉格"],                            color: "#F5C400" },
+  { keywords: ["wheat", "小麦", "weiss", "白啤"],           color: "#9E9E9E" },
+  { keywords: ["porter", "波特"],                           color: "#5A3018" },
+  { keywords: ["sour", "酸"],                               color: "#C8252A" },
+  { keywords: ["saison", "赛松"],                           color: "#2E7D32" },
+  { keywords: ["barleywine", "大麦酒"],                     color: "#6A1B9A" },
+  { keywords: ["belgian", "比利时"],                        color: "#1565C0" },
+  { keywords: ["ale", "艾尔"],                              color: "#F5C400" },
+  // 鸡尾酒
+  { keywords: ["cocktail", "鸡尾酒", "mojito", "莫吉托"],  color: "#00897B" },
+  { keywords: ["whisky", "威士忌", "bourbon"],              color: "#8D4B00" },
+  { keywords: ["gin", "金酒"],                              color: "#4A7C59" },
+  { keywords: ["rum", "朗姆"],                              color: "#C47D00" },
+  // 咖啡
+  { keywords: ["coffee", "咖啡", "cold brew", "冷萃"],      color: "#4E342E" },
+  { keywords: ["latte", "拿铁"],                            color: "#A1887F" },
+  { keywords: ["espresso", "浓缩"],                         color: "#3E2723" },
+  // 兜底
+  { keywords: [],                                           color: "#2B2B2B" },
 ];
+
+function getStyleColor(style, style_en) {
+  const hay = ((style || "") + " " + (style_en || "")).toLowerCase();
+  for (const entry of STYLE_COLORS) {
+    if (entry.keywords.length === 0) return entry.color;
+    if (entry.keywords.some(k => hay.includes(k.toLowerCase()))) return entry.color;
+  }
+  return "#2B2B2B";
+}
 
 // ?page=1 → 左屏，?page=2 → 中屏（三屏时）或右屏（两屏时），?page=3 → 右屏（三屏时），无参数 → 预览翻页
 const rawPage  = new URLSearchParams(location.search).get("page");
@@ -483,9 +504,9 @@ const SEAL_HTML = `
   </div>`;
 
 function makeCard(item) {
-  const no    = String(item.no).padStart(2, "0");
-  const color = item.color || DEFAULT_COLORS[item.no - 1] || "dark";
-  const badge = item.special ? SEAL_HTML : "";
+  const no         = String(item.no).padStart(2, "0");
+  const blockColor = getStyleColor(item.style, item.style_en);
+  const badge      = item.special ? SEAL_HTML : "";
 
   const hasLarge = item.large_price && item.large_price.trim();
   const hasSmall = item.small_price && item.small_price.trim();
@@ -532,7 +553,7 @@ function makeCard(item) {
   return `
 <div class="card${item.special ? " special" : ""}">
   ${item.sold_out ? `<div class="sold-out-stamp"><div class="stamp-inner"><div class="stamp-cn">售罄</div><div class="stamp-en">SOLD OUT</div></div></div>` : ""}
-  <div class="card-num c-${esc(color)}${item.special ? " has-badge" : ""}${sponsored ? " sponsored" : ""}">
+  <div class="card-num${sponsored ? " sponsored" : ""}" style="background:${blockColor}">
     ${badge}
     <span class="num">${no}</span>
     ${sponsorIconHtml}
