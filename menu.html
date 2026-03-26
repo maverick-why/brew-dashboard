@@ -108,22 +108,24 @@
       position: relative;
       overflow: hidden;
     }
-    /* 已冠名：编号靠上，图标居下 */
+    /* 已冠名：编号靠上，图标放大填满色块下半 */
     .card-num.sponsored {
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding-top: calc(16px * var(--rs));
-      gap: calc(4px * var(--rs));
+      padding-top: calc(14px * var(--rs));
+      padding-bottom: calc(8px * var(--rs));
     }
     .card-num.sponsored .num {
+      flex-shrink: 0;
       font-size: calc(44px * var(--rs));
     }
     .sponsor-tap-icon {
-      width: calc(42px * var(--rs));
-      height: auto;
+      flex: 1;           /* 填满编号以下的剩余高度 */
+      width: 78%;        /* 宽度相对色块，留两侧呼吸 */
+      min-height: 0;
       object-fit: contain;
-      flex-shrink: 0;
+      object-position: center bottom;  /* 贴底对齐，底部间隙由 padding-bottom 控制 */
     }
     .num {
       font-family: 'Bebas Neue', sans-serif;
@@ -324,7 +326,9 @@
       gap: calc(4px * var(--rs));
       margin-left: calc(8px * var(--rs));
     }
-    .info-en { flex: 1; min-width: 0 }
+    .info-en { flex: 1; min-width: 0; }
+    /* 有冠名时 info-en 不撑满，让冠名文字 flex:1 填中间 */
+    .row-bottom.has-sponsor .info-en { flex: 0 0 auto; max-width: 45%; }
     .alc-info {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 400;
@@ -336,34 +340,25 @@
       letter-spacing: 0.5px;
       line-height: 1.05;
     }
-    /* 冠名信息块（底部中间） */
-    .sponsor-block {
+    /* 冠名信息：单行，紧跟英文名右侧，往参数方向自然延伸 */
+    .sponsor-inline {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 0;
-      padding: 0 calc(8px * var(--rs));
-    }
-    .sponsor-label {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: calc(11px * var(--rs));
-      color: #bbb;
-      letter-spacing: 1px;
-      line-height: 1;
-      margin-bottom: calc(3px * var(--rs));
-    }
-    .sponsor-name {
-      font-family: 'Noto Sans SC', sans-serif;
-      font-size: calc(22px * var(--rs));
-      font-weight: 700;
-      color: #b07d00;
-      letter-spacing: calc(2px * var(--rs));
+      margin-left: calc(14px * var(--rs));
+      align-self: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 100%;
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: calc(18px * var(--rs));
+      line-height: 1;
+    }
+    .sponsor-inline .sp-prefix {
+      color: #bbb;       /* 中灰：前缀"酒头冠名：" */
+      font-weight: 400;
+    }
+    .sponsor-inline .sp-name {
+      color: #666;       /* 深灰：冠名用户名，不抢主视觉 */
+      font-weight: 500;
     }
 
     /* 售罄印章 */
@@ -593,8 +588,8 @@ function makeCard(item) {
   const sponsorIconHtml = sponsored
     ? `<img class="sponsor-tap-icon" src="/酒头.png" alt="酒头" />`
     : "";
-  const sponsorBlockHtml = sponsored
-    ? `<div class="sponsor-block"><div class="sponsor-label">酒头冠名</div><div class="sponsor-name">${esc(item.sponsor_name)}</div></div>`
+  const sponsorInlineHtml = sponsored
+    ? `<span class="sponsor-inline"><span class="sp-prefix">酒头冠名：</span><span class="sp-name">${esc(item.sponsor_name)}</span></span>`
     : "";
 
   return `
@@ -618,13 +613,13 @@ function makeCard(item) {
       <div class="price-block${singlePrice ? " single" : ""}">${priceL}${priceS}</div>
     </div>
     <div class="divider"></div>
-    <div class="row-bottom">
+    <div class="row-bottom${sponsored ? " has-sponsor" : ""}">
       <div class="info-en">
         <div class="en-name">${esc(item.name_en)}</div>
         <div class="en-style">${esc(item.style_en)}</div>
       </div>
       ${commentTagsHtml ? `<div class="comment-tags">${commentTagsHtml}</div>` : ""}
-      ${sponsorBlockHtml}
+      ${sponsorInlineHtml}
       <div class="alc-info">${abvIbu}</div>
     </div>
   </div>
