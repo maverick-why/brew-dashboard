@@ -121,11 +121,11 @@
       font-size: calc(44px * var(--rs));
     }
     .sponsor-tap-icon {
-      flex: 1;           /* 填满编号以下的剩余高度 */
-      width: 78%;        /* 宽度相对色块，留两侧呼吸 */
+      flex: 1;
+      width: 78%;
       min-height: 0;
       object-fit: contain;
-      object-position: center bottom;  /* 贴底对齐，底部间隙由 padding-bottom 控制 */
+      object-position: center 30%;   /* 偏上，避免图标过低 */
     }
     .num {
       font-family: 'Bebas Neue', sans-serif;
@@ -349,15 +349,15 @@
       overflow: hidden;
       text-overflow: ellipsis;
       font-family: 'Noto Sans SC', sans-serif;
-      font-size: calc(18px * var(--rs));
+      font-size: calc(36px * var(--rs));
       line-height: 1;
     }
     .sponsor-inline .sp-prefix {
-      color: #bbb;       /* 中灰：前缀"酒头冠名：" */
+      color: #bbb;
       font-weight: 400;
     }
     .sponsor-inline .sp-name {
-      color: #666;       /* 深灰：冠名用户名，不抢主视觉 */
+      color: #666;
       font-weight: 500;
     }
 
@@ -400,62 +400,14 @@
     /* 空卡片 */
     .card.empty .beer-name { color: #ddd; font-size: calc(28px * var(--rs)); font-weight: 400 }
 
-    /* ── 精选 special ── */
+    /* ── 精选 special：只改底色和文字颜色，不显示徽章 ── */
     .card.special { background: #fdf8f0; }
     .card.special .beer-name  { color: #8a5f00; }
     .card.special .price-line { color: #b07d00; }
     .card.special .divider    { background: #e8d8b0; }
 
-    .trapez-badge {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: calc(80px * var(--rs));
-      background: linear-gradient(180deg, #f0c030 0%, #c8920a 100%);
-      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 38%, 0% 100%);
-      z-index: 3;
-    }
-    .seal {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 4;
-      width: calc(52px * var(--rs));
-      height: calc(52px * var(--rs));
-    }
-    .seal-outer {
-      position: absolute; inset: 0;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #f5d272, #c8920a);
-      box-shadow:
-        0 0 0 2px rgba(255,255,255,.7),
-        0 2px 8px rgba(0,0,0,.4),
-        inset 0 1px 2px rgba(255,255,255,.4);
-    }
-    .seal-inner {
-      position: absolute; inset: 5px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(120,70,0,.3);
-    }
-    .seal-char {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Noto Serif JP', serif;
-      font-weight: 600;
-      font-size: calc(20px * var(--rs));
-      color: #5c3600;
-      text-shadow: 0 1px 0 rgba(255,220,100,.6);
-    }
-    .seal-dot {
-      position: absolute; width: 3px; height: 3px;
-      border-radius: 50%; background: rgba(120,70,0,.3);
-    }
-    .seal-dot.t { top: 8px;    left: 50%; transform: translateX(-50%); }
-    .seal-dot.b { bottom: 8px; left: 50%; transform: translateX(-50%); }
-    .seal-dot.l { left: 8px;   top: 50%;  transform: translateY(-50%); }
-    .seal-dot.r { right: 8px;  top: 50%;  transform: translateY(-50%); }
-    .card-num.has-badge .num { margin-top: calc(28px * var(--rs)); }
+    /* trapez-badge / seal 全部隐藏 */
+    .trapez-badge, .seal { display: none; }
 
     /* 编号色块 */
     .c-yellow { background: #F5C400 }
