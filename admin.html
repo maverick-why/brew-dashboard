@@ -297,6 +297,7 @@
     .w-price{min-width:46px}
     .w-size{min-width:48px}
     .w-abv{min-width:40px}
+    .w-sponsor{min-width:96px; max-width:120px}
     .w-flag{min-width:52px}
 
     /* # 列横向固定，横向滚动时始终可见 */
@@ -456,6 +457,7 @@
               <th class="w-size">大杯容量</th>
               <th class="w-price">小杯价</th>
               <th class="w-size">小杯容量</th>
+              <th class="w-sponsor">冠名</th>
               <th style="width:52px">售罄</th>
               <th style="width:52px">精选</th>
             </tr>
@@ -863,6 +865,7 @@
     { k: "large_size",  cls: "w-size",    ph: "500ml" },
     { k: "small_price", cls: "w-price",   ph: "45" },
     { k: "small_size",  cls: "w-size",    ph: "330ml" },
+    { k: "sponsor_name",cls: "w-sponsor", ph: "谢谢谢谢谢谢" },
   ];
 
   const FLAG_OPTIONS = [

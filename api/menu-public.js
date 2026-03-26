@@ -56,6 +56,7 @@ module.exports = async (req, res) => {
         flag:        safe(row.flag),
         sold_out:    !!row.sold_out,
         special:     !!row.special,
+        sponsor_name: safe(row.sponsor_name),
       });
     }
 
