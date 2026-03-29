@@ -7,8 +7,8 @@ module.exports = async function handler(req, res) {
   if (!ensureMethod(req, res, ['POST'])) return;
 
   try {
-    const { content, openId } = await readJsonBody(req);
-    if (!content || !openId) return error(res, 400, '缺少 content 或 openId');
+    const { content, phone } = await readJsonBody(req);
+    if (!content || !phone) return error(res, 400, '缺少 content 或 phone');
 
     // 长度校验
     const isChinese = /[\u4e00-\u9fa5]/.test(content);
@@ -22,7 +22,7 @@ module.exports = async function handler(req, res) {
     }
 
     // pass 或 edge 都生成 token
-    const token = generateReviewToken(content, result, openId);
+    const token = generateReviewToken(content, result, phone);
     return ok(res, {
       result,
       token,

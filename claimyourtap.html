@@ -161,16 +161,12 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
 .loading-spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* 非会员提示 */
-.non-member-mask{position:fixed;inset:0;z-index:200;background:rgba(45,37,32,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.non-member-mask.show{opacity:1;pointer-events:auto}
-.nm-box{background:#faf8f5;border-radius:20px;padding:28px 20px 20px;width:100%;max-width:320px;text-align:center}
-.nm-icon{font-size:44px;margin-bottom:12px}
-.nm-title{font-size:17px;font-weight:900;color:#2d2520;letter-spacing:2px;margin-bottom:8px}
-.nm-body{font-size:13px;color:#5a5048;line-height:1.8;letter-spacing:.3px;margin-bottom:14px}
-.nm-hint{background:#f5f0e8;border-radius:10px;padding:12px 14px;font-size:12px;color:#7a5820;line-height:1.8;letter-spacing:.3px;margin-bottom:18px;text-align:left}
-.nm-hint-label{font-size:10px;color:#b8a060;font-weight:700;letter-spacing:2px;display:block;margin-bottom:4px}
-.nm-close{width:100%;height:46px;border-radius:12px;background:#2d2520;border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans SC',sans-serif;letter-spacing:1.5px}
+/* 会员验证弹窗 - 非会员状态内容 */
+.vm-nonmember-view{text-align:center;padding:24px 20px 0}
+.vm-nonmember-icon{font-size:42px;margin-bottom:12px}
+.vm-nonmember-title{font-size:16px;font-weight:900;color:#2d2520;letter-spacing:2px;margin-bottom:8px}
+.vm-nonmember-body{font-size:13px;color:#5a5048;line-height:1.8;letter-spacing:.3px}
+a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:center}
 
 /* 二次确认 */
 .confirm-mask{position:fixed;inset:0;z-index:200;background:rgba(45,37,32,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -420,17 +416,69 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
   </div>
 </div>
 
-<!-- 非会员提示 -->
-<div class="non-member-mask" id="nonMemberMask">
-  <div class="nm-box">
-    <div class="nm-icon">🍺</div>
-    <div class="nm-title">仅限会员参与</div>
-    <div class="nm-body">本活动仅限时光酿造所会员参与。<br>请先在小程序完成注册，注册后需要有积分和余额才能参与冠名。</div>
-    <div class="nm-hint">
-      <span class="nm-hint-label">如何参与</span>
-      在微信中搜索「时光酿造所」小程序，完成会员注册并充值积分后即可回来参与冠名
+<!-- 会员验证弹窗 -->
+<div class="modal-mask" id="verifyMask">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <!-- 状态1：手机号输入 -->
+    <div id="vstateInput">
+      <div class="modal-top">
+        <div class="mt-tap-label">MEMBER VERIFICATION · 会员验证</div>
+        <div style="font-size:17px;font-weight:900;color:#2d2520;letter-spacing:2px;margin-bottom:3px">验证会员身份</div>
+        <div style="font-size:12px;color:#b8b0a4;letter-spacing:.3px">本活动仅限时光酿造所会员参与</div>
+      </div>
+      <div class="modal-input-area">
+        <div class="mia-label">手机号</div>
+        <div class="mia-input-row" id="phoneInputRow">
+          <span class="mia-prefix">+86</span>
+          <div class="mia-sep"></div>
+          <input class="mia-input" id="phoneInput" type="tel" maxlength="11" placeholder="请输入注册手机号" autocomplete="tel"/>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-main" id="btnVerify" disabled>请输入手机号</button>
+        <button class="btn-ghost" id="btnVerifyCancel">取消</button>
+      </div>
     </div>
-    <button class="nm-close" id="btnNonMemberClose">我知道了</button>
+
+    <!-- 状态2：查到会员 -->
+    <div id="vstateSuccess" style="display:none">
+      <div class="modal-top">
+        <div class="mt-tap-label">MEMBER VERIFIED · 验证通过</div>
+        <div class="mt-card">
+          <div class="mt-badge" style="background:#2e7d32"><span style="font-family:sans-serif;font-size:22px;color:#fff">✓</span></div>
+          <div class="mt-info">
+            <div class="mt-name" style="color:#2e7d32">会员验证通过</div>
+            <div class="mt-style" id="verifyPhoneDisplay">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="user-info-row show" style="margin:12px 20px 0">
+        <div class="uir-row"><span class="uir-label">当前积分</span><span class="uir-val" id="verifyPointVal">—</span></div>
+        <div class="uir-divider"></div>
+        <div class="uir-row"><span class="uir-label">当前余额</span><span class="uir-val" id="verifyBalanceVal">—</span></div>
+        <div class="uir-divider"></div>
+        <div class="uir-row"><span class="uir-label">冠名费用</span><span class="uir-val" style="color:#c8922a">5 积分 + ¥1.00</span></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-main" id="btnGoSelect" style="background:#c8922a">选择酒头，开始冠名 →</button>
+      </div>
+    </div>
+
+    <!-- 状态3：非会员 -->
+    <div id="vstateNonMember" style="display:none">
+      <div class="vm-nonmember-view">
+        <div class="vm-nonmember-icon">🍺</div>
+        <div class="vm-nonmember-title">仅限会员参与</div>
+        <div class="vm-nonmember-body">未找到该手机号的会员记录。<br>请先在小程序完成注册，充值积分后即可参与冠名。</div>
+      </div>
+      <div class="modal-actions" style="margin-top:24px">
+        <a class="btn-main" href="https://pospal.cn/d/3736013" target="_blank" style="background:linear-gradient(135deg,#c9975b,#b8874d)">前往注册 →</a>
+        <button class="btn-ghost" id="btnRetryPhone">重新输入手机号</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -464,8 +512,10 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
 </div>
 
 <script>
-/* ══ 用户身份 ══ */
-const openId = 'test_openid_001'; // TODO: 上线前替换为微信 OAuth
+/* ══ 已验证的会员信息（手机号验证后填入）══ */
+let verifiedPhone = null;
+let verifiedPoint = 0;
+let verifiedBalance = 0;
 
 /* ══ 机审 token（由后端签发，提交时携带）══ */
 let reviewToken = null;
@@ -504,7 +554,7 @@ async function reviewContent(content) {
   const res = await fetch('/api/review-content', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content, openId }),
+    body: JSON.stringify({ content, phone: verifiedPhone }),
   });
   const json = await res.json();
   if (json.code !== 0) throw new Error(json.message);
@@ -524,28 +574,12 @@ async function machineReview(text) {
   }
 }
 
-/* ══ 查询会员信息（调用后端 /api/member-info）══ */
-async function queryMemberInfo() {
-  const res = await fetch('/api/member-info', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ openId }),
-  });
-  const json = await res.json();
-  if (json.code !== 0) {
-    const err = new Error(json.message);
-    err.httpStatus = res.status;
-    throw err;
-  }
-  return json.data; // { point, balance, customerUid }
-}
-
 /* ══ 提交冠名（调用后端 /api/sponsor）══ */
 async function submitSponsor(tapNo, sponsorName) {
   const res = await fetch('/api/sponsor', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ openId, tapNo, sponsorName, reviewToken }),
+    body: JSON.stringify({ phone: verifiedPhone, tapNo, sponsorName, reviewToken }),
   });
   const json = await res.json();
   if (json.code !== 0) throw new Error(json.message);
@@ -557,7 +591,7 @@ async function pollStatus(tapNo, maxMs = 2 * 60 * 60 * 1000) {
   const start = Date.now();
   while (Date.now() - start < maxMs) {
     await new Promise(r => setTimeout(r, 10000));
-    const res = await fetch(`/api/sponsor?openId=${encodeURIComponent(openId)}&tapNo=${tapNo}`);
+    const res = await fetch(`/api/sponsor?phone=${encodeURIComponent(verifiedPhone)}&tapNo=${tapNo}`);
     const json = await res.json();
     if (json.code === 0 && json.data.status !== 'pending') {
       return json.data.status;
@@ -607,7 +641,7 @@ function scheduleReview(val) {
       showReviewStatus("fail","不符合规范","请修改后重新输入");
     }
     updateSubmitBtn();
-  }, 800); // 停止输入800ms后触发
+  }, 1200); // 停止输入1200ms后触发
 }
 
 function updateSubmitBtn() {
@@ -624,12 +658,9 @@ function updateSubmitBtn() {
   if(reviewResult.result === "fail") {
     btn.disabled=true; btn.textContent="内容不合规，请修改"; return;
   }
-  // pass 或 edge：都允许进入下一步（查询积分）
-  if(!fetchedUser) {
-    btn.disabled=false; btn.textContent="查询积分并确认冠名"; return;
-  }
-  if(fetchedUser.point < 5) { btn.disabled=true; btn.textContent="积分不足，无法冠名"; return; }
-  if(fetchedUser.balance < 1){ btn.disabled=true; btn.textContent="余额不足，请先充值";  return; }
+  // 验证时已拿到积分/余额，直接检查
+  if(verifiedPoint < 5) { btn.disabled=true; btn.textContent="积分不足，无法冠名"; return; }
+  if(verifiedBalance < 1){ btn.disabled=true; btn.textContent="余额不足，请先充值"; return; }
   btn.disabled=false; btn.textContent="确认冠名";
 }
 
@@ -652,9 +683,15 @@ function openModal(tap){
   document.getElementById("modalName").textContent =tap.name||tap.name_en;
   document.getElementById("modalStyle").textContent=tap.style;
   document.getElementById("modalEn").textContent   =[tap.name_en,tap.style_en].filter(Boolean).join(" · ");
+  // 预填验证时已取得的积分/余额
+  fetchedUser = { point: verifiedPoint, balance: verifiedBalance };
+  document.getElementById("uirPoint").textContent  = `${verifiedPoint} 积分`;
+  document.getElementById("uirBalance").textContent= `¥ ${verifiedBalance.toFixed(2)}`;
+  document.getElementById("uirPoint").className  = "uir-val"+(verifiedPoint>=5?" ok":" warn");
+  document.getElementById("uirBalance").className = "uir-val"+(verifiedBalance>=1?" ok":" warn");
+  userRow.classList.add("show");
   input.value=""; charCnt.textContent="0"; charCnt.className="mia-count";
   hideReviewStatus();
-  userRow.classList.remove("show");
   updateSubmitBtn();
   mask.classList.add("show");
   setTimeout(()=>input.focus(),300);
@@ -686,41 +723,10 @@ input.addEventListener("input",()=>{
 
 document.getElementById("btnCancel").addEventListener("click",closeModal);
 mask.addEventListener("click",e=>{if(e.target===mask)closeModal();});
-document.getElementById("btnNonMemberClose").addEventListener("click",()=>{
-  document.getElementById("nonMemberMask").classList.remove("show");
-});
 
 document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
   if(!input.value.trim()||!reviewResult||reviewResult.result==="fail") return;
-  // 第一阶段：查询积分
-  if(!fetchedUser){
-    const btn=document.getElementById("btnSubmitFlow");
-    btn.disabled=true;
-    btn.innerHTML='<span class="loading-spin"></span>查询积分中…';
-    try {
-      fetchedUser = await queryMemberInfo();
-    } catch(e) {
-      btn.disabled=false;
-      btn.textContent="查询积分并确认冠名";
-      if (e.httpStatus === 404 || /未找到会员|未绑定手机号|未找到银豹/.test(e.message)) {
-        closeModal();
-        document.getElementById("nonMemberMask").classList.add("show");
-      } else {
-        showToast("查询会员信息失败：" + (e.message || "网络错误"));
-      }
-      return;
-    }
-    const ptEl=document.getElementById("uirPoint");
-    const blEl=document.getElementById("uirBalance");
-    ptEl.textContent=`${fetchedUser.point} 积分`;
-    blEl.textContent=`¥ ${fetchedUser.balance.toFixed(2)}`;
-    ptEl.className="uir-val"+(fetchedUser.point>=5?" ok":" warn");
-    blEl.className="uir-val"+(fetchedUser.balance>=1?" ok":" warn");
-    userRow.classList.add("show");
-    updateSubmitBtn();
-    return;
-  }
-  // 第二阶段：二次确认
+  // 积分/余额已在验证时获取，直接进入二次确认
   document.getElementById("cbName").textContent=input.value.trim();
   document.getElementById("confirmMask").classList.add("show");
 });
@@ -788,7 +794,88 @@ function goScreen(n){
   if(n===2) screens.classList.add("show-status");
   document.getElementById("demoWrap").style.display=n===2?"block":"none";
 }
-document.getElementById("btnEnter").addEventListener("click",()=>goScreen(1));
+/* ══ 会员验证弹窗 ══ */
+const verifyMask = document.getElementById("verifyMask");
+
+function showVerifyState(state) {
+  document.getElementById("vstateInput").style.display     = state==="input"     ? "" : "none";
+  document.getElementById("vstateSuccess").style.display   = state==="success"   ? "" : "none";
+  document.getElementById("vstateNonMember").style.display = state==="nonmember" ? "" : "none";
+}
+function openVerifyModal() {
+  showVerifyState("input");
+  document.getElementById("phoneInput").value = "";
+  const btn = document.getElementById("btnVerify");
+  btn.disabled = true; btn.textContent = "请输入手机号";
+  document.getElementById("phoneInputRow").classList.remove("pass","fail");
+  verifyMask.classList.add("show");
+  setTimeout(()=>document.getElementById("phoneInput").focus(), 300);
+}
+document.getElementById("btnEnter").addEventListener("click", openVerifyModal);
+document.getElementById("btnVerifyCancel").addEventListener("click", ()=>verifyMask.classList.remove("show"));
+verifyMask.addEventListener("click", e=>{ if(e.target===verifyMask) verifyMask.classList.remove("show"); });
+
+document.getElementById("phoneInput").addEventListener("input", ()=>{
+  const val = document.getElementById("phoneInput").value.trim();
+  const btn = document.getElementById("btnVerify");
+  if (/^1[3-9]\d{9}$/.test(val)) {
+    btn.disabled = false; btn.textContent = "查询会员";
+  } else {
+    btn.disabled = true;
+    btn.textContent = val.length === 0 ? "请输入手机号" : (val.length < 11 ? "请输入11位手机号" : "手机号格式不正确");
+  }
+});
+
+document.getElementById("btnVerify").addEventListener("click", async()=>{
+  const phone = document.getElementById("phoneInput").value.trim();
+  const btn = document.getElementById("btnVerify");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spin"></span>查询中…';
+  try {
+    const res = await fetch("/api/member-info", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    const json = await res.json();
+    if (json.code !== 0) {
+      if (res.status === 404 || /未找到/.test(json.message)) {
+        showVerifyState("nonmember");
+      } else {
+        btn.disabled = false; btn.textContent = "查询失败，请重试";
+        showToast(json.message || "查询失败");
+      }
+      return;
+    }
+    verifiedPhone   = phone;
+    verifiedPoint   = json.data.point;
+    verifiedBalance = json.data.balance;
+    document.getElementById("verifyPhoneDisplay").textContent = phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
+    const ptEl = document.getElementById("verifyPointVal");
+    const blEl = document.getElementById("verifyBalanceVal");
+    ptEl.textContent = `${verifiedPoint} 积分`;
+    blEl.textContent = `¥ ${verifiedBalance.toFixed(2)}`;
+    ptEl.className = "uir-val"+(verifiedPoint>=5?" ok":" warn");
+    blEl.className = "uir-val"+(verifiedBalance>=1?" ok":" warn");
+    showVerifyState("success");
+  } catch(e) {
+    btn.disabled = false; btn.textContent = "查询失败，请重试";
+    showToast("查询失败：" + (e.message || "网络错误"));
+  }
+});
+
+document.getElementById("btnGoSelect").addEventListener("click", ()=>{
+  verifyMask.classList.remove("show");
+  goScreen(1);
+});
+document.getElementById("btnRetryPhone").addEventListener("click", ()=>{
+  showVerifyState("input");
+  document.getElementById("phoneInput").value = "";
+  const btn = document.getElementById("btnVerify");
+  btn.disabled = true; btn.textContent = "请输入手机号";
+  setTimeout(()=>document.getElementById("phoneInput").focus(), 100);
+});
+
 document.getElementById("btnBackToPoster").addEventListener("click",()=>goScreen(-1));
 document.getElementById("btnBackToSelect").addEventListener("click",()=>goScreen(1));
 

@@ -5,33 +5,19 @@ const { getSupabase } = require('./_lib/supabase');
 const { PospalClient } = require('./_lib/pospal');
 const { verifyReviewToken } = require('./_lib/claude');
 
-async function getCustomerUid(openId) {
-  const supabase = getSupabase();
-  const { data: member } = await supabase
-    .from('wx_members')
-    .select('phone')
-    .eq('openid', openId)
-    .single();
-  if (!member?.phone) return null;
-
-  const pospal = new PospalClient();
-  const customerInfo = await pospal.getMemberByPhone(member.phone);
-  return customerInfo?.customerUid || null;
-}
-
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
 
-  // GET → 查状态（替代 sponsor-status.js）
+  // GET → 查状态
   if (req.method === 'GET') {
     try {
-      const { openId, tapNo } = getQuery(req);
-      if (!openId || !tapNo) return error(res, 400, '缺少 openId 或 tapNo');
+      const { phone, tapNo } = getQuery(req);
+      if (!phone || !tapNo) return error(res, 400, '缺少 phone 或 tapNo');
       const supabase = getSupabase();
       const { data, error: dbError } = await supabase
         .from('sponsor_records')
         .select('status, reject_reason')
-        .eq('open_id', openId)
+        .eq('open_id', `h5:${phone}`)
         .eq('tap_no', parseInt(tapNo, 10))
         .order('created_at', { ascending: false })
         .limit(1)
@@ -47,21 +33,34 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return error(res, 405, 'Method Not Allowed');
 
   try {
-    const { openId, tapNo, sponsorName, reviewToken } = await readJsonBody(req);
+    const { phone, tapNo, sponsorName, reviewToken } = await readJsonBody(req);
 
-    if (!openId || !tapNo || !sponsorName || !reviewToken) {
+    if (!phone || !tapNo || !sponsorName || !reviewToken) {
       return error(res, 400, '参数不完整');
+    }
+    if (!/^1[3-9]\d{9}$/.test(phone)) {
+      return error(res, 400, '手机号格式不正确');
     }
     if (!Number.isInteger(tapNo) || tapNo < 1 || tapNo > 27) {
       return error(res, 400, 'tapNo 必须是 1-27 的整数');
     }
 
-    const tokenCheck = verifyReviewToken(reviewToken, sponsorName, openId);
+    // 验证审核 token（用 phone 作为用户标识，与 review-content 一致）
+    const tokenCheck = verifyReviewToken(reviewToken, sponsorName, phone);
     if (!tokenCheck.valid) return error(res, 400, '审核 token 无效或已过期，请重新审核');
     const reviewResult = tokenCheck.reviewResult;
 
+    // 后端重新查 customerUid，防止客户端伪造
+    const pospal = new PospalClient();
+    const customerInfo = await pospal.getMemberByPhone(phone);
+    const customerUid = customerInfo?.customerUid;
+    if (!customerUid) {
+      return error(res, 404, '未找到银豹会员记录，请先注册');
+    }
+
     const supabase = getSupabase();
     const expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const openId = `h5:${phone}`;
 
     const { data: inserted, error: insertError } = await supabase
       .from('sponsor_records')
@@ -69,6 +68,7 @@ module.exports = async function handler(req, res) {
         tap_no: tapNo,
         sponsor_name: sponsorName,
         open_id: openId,
+        customer_uid: customerUid,
         review_result: reviewResult,
         status: 'pending',
         expire_at: expireAt,
@@ -84,17 +84,7 @@ module.exports = async function handler(req, res) {
     }
 
     const recordId = inserted.id;
-
-    const customerUid = await getCustomerUid(openId);
-    if (!customerUid) {
-      await supabase.from('sponsor_records').delete().eq('id', recordId);
-      return error(res, 404, '未找到银豹会员记录，请先在小程序完成注册');
-    }
-
-    await supabase.from('sponsor_records').update({ customer_uid: customerUid }).eq('id', recordId);
-
     const ts = Date.now();
-    const pospal = new PospalClient();
 
     try {
       await pospal.adjustPoints(customerUid, -5, `${openId}_${tapNo}_pts_${ts}`);
