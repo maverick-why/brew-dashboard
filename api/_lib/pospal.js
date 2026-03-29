@@ -50,12 +50,13 @@ class PospalClient {
     }
   }
 
-  // 手机号查会员 → { customerUid, ... }
+  // 手机号查会员 → { customerUid, point, balance, ... }
   async getMemberByPhone(phone) {
-    return this._request('/pospal-api2/openapi/v1/customerOpenapi/queryBytel', {
+    const list = await this._request('/pospal-api2/openapi/v1/customerOpenapi/queryBytel', {
       appId: this.appId,
       customerTel: phone,
     });
+    return Array.isArray(list) ? list[0] : list;
   }
 
   // UID 查积分余额 → { point, balance, ... }

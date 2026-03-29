@@ -17,10 +17,9 @@ module.exports = async function handler(req, res) {
       return error(res, 404, '未找到会员记录，请先注册');
     }
 
-    const balanceInfo = await pospal.getMemberBalance(customerInfo.customerUid);
     return ok(res, {
-      point: balanceInfo.point ?? 0,
-      balance: balanceInfo.balance ?? 0,
+      point: customerInfo.point ?? 0,
+      balance: customerInfo.balance ?? 0,
     });
   } catch (err) {
     return error(res, 500, err.message || 'Internal server error');
