@@ -86,27 +86,10 @@ module.exports = async function handler(req, res) {
     const recordId = inserted.id;
 
     try {
-      await pospal.adjustPoints(customerUid, -5);
-    } catch (pErr) {
+      await pospal.adjustPointsAndBalance(customerUid, -5, -1);
+    } catch (deductErr) {
       await supabase.from('sponsor_records').delete().eq('id', recordId);
-      return error(res, 502, `积分扣除失败：${pErr.message}`);
-    }
-
-    try {
-      await pospal.adjustBalance(customerUid, -1);
-    } catch (bErr) {
-      try {
-        await pospal.adjustPoints(customerUid, 5);
-      } catch (refundErr) {
-        await supabase.from('pospal_compensation_log').insert({
-          open_id: openId,
-          tap_no: tapNo,
-          action: '余额扣除失败，积分补偿也失败，需人工退还5积分',
-          payload: { customerUid, error: refundErr.message },
-        });
-      }
-      await supabase.from('sponsor_records').delete().eq('id', recordId);
-      return error(res, 502, `余额扣除失败：${bErr.message}`);
+      return error(res, 502, `扣款失败：${deductErr.message}`);
     }
 
     const finalStatus = reviewResult === 'pass' ? 'live' : 'pending';

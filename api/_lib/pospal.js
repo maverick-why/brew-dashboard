@@ -70,24 +70,14 @@ class PospalClient {
     });
   }
 
-  // 调整积分（delta 为负数则扣除）
-  async adjustPoints(customerUid, delta) {
+  // 同时调整积分和余额（delta 为负数则扣除）
+  async adjustPointsAndBalance(customerUid, pointDelta, balanceDelta) {
     const dataChangeTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
     return this._request('/pospal-api2/openapi/v1/customerOpenApi/updateBalancePointByIncrement', {
       appId: this.appId,
       customerUid,
-      pointIncrement: delta,
-      dataChangeTime,
-    });
-  }
-
-  // 调整余额（delta 为负数则扣除）
-  async adjustBalance(customerUid, delta) {
-    const dataChangeTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    return this._request('/pospal-api2/openapi/v1/customerOpenApi/updateBalancePointByIncrement', {
-      appId: this.appId,
-      customerUid,
-      balanceIncrement: delta,
+      pointIncrement: pointDelta,
+      balanceIncrement: balanceDelta,
       dataChangeTime,
     });
   }
