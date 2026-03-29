@@ -5,7 +5,7 @@
   "crons": [
     {
       "path": "/api/cron/sponsor-expiry",
-      "schedule": "0 * * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 }
