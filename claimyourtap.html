@@ -640,11 +640,7 @@ function updateSubmitBtn() {
   }
   // 验证时已拿到积分/余额，直接检查
   if(verifiedPoint < 5) { btn.disabled=true; btn.textContent="积分不足，无法冠名"; return; }
-  if(verifiedBalance < 1){
-    document.getElementById("btnGoSelect").style.display="none";
-    document.getElementById("btnRecharge").style.display="";
-    return;
-  }
+  if(verifiedBalance < 1){ btn.disabled=true; btn.textContent="余额不足，请先充值"; return; }
   btn.disabled=false; btn.textContent="确认冠名";
 }
 
