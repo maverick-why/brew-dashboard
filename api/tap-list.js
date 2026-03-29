@@ -22,17 +22,18 @@ module.exports = async function handler(req, res) {
     }
 
     const result = TAPS.map(tap => {
-      const sponsor = sponsorMap[tap.tapNo];
-      if (sponsor) {
-        return {
-          tapNo: tap.tapNo,
-          name: tap.name,
-          status: 'taken',
-          sponsorName: sponsor.sponsor_name,
-          expireAt: sponsor.expire_at,
-        };
+      const sponsorRecord = sponsorMap[tap.no];
+      const base = {
+        no: tap.no,
+        name: tap.name,
+        name_en: tap.name_en,
+        style: tap.style,
+        style_en: tap.style_en,
+      };
+      if (sponsorRecord) {
+        return { ...base, sponsor: sponsorRecord.sponsor_name, expireAt: sponsorRecord.expire_at };
       }
-      return { tapNo: tap.tapNo, name: tap.name, status: 'available' };
+      return base;
     });
 
     return ok(res, result);
