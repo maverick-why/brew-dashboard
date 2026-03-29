@@ -84,26 +84,25 @@ module.exports = async function handler(req, res) {
     }
 
     const recordId = inserted.id;
-    const ts = Date.now();
 
     try {
-      await pospal.adjustPoints(customerUid, -5, `${openId}_${tapNo}_pts_${ts}`);
+      await pospal.adjustPoints(customerUid, -5);
     } catch (pErr) {
       await supabase.from('sponsor_records').delete().eq('id', recordId);
       return error(res, 502, `积分扣除失败：${pErr.message}`);
     }
 
     try {
-      await pospal.adjustBalance(customerUid, -1, `${openId}_${tapNo}_bal_${ts}`);
+      await pospal.adjustBalance(customerUid, -1);
     } catch (bErr) {
       try {
-        await pospal.adjustPoints(customerUid, 5, `${openId}_${tapNo}_pts_refund_${ts}`);
+        await pospal.adjustPoints(customerUid, 5);
       } catch (refundErr) {
         await supabase.from('pospal_compensation_log').insert({
           open_id: openId,
           tap_no: tapNo,
           action: '余额扣除失败，积分补偿也失败，需人工退还5积分',
-          payload: { customerUid, ts, error: refundErr.message },
+          payload: { customerUid, error: refundErr.message },
         });
       }
       await supabase.from('sponsor_records').delete().eq('id', recordId);
