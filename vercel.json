@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/claimyourtap", "destination": "/claimyourtap.html" }
+  ],
   "crons": [
     {
       "path": "/api/cron/sponsor-expiry",
