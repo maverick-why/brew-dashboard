@@ -23,7 +23,8 @@ async function reviewContent(text) {
   const timeout = setTimeout(() => controller.abort(), 3000);
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const baseUrl = (process.env.CLAUDE_BASE_URL || 'https://api.anthropic.com').replace(/\/$/, '');
+    const res = await fetch(`${baseUrl}/v1/messages`, {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
