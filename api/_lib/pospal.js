@@ -40,7 +40,10 @@ class PospalClient {
         signal: controller.signal,
       });
       if (!res.ok) throw new Error(`Pospal HTTP ${res.status}`);
-      const data = await res.json();
+      const text = await res.text();
+      // customerUid exceeds JS safe integer range — preserve as string before parsing
+      const safeText = text.replace(/"customerUid"\s*:\s*(\d+)/g, '"customerUid":"$1"');
+      const data = JSON.parse(safeText);
       if (data.status !== 'success') {
         throw new Error(`Pospal error: ${data.message || JSON.stringify(data)}`);
       }
