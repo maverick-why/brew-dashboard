@@ -508,7 +508,7 @@
       <div class="tableWrap">
         <table id="all-sponsors-table">
           <thead>
-            <tr><th>ID</th><th>酒头</th><th>冠名</th><th>状态</th><th>到期时间</th><th>操作</th></tr>
+            <tr><th>ID</th><th>酒头</th><th>冠名</th><th>电话</th><th>状态</th><th>到期时间</th><th>操作</th></tr>
           </thead>
           <tbody id="all-sponsors-body"></tbody>
         </table>
@@ -1171,12 +1171,13 @@
     const data = json.data || [];
     const tbody = document.getElementById('all-sponsors-body');
     tbody.innerHTML = data.length === 0
-      ? '<tr><td colspan="6" style="text-align:center;color:var(--sub);padding:20px">暂无记录</td></tr>'
+      ? '<tr><td colspan="7" style="text-align:center;color:var(--sub);padding:20px">暂无记录</td></tr>'
       : data.map(s => `
         <tr>
           <td class="idCell">${s.id}</td>
           <td>${s.tap_no}号</td>
           <td>${s.sponsor_name}</td>
+          <td>${(s.open_id || '').replace(/^h5:/, '')}</td>
           <td>${s.status}</td>
           <td>${s.expire_at ? new Date(s.expire_at).toLocaleDateString('zh-CN') : '-'}</td>
           <td><div class="rowActions">
