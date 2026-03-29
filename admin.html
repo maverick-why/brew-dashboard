@@ -366,6 +366,8 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="fermenter">发酵罐</button>
       <button class="tab-btn" data-tab="menu">酒单管理</button>
+      <button class="tab-btn" data-tab="sponsor-review">冠名审核</button>
+      <button class="tab-btn" data-tab="sponsor-manage">冠名管理</button>
     </div>
 
     <!-- Tab: 发酵罐 -->
@@ -464,6 +466,61 @@
           </thead>
           <tbody id="menuTbody"></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+    <!-- Tab: 冠名审核 -->
+    <div class="tab-pane" id="tab-sponsor-review">
+      <div class="toolbar">
+        <div class="btns">
+          <h3 style="margin:0;font-size:14px;font-weight:900">冠名审核（待人工审核）</h3>
+          <button onclick="loadPendingSponsors()">刷新</button>
+        </div>
+      </div>
+      <div class="tableWrap">
+        <table id="pending-sponsors-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>酒头</th><th>冠名内容</th><th>提交时间</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="pending-sponsors-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: 冠名管理 -->
+    <div class="tab-pane" id="tab-sponsor-manage">
+      <div class="toolbar">
+        <div class="btns">
+          <h3 style="margin:0;font-size:14px;font-weight:900">冠名管理</h3>
+          <select id="sponsor-status-filter" onchange="loadAllSponsors()" style="width:auto">
+            <option value="">全部</option>
+            <option value="live">进行中</option>
+            <option value="pending">待审核</option>
+            <option value="rejected">已拒绝</option>
+            <option value="expired">已到期</option>
+          </select>
+          <button onclick="loadAllSponsors()">刷新</button>
+        </div>
+      </div>
+      <div class="tableWrap">
+        <table id="all-sponsors-table">
+          <thead>
+            <tr><th>ID</th><th>酒头</th><th>冠名</th><th>状态</th><th>到期时间</th><th>操作</th></tr>
+          </thead>
+          <tbody id="all-sponsors-body"></tbody>
+        </table>
+      </div>
+      <div class="toolbar" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px;flex-wrap:wrap;gap:8px">
+        <h4 style="margin:0;font-size:13px;font-weight:900;width:100%">手动添加冠名</h4>
+        <div class="btns" style="flex-wrap:wrap;gap:8px">
+          <input id="add-tap-no" type="number" placeholder="酒头编号 1-27" min="1" max="27" style="width:140px">
+          <input id="add-sponsor-name" type="text" placeholder="冠名内容（≤6字）" style="width:160px">
+          <input id="add-open-id" type="text" placeholder="openId（可选）" style="width:200px">
+          <button onclick="addSponsorManually()">添加</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1062,6 +1119,105 @@
       else apiSave();
     }
   });
+
+  // ====== Sponsor Review Tab
+  async function loadPendingSponsors() {
+    const res = await fetch('/api/admin/sponsors?status=pending', {
+      headers: { 'x-admin-pass': ADMIN_PASS }
+    });
+    const json = await res.json();
+    const data = json.data || [];
+    const tbody = document.getElementById('pending-sponsors-body');
+    tbody.innerHTML = data.length === 0
+      ? '<tr><td colspan="5" style="text-align:center;color:var(--sub);padding:20px">暂无待审核记录</td></tr>'
+      : data.map(s => `
+        <tr>
+          <td class="idCell">${s.id}</td>
+          <td>${s.tap_no}号</td>
+          <td>${s.sponsor_name}</td>
+          <td>${new Date(s.created_at).toLocaleString('zh-CN')}</td>
+          <td><div class="rowActions">
+            <button class="mini primary" onclick="reviewSponsor(${s.id},'approve')">通过</button>
+            <button class="mini danger" onclick="reviewSponsor(${s.id},'reject')">拒绝</button>
+          </div></td>
+        </tr>
+      `).join('');
+  }
+
+  async function reviewSponsor(id, action) {
+    let reason = null;
+    if (action === 'reject') {
+      reason = prompt('请填写拒绝原因：');
+      if (!reason) return;
+    } else {
+      if (!confirm('确认通过？')) return;
+    }
+    const res = await fetch('/api/admin/review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+      body: JSON.stringify({ id, action, adminUser: 'admin', reason }),
+    });
+    const json = await res.json();
+    toast(json.code === 0 ? (action === 'approve' ? '已通过' : '已拒绝') : `操作失败：${json.message}`, json.code === 0);
+    loadPendingSponsors();
+  }
+
+  // ====== Sponsor Manage Tab
+  async function loadAllSponsors() {
+    const status = document.getElementById('sponsor-status-filter').value;
+    const url = '/api/admin/sponsors' + (status ? `?status=${status}` : '');
+    const res = await fetch(url, { headers: { 'x-admin-pass': ADMIN_PASS } });
+    const json = await res.json();
+    const data = json.data || [];
+    const tbody = document.getElementById('all-sponsors-body');
+    tbody.innerHTML = data.length === 0
+      ? '<tr><td colspan="6" style="text-align:center;color:var(--sub);padding:20px">暂无记录</td></tr>'
+      : data.map(s => `
+        <tr>
+          <td class="idCell">${s.id}</td>
+          <td>${s.tap_no}号</td>
+          <td>${s.sponsor_name}</td>
+          <td>${s.status}</td>
+          <td>${s.expire_at ? new Date(s.expire_at).toLocaleDateString('zh-CN') : '-'}</td>
+          <td><div class="rowActions">
+            ${s.status === 'live' ? `<button class="mini danger" onclick="revokeSponsor(${s.id})">撤销</button>` : ''}
+          </div></td>
+        </tr>
+      `).join('');
+  }
+
+  async function addSponsorManually() {
+    const tapNo = parseInt(document.getElementById('add-tap-no').value, 10);
+    const sponsorName = document.getElementById('add-sponsor-name').value.trim();
+    const openId = document.getElementById('add-open-id').value.trim();
+    if (!tapNo || !sponsorName) return toast('请填写酒头编号和冠名内容', false);
+    const res = await fetch('/api/admin/sponsor-add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+      body: JSON.stringify({ tapNo, sponsorName, openId: openId || 'admin', adminUser: 'admin' }),
+    });
+    const json = await res.json();
+    toast(json.code === 0 ? '添加成功' : `失败：${json.message}`, json.code === 0);
+    if (json.code === 0) {
+      document.getElementById('add-tap-no').value = '';
+      document.getElementById('add-sponsor-name').value = '';
+      document.getElementById('add-open-id').value = '';
+      loadAllSponsors();
+    }
+  }
+
+  async function revokeSponsor(id) {
+    const reason = prompt('请填写撤销原因：');
+    if (!reason) return;
+    const res = await fetch('/api/admin/review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+      body: JSON.stringify({ id, action: 'reject', adminUser: 'admin', reason }),
+    });
+    const json = await res.json();
+    toast(json.code === 0 ? '已撤销' : `操作失败：${json.message}`, json.code === 0);
+    loadAllSponsors();
+  }
 
   // ====== login on entry
   document.getElementById("loginBtn").addEventListener("click", doLogin);
