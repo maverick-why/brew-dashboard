@@ -51,9 +51,9 @@ class PospalClient {
 
   // 接口9：手机号查会员 → { customerUid, phone, ... }
   async getMemberByPhone(phone) {
-    return this._request('/pospal-api2/openapi/v1/customerOpenapi/queryBytel', {
+    return this._request('/openapi/customer/queryCustomerByPhone', {
       appId: this.appId,
-      customerTel: phone,
+      customerPhone: phone,
     });
   }
 
