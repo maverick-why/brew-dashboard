@@ -525,7 +525,7 @@ async function pollStatus(tapNo, maxMs = 2 * 60 * 60 * 1000) {
   const start = Date.now();
   while (Date.now() - start < maxMs) {
     await new Promise(r => setTimeout(r, 10000));
-    const res = await fetch(`/api/sponsor-status?openId=${encodeURIComponent(openId)}&tapNo=${tapNo}`);
+    const res = await fetch(`/api/sponsor?openId=${encodeURIComponent(openId)}&tapNo=${tapNo}`);
     const json = await res.json();
     if (json.code === 0 && json.data.status !== 'pending') {
       return json.data.status;

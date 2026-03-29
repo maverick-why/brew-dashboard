@@ -903,8 +903,8 @@
   });
 
   // ====== Menu state
-  const MENU_LOAD_URL = "/api/menu-load";
-  const MENU_SAVE_URL = "/api/menu-save";
+  const MENU_LOAD_URL = "/api/menu-edit";
+  const MENU_SAVE_URL = "/api/menu-edit";
   let menuState = {}; // { "1": {...}, ... }
 
   const MENU_FIELDS = [
@@ -1122,7 +1122,7 @@
 
   // ====== Sponsor Review Tab
   async function loadPendingSponsors() {
-    const res = await fetch('/api/admin/sponsors?status=pending', {
+    const res = await fetch('/api/admin?status=pending', {
       headers: { 'x-admin-pass': ADMIN_PASS }
     });
     const json = await res.json();
@@ -1152,7 +1152,7 @@
     } else {
       if (!confirm('确认通过？')) return;
     }
-    const res = await fetch('/api/admin/review', {
+    const res = await fetch('/api/admin?op=review', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
       body: JSON.stringify({ id, action, adminUser: 'admin', reason }),
@@ -1165,7 +1165,7 @@
   // ====== Sponsor Manage Tab
   async function loadAllSponsors() {
     const status = document.getElementById('sponsor-status-filter').value;
-    const url = '/api/admin/sponsors' + (status ? `?status=${status}` : '');
+    const url = '/api/admin' + (status ? `?status=${status}` : '');
     const res = await fetch(url, { headers: { 'x-admin-pass': ADMIN_PASS } });
     const json = await res.json();
     const data = json.data || [];
@@ -1191,7 +1191,7 @@
     const sponsorName = document.getElementById('add-sponsor-name').value.trim();
     const openId = document.getElementById('add-open-id').value.trim();
     if (!tapNo || !sponsorName) return toast('请填写酒头编号和冠名内容', false);
-    const res = await fetch('/api/admin/sponsor-add', {
+    const res = await fetch('/api/admin?op=add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
       body: JSON.stringify({ tapNo, sponsorName, openId: openId || 'admin', adminUser: 'admin' }),
@@ -1209,7 +1209,7 @@
   async function revokeSponsor(id) {
     const reason = prompt('请填写撤销原因：');
     if (!reason) return;
-    const res = await fetch('/api/admin/review', {
+    const res = await fetch('/api/admin?op=review', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
       body: JSON.stringify({ id, action: 'reject', adminUser: 'admin', reason }),
