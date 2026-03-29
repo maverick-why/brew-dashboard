@@ -740,7 +740,7 @@ const confirmMask=document.getElementById("confirmMask");
 document.getElementById("cbCancel").addEventListener("click",()=>confirmMask.classList.remove("show"));
 document.getElementById("cbOk").addEventListener("click",async()=>{
   confirmMask.classList.remove("show");
-  const tapNo = String(selectedTap.no).padStart(2,"0");
+  const tapNo = selectedTap.no;
   const sponsorName = input.value.trim();
   const order={
     tapNo,
