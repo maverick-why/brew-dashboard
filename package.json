@@ -2,6 +2,8 @@
   "name": "brew-dashboard",
   "private": true,
   "dependencies": {
-    "ioredis": "^5.4.1"
+    "@supabase/supabase-js": "^2.49.4",
+    "ioredis": "^5.4.1",
+    "node-fetch": "^2.7.0"
   }
 }

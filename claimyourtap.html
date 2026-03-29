@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>霸占一支酒头 · 时光酿造所</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@600&family=Barlow+Condensed:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',sans-serif;color:#2d2520;overflow:hidden}
+
+/* 固定全屏容器，内部三屏横向滑动，每屏独立纵向滚动 */
+.screens-wrap{position:fixed;inset:0;overflow:hidden}
+.screens{display:flex;flex-direction:row;width:300%;height:100%;transition:transform .42s cubic-bezier(.32,.72,0,1)}
+.screens.show-select{transform:translateX(-33.333%)}
+.screens.show-status{transform:translateX(-66.666%)}
+.screen{width:33.333%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* ── 海报页 ── */
+#screenPoster{background:#faf8f5;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100%;padding:48px 24px 60px}
+#screenPoster::before{content:'';position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%232d2520' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+.poster-tag{position:relative;z-index:1;background:#2d2520;color:#faf8f5;font-size:11px;font-weight:500;letter-spacing:2px;padding:6px 16px;border-radius:999px;margin-bottom:20px}
+.poster-title{position:relative;z-index:1;font-family:'Noto Serif SC',serif;font-size:36px;font-weight:600;color:#2d2520;letter-spacing:4px;text-align:center;line-height:1.15;margin-bottom:6px}
+.poster-en{position:relative;z-index:1;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:400;color:rgba(45,37,32,.38);letter-spacing:5px;text-align:center;margin-bottom:28px;text-transform:uppercase}
+.poster-tap-wrap{position:relative;z-index:1;width:180px;height:180px;display:flex;align-items:center;justify-content:center;margin-bottom:28px;flex-shrink:0}
+.poster-ring-outer{position:absolute;inset:0;border-radius:50%;border:2px dashed rgba(201,151,91,.32);animation:spin-slow 20s linear infinite}
+.poster-ring-inner{position:absolute;inset:20px;border-radius:50%;border:1px solid #d4cfc7}
+@keyframes spin-slow{to{transform:rotate(360deg)}}
+.poster-tap-img{position:relative;z-index:2;width:88px;height:auto;filter:drop-shadow(0 8px 20px rgba(45,37,32,.18))}
+.poster-card{position:relative;z-index:1;background:linear-gradient(135deg,#c9975b,#b8874d);border-radius:16px;padding:24px 20px;width:100%;max-width:340px;overflow:hidden;box-shadow:0 12px 36px rgba(180,130,70,.28);margin-bottom:24px}
+.poster-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07)}
+.poster-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:rgba(0,0,0,.06)}
+.pc-slogan{text-align:center;margin-bottom:20px;position:relative;z-index:1}
+.pc-slogan-main{font-size:22px;font-weight:600;color:#faf8f5;letter-spacing:4px;margin-bottom:4px}
+.pc-slogan-sub{font-size:12px;color:rgba(250,248,245,.75);letter-spacing:1px}
+.pc-divider{border:none;border-top:1px dashed rgba(250,248,245,.3);margin-bottom:20px}
+.pc-rows{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.pc-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.12);border-radius:8px;padding:12px 16px;backdrop-filter:blur(4px)}
+.pc-row-label{font-size:13px;color:rgba(250,248,245,.85);letter-spacing:.5px}
+.pc-row-val{display:flex;align-items:baseline;gap:3px}
+.pc-num{font-family:'Noto Serif SC',serif;font-size:26px;font-weight:700;color:#faf8f5;line-height:1}
+.pc-unit{font-size:13px;color:rgba(250,248,245,.75);letter-spacing:.5px}
+.pc-plus{font-size:16px;font-weight:700;color:#faf8f5;margin:0 2px}
+.poster-limit{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.poster-limit-line{flex:1;height:1px;background:repeating-linear-gradient(90deg,#d4cfc7 0,#d4cfc7 4px,transparent 4px,transparent 8px)}
+.poster-limit-text{font-size:13px;color:rgba(45,37,32,.55);letter-spacing:.5px;white-space:nowrap}
+.poster-limit-num{color:#c9975b;font-weight:700}
+.btn-cta{position:relative;z-index:1;background:#2d2520;color:#faf8f5;font-size:15px;font-weight:600;letter-spacing:3px;padding:16px 48px;border-radius:999px;border:none;cursor:pointer;font-family:'Noto Sans SC',sans-serif;display:flex;align-items:center;gap:10px;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 24px rgba(45,37,32,.2)}
+.btn-cta:active{transform:scale(.96)}
+.poster-footnote{position:relative;z-index:1;font-size:11px;color:rgba(45,37,32,.35);letter-spacing:1.5px;margin-top:14px}
+
+/* ── 导航栏 ── */
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e8e3dc;background:#faf8f5;position:sticky;top:0;z-index:20}
+.nav-back{font-size:13px;color:#b8b0a4;letter-spacing:.5px;cursor:pointer;background:none;border:none;font-family:inherit;display:flex;align-items:center;gap:4px;padding:4px 0}
+.nav-title{font-size:14px;font-weight:700;color:#2d2520;letter-spacing:2px}
+.nav-ph{width:60px}
+
+/* ── 选择页 ── */
+.page-header{padding:28px 20px 20px;text-align:center}
+.ph-title{font-weight:900;font-size:24px;color:#2d2520;letter-spacing:6px;line-height:1.1}
+.ph-en{font-family:'Barlow Condensed',sans-serif;font-weight:500;font-size:11px;color:#b8b0a4;letter-spacing:4px;margin-top:4px;text-transform:uppercase}
+.ph-badge-wrap{margin:14px auto 0;position:relative;display:inline-block}
+.ph-badge{background:#c8922a;border-radius:12px;padding:9px 20px;font-size:17px;font-weight:900;color:#fff;letter-spacing:4px;display:inline-block}
+.ph-member-tag{position:absolute;top:-10px;right:-12px;background:#2d2520;color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.ph-cost-row{display:flex;align-items:baseline;justify-content:center;gap:0;margin-top:18px;flex-wrap:wrap}
+.cost-item{display:flex;align-items:baseline;gap:2px;padding:0 10px}
+.cost-item:not(:last-child){border-right:1px solid #e0dbd4}
+.cost-num{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;letter-spacing:1px;color:#c8922a}
+.cost-unit{font-size:12px;color:#b8b0a4;letter-spacing:.5px}
+.cost-big{font-weight:900;font-size:19px;color:#c8922a;letter-spacing:2px}
+.ph-sub{font-size:12px;color:#8a8078;letter-spacing:.5px;margin-top:10px}
+.dashed-div{border:none;border-top:1px dashed #d4cfc7;margin:18px 20px 0}
+.stats-bar{display:flex;align-items:center;justify-content:center;padding:14px 20px}
+.stat-item{display:flex;align-items:baseline;gap:6px;padding:0 28px}
+.stat-item:first-child{border-right:1px solid #e8e3dc}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1;letter-spacing:1px}
+.stat-item:first-child .stat-num{color:#8a8078}
+.stat-item:last-child  .stat-num{color:#c8922a}
+.stat-label{font-size:12px;color:#b8b0a4;letter-spacing:.5px}
+.tap-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:14px 12px 8px;max-width:480px;margin:0 auto}
+.tap-item{display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;border-radius:10px;cursor:pointer;position:relative;transition:transform .12s;background:transparent;border:none;-webkit-appearance:none;font-family:inherit}
+.tap-item:active{transform:scale(.93)}
+.tap-item.taken{cursor:not-allowed}
+.tap-item.taken:active{transform:none}
+.ti-badge{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.5px;line-height:1;margin-bottom:6px;flex-shrink:0}
+.vacant .ti-badge{background:#f0ece6;color:#c8b99a}
+.taken  .ti-badge{background:#c8922a;color:#fff}
+.ti-img{width:52px;height:52px;object-fit:contain;display:block;flex-shrink:0}
+.vacant .ti-img{opacity:.28;filter:saturate(0)}
+.taken  .ti-img{opacity:1}
+.ti-line{width:80%;height:1px;margin:6px 0 4px}
+.vacant .ti-line{background:#e8e3dc}
+.taken  .ti-line{background:#e8c87a}
+.ti-name{font-size:10px;letter-spacing:.5px;line-height:1;text-align:center;min-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56px}
+.vacant .ti-name{color:#ccc8c0}
+.taken  .ti-name{color:#8a7040;font-weight:700}
+.rules-section{margin:18px 16px 0;background:#fff;border-radius:12px;padding:14px 16px;border:1px solid #ede8e0}
+.rule-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0}
+.rule-dot{width:5px;height:5px;border-radius:50%;background:#c8922a;flex-shrink:0;margin-top:6px}
+.rule-text{font-size:13px;color:#5a5048;line-height:1.6;letter-spacing:.3px}
+.footer-note{padding:14px 20px 48px;text-align:center;font-size:12px;color:#b8b0a4;letter-spacing:.5px}
+
+/* ── 冠名弹窗 ── */
+.modal-mask{position:fixed;inset:0;z-index:100;background:rgba(45,37,32,.4);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-mask.show{opacity:1;pointer-events:auto}
+.modal-sheet{background:#faf8f5;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 40px;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);overflow:hidden}
+.modal-mask.show .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:#e0dbd4;margin:14px auto 0}
+.modal-top{padding:18px 20px 16px;border-bottom:1px solid #e8e3dc}
+.mt-tap-label{font-size:11px;color:#b8b0a4;letter-spacing:1.5px;margin-bottom:10px}
+.mt-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #ede8e0}
+.mt-badge{width:44px;height:44px;border-radius:10px;background:#c8922a;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mt-badge span{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:1px;line-height:1}
+.mt-info{flex:1;min-width:0}
+.mt-name{font-size:17px;font-weight:900;color:#2d2520;letter-spacing:3px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt-style{font-size:12px;color:#aaa;margin-top:2px;letter-spacing:.5px}
+.mt-en{font-size:11px;color:#ccc;margin-top:2px;font-family:'Barlow Condensed',sans-serif;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-input-area{padding:16px 20px 0}
+.mia-label{font-size:11px;color:#b8b0a4;letter-spacing:1.5px;margin-bottom:10px}
+.mia-input-row{display:flex;align-items:center;background:#fff;border:1.5px solid #e8e3dc;border-radius:10px;padding:12px 14px;gap:8px;transition:border-color .2s}
+.mia-input-row:focus-within{border-color:#c8922a}
+.mia-input-row.reviewing{border-color:#e8b070;background:#fffdf8}
+.mia-input-row.pass{border-color:#2e7d32;background:#f8fff8}
+.mia-input-row.fail{border-color:#c8252a;background:#fff8f8}
+.mia-prefix{font-size:13px;color:#b8b0a4;white-space:nowrap;flex-shrink:0;letter-spacing:.5px}
+.mia-sep{width:1px;height:16px;background:#e8e3dc;flex-shrink:0}
+.mia-input{flex:1;border:none;outline:none;background:transparent;font-family:'Noto Sans SC',sans-serif;font-size:17px;font-weight:700;color:#c8922a;letter-spacing:2px;caret-color:#c8922a;min-width:0}
+.mia-input::placeholder{font-size:13px;color:#d4cfc7;font-weight:400;letter-spacing:.5px}
+.mia-count{font-size:11px;color:#d4cfc7;flex-shrink:0;font-family:'Barlow Condensed',sans-serif}
+.mia-count.full{color:#c8922a}
+
+/* 机审状态提示 */
+.review-status{margin:8px 20px 0;padding:10px 14px;border-radius:8px;font-size:12px;line-height:1.6;display:none;align-items:flex-start;gap:8px}
+.review-status.show{display:flex}
+.review-status.checking{background:#fffbf0;border-left:3px solid #e8c870;color:#8a7020}
+.review-status.pass   {background:#f0fff4;border-left:3px solid #2e7d32;color:#1b5e20}
+.review-status.fail   {background:#fff0f0;border-left:3px solid #c8252a;color:#8a1010}
+.review-status.edge   {background:#fff8f0;border-left:3px solid #e8802a;color:#7a4010}
+.rs-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.rs-text{flex:1}
+.rs-title{font-weight:700;margin-bottom:2px}
+.rs-sub{font-size:11px;opacity:.8}
+
+.modal-warn{margin:10px 20px 0;padding:10px 14px;background:#fff8f0;border-radius:8px;border-left:3px solid #e8b070;font-size:11px;color:#a07040;line-height:1.7;letter-spacing:.3px}
+.user-info-row{display:none;margin:12px 20px 0;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #ede8e0;flex-direction:column;gap:6px}
+.user-info-row.show{display:flex}
+.uir-row{display:flex;justify-content:space-between;align-items:center}
+.uir-label{font-size:12px;color:#b8b0a4;letter-spacing:.5px}
+.uir-val{font-size:13px;font-weight:700;color:#2d2520;letter-spacing:.5px}
+.uir-val.ok{color:#2e7d32}
+.uir-val.warn{color:#c8252a}
+.uir-divider{height:1px;background:#f0ece6}
+.modal-actions{padding:16px 20px 0;display:flex;flex-direction:column;gap:8px}
+.btn-main{width:100%;height:50px;border-radius:12px;background:#c8922a;border:none;color:#fff;font-size:15px;font-weight:900;letter-spacing:3px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-main:active{opacity:.8}
+.btn-main:disabled{background:#e8e3dc;color:#c8b99a;cursor:not-allowed}
+.btn-main.green{background:#2e7d32}
+.btn-ghost{width:100%;height:40px;border-radius:12px;background:transparent;border:none;color:#b8b0a4;font-size:13px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;letter-spacing:.5px}
+.btn-secondary{width:100%;height:44px;border-radius:12px;background:#fff;border:1px solid #e8e3dc;color:#8a8078;font-size:13px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;letter-spacing:.5px}
+.loading-spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 二次确认 */
+.confirm-mask{position:fixed;inset:0;z-index:200;background:rgba(45,37,32,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.confirm-mask.show{opacity:1;pointer-events:auto}
+.confirm-box{background:#faf8f5;border-radius:16px;padding:24px 20px;width:100%;max-width:320px;text-align:center}
+.cb-title{font-size:16px;font-weight:900;color:#2d2520;letter-spacing:2px;margin-bottom:6px}
+.cb-sub{font-size:12px;color:#8a8078;line-height:1.7;letter-spacing:.3px;margin-bottom:14px}
+.cb-review-badge{display:inline-flex;align-items:center;gap:4px;background:#f0fff4;border:1px solid #a5d6a7;border-radius:999px;padding:4px 12px;font-size:11px;color:#2e7d32;font-weight:700;letter-spacing:.5px;margin-bottom:14px}
+.cb-cost{background:#fff;border-radius:10px;padding:12px;margin-bottom:14px;border:1px solid #ede8e0}
+.cb-cost-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
+.cb-cost-label{color:#b8b0a4}
+.cb-cost-val{font-weight:700;color:#2d2520}
+.cb-warn{font-size:11px;color:#a07040;background:#fff8f0;border-radius:8px;padding:8px 12px;margin-bottom:16px;border-left:3px solid #e8b070;text-align:left;line-height:1.7}
+.cb-btns{display:flex;gap:10px}
+.cb-btn-cancel{flex:1;height:44px;border-radius:10px;background:#f0ece6;border:none;color:#8a8078;font-size:14px;cursor:pointer;font-family:'Noto Sans SC',sans-serif}
+.cb-btn-ok{flex:2;height:44px;border-radius:10px;background:#c8922a;border:none;color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:'Noto Sans SC',sans-serif;letter-spacing:2px}
+
+/* ── 状态页 ── */
+.status-main{padding:0 20px 80px;max-width:480px;margin:0 auto}
+.status-card{margin:20px 0 16px;border-radius:16px;overflow:hidden;border:1px solid #e8e3dc}
+.sc-head{padding:26px 24px 20px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.sc-head.pending {background:linear-gradient(160deg,#f5f0e8,#ede5d4)}
+.sc-head.approved{background:linear-gradient(160deg,#f0f7f0,#dff0de)}
+.sc-head.rejected{background:linear-gradient(160deg,#fdf0f0,#fae0e0)}
+.sc-icon{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:28px;position:relative}
+.pending  .sc-icon{background:rgba(200,146,42,.12);border:2px solid rgba(200,146,42,.25)}
+.approved .sc-icon{background:rgba(46,125,50,.10); border:2px solid rgba(46,125,50,.25)}
+.rejected .sc-icon{background:rgba(200,37,42,.08); border:2px solid rgba(200,37,42,.20)}
+.pending .sc-icon::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid transparent;border-top-color:#c8922a;border-right-color:rgba(200,146,42,.3);animation:spin 1.6s linear infinite}
+.sc-status-label{font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:5px;text-transform:uppercase}
+.pending  .sc-status-label{color:#c8922a}
+.approved .sc-status-label{color:#2e7d32}
+.rejected .sc-status-label{color:#c8252a}
+.sc-status-text{font-size:21px;font-weight:900;letter-spacing:3px;color:#2d2520;margin-bottom:5px}
+.sc-status-sub{font-size:12px;color:#8a8078;letter-spacing:.5px;line-height:1.8}
+.sc-timeline{padding:14px 20px;background:#fff;border-top:1px solid #f0ece6;display:flex;flex-direction:column}
+.tl-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;position:relative}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:10px;top:26px;bottom:-9px;width:1px;background:#e8e3dc}
+.tl-dot{width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;margin-top:1px;position:relative;z-index:1}
+.tl-dot.done  {background:#c8922a;color:#fff}
+.tl-dot.active{background:#fff;border:2px solid #c8922a;animation:dot-pulse 1.6s ease-in-out infinite}
+.tl-dot.active::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#c8922a}
+@keyframes dot-pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,146,42,.4)}50%{box-shadow:0 0 0 5px rgba(200,146,42,0)}}
+.tl-dot.wait{background:#f0ece6;border:1px solid #e0dbd4}
+.tl-dot.ok  {background:#2e7d32;color:#fff;font-size:12px}
+.tl-dot.fail{background:#c8252a;color:#fff;font-size:12px}
+.tl-info{flex:1}
+.tl-title{font-size:13px;font-weight:700;color:#2d2520;letter-spacing:.5px;line-height:1.3}
+.tl-title.muted{color:#b8b0a4;font-weight:400}
+.tl-time{font-size:11px;color:#b8b0a4;margin-top:2px}
+.info-card{background:#fff;border-radius:12px;border:1px solid #e8e3dc;overflow:hidden;margin-bottom:14px}
+.ic-head{padding:12px 16px;background:#f5f0e8;border-bottom:1px solid #ede5d4;display:flex;align-items:center;justify-content:space-between}
+.ic-head-label{font-size:11px;color:#b8b0a4;letter-spacing:1.5px}
+.ic-tap-badge{background:#c8922a;border-radius:6px;padding:2px 10px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;letter-spacing:1px}
+.ic-body{padding:12px 16px}
+.ic-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f2ed}
+.ic-row:last-child{border-bottom:none}
+.ic-label{font-size:12px;color:#b8b0a4}
+.ic-val{font-size:13px;font-weight:700;color:#2d2520;letter-spacing:.5px}
+.ic-val.gold{color:#c8922a}
+.ic-val.name-val{font-size:16px;letter-spacing:3px}
+.status-actions{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.tip-box{background:#fff;border-radius:12px;border:1px solid #e8e3dc;padding:16px;margin-bottom:14px}
+.tip-title{font-size:11px;color:#b8b0a4;letter-spacing:2px;margin-bottom:10px}
+.tip-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0}
+.tip-dot-sm{width:4px;height:4px;border-radius:50%;background:#d4cfc7;flex-shrink:0;margin-top:6px}
+.tip-text{font-size:12px;color:#8a8078;line-height:1.7;letter-spacing:.3px}
+.preview-snack{background:#fff8f0;border-radius:12px;border:1px solid #f0d8a0;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.ps-icon{font-size:22px;flex-shrink:0}
+.ps-text p{font-size:13px;font-weight:700;color:#8a6020;letter-spacing:.5px;line-height:1.4}
+.ps-text span{font-size:11px;color:#b8a060;letter-spacing:.3px}
+
+/* 演示条 */
+.demo-wrap{position:fixed;bottom:0;left:0;right:0;z-index:300;max-width:480px;margin:0 auto;display:none}
+.demo-label-bar{font-size:9px;color:rgba(255,255,255,.25);letter-spacing:1px;text-align:center;padding:4px 0;background:rgba(45,37,32,.92)}
+.demo-bar{display:flex;background:rgba(45,37,32,.92);backdrop-filter:blur(8px)}
+.demo-btn{flex:1;height:44px;border:none;background:transparent;color:rgba(255,255,255,.45);font-size:10px;font-family:inherit;letter-spacing:.5px;cursor:pointer;border-right:1px solid rgba(255,255,255,.08);transition:color .15s,background .15s}
+.demo-btn:last-child{border-right:none}
+.demo-btn.active{color:#c8922a;background:rgba(200,146,42,.1)}
+</style>
+</head>
+<body>
+
+<div class="screens-wrap">
+<div class="screens" id="screens">
+
+  <!-- ════ 屏1：海报 ════ -->
+  <div class="screen" id="screenPoster">
+    <div class="poster-tag">会员专享活动</div>
+    <h1 class="poster-title">霸占一支酒头</h1>
+    <p class="poster-en">Claim Your Tap</p>
+    <div class="poster-tap-wrap">
+      <div class="poster-ring-outer"></div>
+      <div class="poster-ring-inner"></div>
+      <img class="poster-tap-img" src="酒头.png" alt="酒头"/>
+    </div>
+    <div class="poster-card">
+      <div class="pc-slogan">
+        <div class="pc-slogan-main">花小钱 办大事</div>
+        <div class="pc-slogan-sub">让你的名字永久展示在酒吧</div>
+      </div>
+      <hr class="pc-divider"/>
+      <div class="pc-rows">
+        <div class="pc-row">
+          <span class="pc-row-label">冠名价格</span>
+          <div class="pc-row-val">
+            <span class="pc-num">¥1</span><span class="pc-plus">+</span>
+            <span class="pc-num">5</span><span class="pc-unit">积分</span>
+          </div>
+        </div>
+        <div class="pc-row">
+          <span class="pc-row-label">专属折扣</span>
+          <div class="pc-row-val"><span class="pc-num">85折</span><span class="pc-unit">畅饮</span></div>
+        </div>
+        <div class="pc-row">
+          <span class="pc-row-label">有效期限</span>
+          <div class="pc-row-val"><span class="pc-num">30</span><span class="pc-unit">天</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="poster-limit">
+      <div class="poster-limit-line"></div>
+      <span class="poster-limit-text">仅限 <span class="poster-limit-num">27支</span> 酒头</span>
+      <div class="poster-limit-line"></div>
+    </div>
+    <button class="btn-cta" id="btnEnter">
+      <span>立即霸占酒头</span><span>›</span>
+    </button>
+    <p class="poster-footnote">先到先得，手慢无</p>
+  </div>
+
+  <!-- ════ 屏2：选择 ════ -->
+  <div class="screen" id="screenSelect">
+    <div class="nav-bar">
+      <button class="nav-back" id="btnBackToPoster">← 返回</button>
+      <div class="nav-title">选择酒头</div>
+      <div class="nav-ph"></div>
+    </div>
+    <div class="page-header">
+      <div class="ph-title">霸占一支酒头</div>
+      <div class="ph-en">Claim Your Tap</div>
+      <div class="ph-badge-wrap">
+        <div class="ph-badge">花小钱 办大事</div>
+        <div class="ph-member-tag">会员专享</div>
+      </div>
+      <div class="ph-cost-row">
+        <div class="cost-item"><span class="cost-num">¥1</span><span class="cost-unit">冠名</span><span style="color:#d4cfc7;margin:0 4px;font-size:14px">+</span><span class="cost-num">5</span><span class="cost-unit">积分</span></div>
+        <div class="cost-item"><span class="cost-big">85折</span><span class="cost-unit">畅饮</span></div>
+        <div class="cost-item"><span class="cost-num">30</span><span class="cost-unit">天有效</span></div>
+      </div>
+      <div class="ph-sub">冠名酒头够拉风，还能享受专属折扣</div>
+    </div>
+    <hr class="dashed-div"/>
+    <div class="stats-bar">
+      <div class="stat-item"><span class="stat-num" id="takenCount">0</span><span class="stat-label">已冠名</span></div>
+      <div class="stat-item"><span class="stat-num" id="vacantCount">0</span><span class="stat-label">待冠名</span></div>
+    </div>
+    <div class="tap-grid" id="tapGrid"></div>
+    <div class="rules-section">
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">仅限会员参与，需支付1元 + 5积分</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">冠名后您的名字将展示在酒头信息中</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">享受该酒头85折优惠，有效期30天</div></div>
+      <div class="rule-item"><div class="rule-dot"></div><div class="rule-text">每支酒头限一人冠名，先到先得</div></div>
+    </div>
+    <div class="footer-note">点击未冠名酒头即可参与</div>
+  </div>
+
+  <!-- ════ 屏3：状态 ════ -->
+  <div class="screen" id="screenStatus">
+    <div class="nav-bar">
+      <button class="nav-back" id="btnBackToSelect">← 返回</button>
+      <div class="nav-title">冠名状态</div>
+      <div class="nav-ph"></div>
+    </div>
+    <div class="status-main">
+      <div class="status-card" id="statusCard"></div>
+      <div class="info-card">
+        <div class="ic-head">
+          <span class="ic-head-label">冠名信息</span>
+          <span class="ic-tap-badge" id="icTapNo">—</span>
+        </div>
+        <div class="ic-body">
+          <div class="ic-row"><span class="ic-label">酒头</span><span class="ic-val" id="icBeerName">—</span></div>
+          <div class="ic-row"><span class="ic-label">风格</span><span class="ic-val" id="icStyle">—</span></div>
+          <div class="ic-row"><span class="ic-label">冠名内容</span><span class="ic-val gold name-val" id="icSponsorName">—</span></div>
+          <div class="ic-row"><span class="ic-label">有效期</span><span class="ic-val" id="icExpiry">—</span></div>
+          <div class="ic-row"><span class="ic-label">已扣积分</span><span class="ic-val">5 积分</span></div>
+          <div class="ic-row"><span class="ic-label">已扣余额</span><span class="ic-val">¥ 1.00</span></div>
+        </div>
+      </div>
+      <div class="status-actions" id="statusActions"></div>
+      <div id="statusTip"></div>
+    </div>
+  </div>
+
+</div><!-- /screens -->
+</div><!-- /screens-wrap -->
+
+<!-- 冠名弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <div class="mt-tap-label">当前酒头</div>
+      <div class="mt-card">
+        <div class="mt-badge"><span id="modalNo">01</span></div>
+        <div class="mt-info">
+          <div class="mt-name"  id="modalName">—</div>
+          <div class="mt-style" id="modalStyle">—</div>
+          <div class="mt-en"    id="modalEn">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-input-area">
+      <div class="mia-label">冠名内容</div>
+      <div class="mia-input-row" id="inputRow">
+        <span class="mia-prefix">酒头冠名</span>
+        <div class="mia-sep"></div>
+        <input class="mia-input" id="sponsorInput" type="text" placeholder="中文≤6字 / 英文≤12字符" autocomplete="off"/>
+        <span class="mia-count" id="charCount">0</span>
+      </div>
+    </div>
+
+    <!-- 机审状态提示 -->
+    <div class="review-status" id="reviewStatus">
+      <span class="rs-icon" id="rsIcon">⏳</span>
+      <div class="rs-text">
+        <div class="rs-title" id="rsTitle">正在审核</div>
+        <div class="rs-sub"   id="rsSub">AI 正在检查内容合规性…</div>
+      </div>
+    </div>
+
+    <div class="modal-warn">违规内容不予通过，且已支付的积分与余额<strong>不予退还</strong></div>
+    <div class="user-info-row" id="userInfoRow">
+      <div class="uir-row"><span class="uir-label">当前积分</span><span class="uir-val" id="uirPoint">—</span></div>
+      <div class="uir-divider"></div>
+      <div class="uir-row"><span class="uir-label">当前余额</span><span class="uir-val" id="uirBalance">—</span></div>
+      <div class="uir-divider"></div>
+      <div class="uir-row"><span class="uir-label">需扣除</span><span class="uir-val" style="color:#c8922a">5积分 + ¥1.00</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-main" id="btnSubmitFlow" disabled>输入冠名内容</button>
+      <button class="btn-ghost" id="btnCancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 二次确认 -->
+<div class="confirm-mask" id="confirmMask">
+  <div class="confirm-box">
+    <div class="cb-title">确认冠名</div>
+    <div class="cb-sub">审核通过后将直接上线展示，无需等待人工审核</div>
+    <div class="cb-review-badge">✅ AI 审核通过 · 提交即上线</div>
+    <div class="cb-cost">
+      <div class="cb-cost-row"><span class="cb-cost-label">冠名名称</span><span class="cb-cost-val" id="cbName">—</span></div>
+      <div class="cb-cost-row"><span class="cb-cost-label">扣除积分</span><span class="cb-cost-val">5 积分</span></div>
+      <div class="cb-cost-row"><span class="cb-cost-label">扣除余额</span><span class="cb-cost-val">¥ 1.00</span></div>
+    </div>
+    <div class="cb-warn">最终审核由时光酿造所人工确认，违规内容不退款</div>
+    <div class="cb-btns">
+      <button class="cb-btn-cancel" id="cbCancel">取消</button>
+      <button class="cb-btn-ok"     id="cbOk">确认扣除</button>
+    </div>
+  </div>
+</div>
+
+<!-- 演示条 -->
+<div class="demo-wrap" id="demoWrap">
+  <div class="demo-label-bar">演示：切换审核状态</div>
+  <div class="demo-bar">
+    <button class="demo-btn active" onclick="setStatus('pending')">⏳ 审核中</button>
+    <button class="demo-btn"        onclick="setStatus('approved')">✅ 已通过</button>
+    <button class="demo-btn"        onclick="setStatus('rejected')">❌ 已拒绝</button>
+  </div>
+</div>
+
+<script>
+/* ══ 用户身份 ══ */
+const openId = 'test_openid_001'; // TODO: 上线前替换为微信 OAuth
+
+/* ══ 机审 token（由后端签发，提交时携带）══ */
+let reviewToken = null;
+
+/* ══ 数据 ══ */
+let TAPS = [];
+
+async function loadTaps() {
+  const res = await fetch('/api/tap-list');
+  const json = await res.json();
+  if (json.code === 0) {
+    renderTaps(json.data);
+  }
+}
+
+function renderTaps(taps) {
+  TAPS = taps;
+  const takenN = TAPS.filter(t => t.sponsor).length;
+  document.getElementById("takenCount").textContent = takenN;
+  document.getElementById("vacantCount").textContent = TAPS.length - takenN;
+  const grid = document.getElementById("tapGrid");
+  grid.innerHTML = "";
+  TAPS.forEach(tap => {
+    const taken = !!tap.sponsor;
+    const no = String(tap.no).padStart(2, "0");
+    const btn = document.createElement("button");
+    btn.className = `tap-item ${taken ? "taken" : "vacant"}`;
+    btn.innerHTML = `<div class="ti-badge">${no}</div><img class="ti-img" src="酒头.png" alt=""/><div class="ti-line"></div><div class="ti-name">${taken ? tap.sponsor : ""}</div>`;
+    if (!taken) btn.addEventListener("click", () => openModal(tap));
+    grid.appendChild(btn);
+  });
+}
+
+/* ══ 机器审核（调用后端 /api/review-content）══ */
+async function reviewContent(content) {
+  const res = await fetch('/api/review-content', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content, openId }),
+  });
+  const json = await res.json();
+  if (json.code !== 0) throw new Error(json.message);
+  return json.data; // { result: 'pass'|'edge'|'fail', token?, reason? }
+}
+
+async function machineReview(text) {
+  try {
+    const data = await reviewContent(text);
+    if (data.result === 'pass' || data.result === 'edge') {
+      reviewToken = data.token || null;
+    }
+    return { result: data.result, reason: data.reason };
+  } catch (e) {
+    reviewToken = null;
+    return { result: 'edge', reason: '审核服务异常，转人工复核' };
+  }
+}
+
+/* ══ 查询会员信息（调用后端 /api/member-info）══ */
+async function queryMemberInfo() {
+  const res = await fetch('/api/member-info', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ openId }),
+  });
+  const json = await res.json();
+  if (json.code !== 0) throw new Error(json.message);
+  return json.data; // { point, balance, customerUid }
+}
+
+/* ══ 提交冠名（调用后端 /api/sponsor）══ */
+async function submitSponsor(tapNo, sponsorName) {
+  const res = await fetch('/api/sponsor', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ openId, tapNo, sponsorName, reviewToken }),
+  });
+  const json = await res.json();
+  if (json.code !== 0) throw new Error(json.message);
+  return json.data; // { status: 'live' | 'pending' }
+}
+
+/* ══ 轮询冠名状态 ══ */
+async function pollStatus(tapNo, maxMs = 2 * 60 * 60 * 1000) {
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    await new Promise(r => setTimeout(r, 10000));
+    const res = await fetch(`/api/sponsor-status?openId=${encodeURIComponent(openId)}&tapNo=${tapNo}`);
+    const json = await res.json();
+    if (json.code === 0 && json.data.status !== 'pending') {
+      return json.data.status;
+    }
+  }
+  return 'timeout';
+}
+let reviewResult = null; // null | {result, reason}
+let fetchedUser  = null;
+
+function showReviewStatus(type, title, sub) {
+  const el = document.getElementById("reviewStatus");
+  const icons = { checking:"⏳", pass:"✅", fail:"❌", edge:"⚠️" };
+  el.className = `review-status show ${type}`;
+  document.getElementById("rsIcon").textContent  = icons[type] || "⏳";
+  document.getElementById("rsTitle").textContent = title;
+  document.getElementById("rsSub").textContent   = sub;
+  // 输入框边框颜色
+  const row = document.getElementById("inputRow");
+  row.classList.remove("reviewing","pass","fail");
+  if(type==="checking") row.classList.add("reviewing");
+  if(type==="pass"||type==="edge") row.classList.add("pass");
+  if(type==="fail") row.classList.add("fail");
+}
+function hideReviewStatus() {
+  document.getElementById("reviewStatus").classList.remove("show");
+  document.getElementById("inputRow").classList.remove("reviewing","pass","fail");
+}
+
+/* ══ 防抖机审 ══ */
+let reviewTimer = null;
+function scheduleReview(val) {
+  clearTimeout(reviewTimer);
+  reviewResult = null;
+  hideReviewStatus();
+  updateSubmitBtn();
+  if(!val.trim()) return;
+  reviewTimer = setTimeout(async () => {
+    showReviewStatus("checking","内容审核中","AI 正在检查合规性，请稍候…");
+    updateSubmitBtn();
+    reviewResult = await machineReview(val.trim());
+    if(reviewResult.result === "pass") {
+      showReviewStatus("pass","内容合规","审核通过，提交后将直接上线展示");
+    } else if(reviewResult.result === "edge") {
+      showReviewStatus("edge","需人工复核","内容存在歧义，提交后将由店家人工确认");
+    } else {
+      showReviewStatus("fail","不符合规范","请修改后重新输入");
+    }
+    updateSubmitBtn();
+  }, 800); // 停止输入800ms后触发
+}
+
+function updateSubmitBtn() {
+  const btn = document.getElementById("btnSubmitFlow");
+  const val = document.getElementById("sponsorInput").value.trim();
+  if(!val) {
+    btn.disabled=true; btn.textContent="输入冠名内容"; return;
+  }
+  if(!reviewResult) {
+    btn.disabled=true;
+    btn.innerHTML='<span class="loading-spin"></span>审核中…';
+    return;
+  }
+  if(reviewResult.result === "fail") {
+    btn.disabled=true; btn.textContent="内容不合规，请修改"; return;
+  }
+  // pass 或 edge：都允许进入下一步（查询积分）
+  if(!fetchedUser) {
+    btn.disabled=false; btn.textContent="查询积分并确认冠名"; return;
+  }
+  if(fetchedUser.point < 5) { btn.disabled=true; btn.textContent="积分不足，无法冠名"; return; }
+  if(fetchedUser.balance < 1){ btn.disabled=true; btn.textContent="余额不足，请先充值";  return; }
+  btn.disabled=false; btn.textContent="确认冠名";
+}
+
+/* ══ 弹窗逻辑 ══ */
+const mask    = document.getElementById("modalMask");
+const input   = document.getElementById("sponsorInput");
+const charCnt = document.getElementById("charCount");
+const userRow = document.getElementById("userInfoRow");
+let selectedTap = null;
+
+function countInput(val){
+  let cn=0,total=0;
+  for(const ch of val){if(/[\u4e00-\u9fa5]/.test(ch)){cn++;total+=2;}else total++;}
+  return{cn,total,ok:cn<=6&&total<=12};
+}
+
+function openModal(tap){
+  selectedTap=tap; fetchedUser=null; reviewResult=null;
+  document.getElementById("modalNo").textContent   =String(tap.no).padStart(2,"0");
+  document.getElementById("modalName").textContent =tap.name||tap.name_en;
+  document.getElementById("modalStyle").textContent=tap.style;
+  document.getElementById("modalEn").textContent   =[tap.name_en,tap.style_en].filter(Boolean).join(" · ");
+  input.value=""; charCnt.textContent="0"; charCnt.className="mia-count";
+  hideReviewStatus();
+  userRow.classList.remove("show");
+  updateSubmitBtn();
+  mask.classList.add("show");
+  setTimeout(()=>input.focus(),300);
+}
+function closeModal(){
+  mask.classList.remove("show");
+  selectedTap=null; fetchedUser=null; reviewResult=null;
+  clearTimeout(reviewTimer);
+}
+
+input.addEventListener("input",()=>{
+  if(!countInput(input.value).ok){
+    let out="",c=0,t=0;
+    for(const ch of input.value){
+      const isCn=/[\u4e00-\u9fa5]/.test(ch);
+      const nc=c+(isCn?1:0),nt=t+(isCn?2:1);
+      if(nc>6||nt>12)break;
+      out+=ch;c=nc;t=nt;
+    }
+    input.value=out;
+  }
+  const{cn,total}=countInput(input.value);
+  charCnt.textContent=cn>0?`${cn}/6字`:`${total}/12`;
+  charCnt.className="mia-count"+((cn>=6||total>=12)?" full":"");
+  fetchedUser=null;
+  userRow.classList.remove("show");
+  scheduleReview(input.value);
+});
+
+document.getElementById("btnCancel").addEventListener("click",closeModal);
+mask.addEventListener("click",e=>{if(e.target===mask)closeModal();});
+
+document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
+  if(!input.value.trim()||!reviewResult||reviewResult.result==="fail") return;
+  // 第一阶段：查询积分
+  if(!fetchedUser){
+    const btn=document.getElementById("btnSubmitFlow");
+    btn.disabled=true;
+    btn.innerHTML='<span class="loading-spin"></span>查询积分中…';
+    try {
+      fetchedUser = await queryMemberInfo();
+    } catch(e) {
+      btn.disabled=false;
+      btn.textContent="查询失败，请重试";
+      showToast("查询会员信息失败：" + (e.message || "网络错误"));
+      return;
+    }
+    const ptEl=document.getElementById("uirPoint");
+    const blEl=document.getElementById("uirBalance");
+    ptEl.textContent=`${fetchedUser.point} 积分`;
+    blEl.textContent=`¥ ${fetchedUser.balance.toFixed(2)}`;
+    ptEl.className="uir-val"+(fetchedUser.point>=5?" ok":" warn");
+    blEl.className="uir-val"+(fetchedUser.balance>=1?" ok":" warn");
+    userRow.classList.add("show");
+    updateSubmitBtn();
+    return;
+  }
+  // 第二阶段：二次确认
+  document.getElementById("cbName").textContent=input.value.trim();
+  document.getElementById("confirmMask").classList.add("show");
+});
+
+const confirmMask=document.getElementById("confirmMask");
+document.getElementById("cbCancel").addEventListener("click",()=>confirmMask.classList.remove("show"));
+document.getElementById("cbOk").addEventListener("click",async()=>{
+  confirmMask.classList.remove("show");
+  const tapNo = String(selectedTap.no).padStart(2,"0");
+  const sponsorName = input.value.trim();
+  const order={
+    tapNo,
+    beerName:selectedTap.name, style:selectedTap.style,
+    sponsorName,
+    submitTime:now(),
+    reviewResult: reviewResult?.result,
+  };
+  const btn = document.getElementById("btnSubmitFlow");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spin"></span>提交中…';
+  let submitStatus;
+  try {
+    const res = await submitSponsor(tapNo, sponsorName);
+    submitStatus = res.status; // 'live' | 'pending'
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = "提交失败，请重试";
+    confirmMask.classList.add("show");
+    showToast("提交失败：" + (e.message || "网络错误"));
+    return;
+  }
+  closeModal();
+  document.getElementById("icTapNo").textContent      = order.tapNo;
+  document.getElementById("icBeerName").textContent   = order.beerName;
+  document.getElementById("icStyle").textContent      = order.style;
+  document.getElementById("icSponsorName").textContent= order.sponsorName;
+  window._order = order;
+  // live → 直接上线；pending → 待人工审核
+  const initialStatus = submitStatus === 'live'
+    ? (order.reviewResult === 'pass' ? 'approved' : 'pending_edge')
+    : 'pending';
+  setStatus(initialStatus);
+  goScreen(2);
+  // 如果是 pending，开始轮询
+  if (submitStatus === 'pending' || initialStatus === 'pending' || initialStatus === 'pending_edge') {
+    pollStatus(tapNo).then(finalStatus => {
+      if (finalStatus === 'approved' || finalStatus === 'live') {
+        window._order = order;
+        setStatus('approved');
+        showToast('🎉 冠名审核通过，已上线展示！');
+      } else if (finalStatus === 'rejected') {
+        window._order = order;
+        setStatus('rejected');
+        showToast('冠名审核未通过，请重新申请');
+      }
+    });
+  }
+});
+
+/* ══ 页面导航 ══ */
+const screens=document.getElementById("screens");
+function goScreen(n){
+  screens.classList.remove("show-select","show-status");
+  if(n===1) screens.classList.add("show-select");
+  if(n===2) screens.classList.add("show-status");
+  document.getElementById("demoWrap").style.display=n===2?"block":"none";
+}
+document.getElementById("btnEnter").addEventListener("click",()=>goScreen(1));
+document.getElementById("btnBackToPoster").addEventListener("click",()=>goScreen(-1));
+document.getElementById("btnBackToSelect").addEventListener("click",()=>goScreen(1));
+
+/* ══ 初始化：加载酒头列表 ══ */
+loadTaps();
+
+/* ══ 状态渲染 ══ */
+function setStatus(status){
+  const order=window._order||{tapNo:"07",beerName:"西海岸炸弹",style:"西海岸IPA",sponsorName:"天下无敌",submitTime:"2026-03-29 14:32"};
+  const approveTime="2026-03-29 16:08",expiry="2026-04-28";
+  const CFG={
+    pending:{
+      headCls:"pending",icon:"⏳",label:"Reviewing",text:"审核中",
+      sub:"机器初审通过\n等待时光酿造所人工确认",
+      tl:[
+        {dot:"done", title:"提交申请",    time:order.submitTime},
+        {dot:"done", title:"机器初审通过",time:"内容合规"},
+        {dot:"active",title:"人工确认中", time:"预计24小时内"},
+        {dot:"wait", title:"大屏上线展示",time:""},
+      ],
+      actions:`<button class="btn-secondary" onclick="showToast('当前仍在审核中，请耐心等待')">刷新状态</button>`,
+      tip:`<div class="tip-box"><div class="tip-title">温馨提示</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">内容已通过 AI 初审，人工确认通常在24小时内完成</div></div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">审核结果将通过公众号消息通知您</div></div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">违规内容不予通过，已扣积分与余额不退还</div></div>
+      </div>`,
+      expiry:"审核通过后生效",
+    },
+    pending_edge:{
+      headCls:"pending",icon:"⏳",label:"Reviewing",text:"待人工审核",
+      sub:"内容存在歧义，已转人工审核\n等待时光酿造所确认",
+      tl:[
+        {dot:"done", title:"提交申请",    time:order.submitTime},
+        {dot:"done", title:"AI 初审",     time:"转人工复核"},
+        {dot:"active",title:"人工审核中", time:"预计24小时内"},
+        {dot:"wait", title:"大屏上线展示",time:""},
+      ],
+      actions:`<button class="btn-secondary" onclick="showToast('当前仍在审核中，请耐心等待')">刷新状态</button>`,
+      tip:`<div class="tip-box"><div class="tip-title">温馨提示</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">您的冠名内容由 AI 标记为边缘内容，已转人工复核</div></div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">通过后将立即上线，拒绝则积分与余额不退还</div></div>
+      </div>`,
+      expiry:"审核通过后生效",
+    },
+    approved:{
+      headCls:"approved",icon:"🎉",label:"Live",text:"已上线展示",
+      sub:"您的冠名已通过审核并上线\n快去酒单大屏看看你的名字吧",
+      tl:[
+        {dot:"done",title:"提交申请",   time:order.submitTime},
+        {dot:"done",title:"AI 审核通过",time:"内容合规"},
+        {dot:"ok",  title:"大屏已展示", time:"已上线"},
+      ],
+      actions:`
+        <button class="btn-main green" onclick="showToast('即将跳转到酒单大屏')">🍺 去酒墙上看看效果</button>
+        <button class="btn-secondary"  onclick="showToast('已复制分享链接')">分享给朋友</button>`,
+      tip:`
+        <div class="preview-snack"><div class="ps-icon">🍺</div><div class="ps-text">
+          <p>冠名期间享受85折专属优惠</p>
+          <span>有效期至 ${expiry} · 仅限本人冠名酒头</span>
+        </div></div>
+        <div class="tip-box"><div class="tip-title">冠名权益</div>
+          <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">您的名字将在酒单大屏底部持续展示30天</div></div>
+          <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">点单该酒头时出示会员码可享85折优惠</div></div>
+          <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">到期后冠名自动释放，如需续期请重新申请</div></div>
+        </div>`,
+      expiry:`${expiry} 到期`,
+    },
+    rejected:{
+      headCls:"rejected",icon:"⚠️",label:"Rejected",text:"审核未通过",
+      sub:"内容不符合规范\n请修改后重新申请",
+      tl:[
+        {dot:"done",title:"提交申请",  time:order.submitTime},
+        {dot:"done",title:"AI 初审",   time:"转人工复核"},
+        {dot:"fail",title:"审核未通过",time:approveTime},
+      ],
+      actions:`
+        <button class="btn-main" style="background:#c8252a" onclick="goScreen(1)">重新申请冠名</button>
+        <button class="btn-secondary" onclick="showToast('请联系店员或在公众号留言')">联系店员</button>`,
+      tip:`<div class="tip-box"><div class="tip-title">温馨提示</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">冠名内容不符合规范，请修改后重新申请</div></div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">已扣除的 5积分 + ¥1.00 不予退还</div></div>
+        <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">重新申请时请使用符合规范的昵称或个人标签</div></div>
+      </div>`,
+      expiry:"—",
+    },
+  };
+  const c=CFG[status]||CFG.pending;
+  document.getElementById("statusCard").innerHTML=`
+    <div class="sc-head ${c.headCls}">
+      <div class="sc-icon">${c.icon}</div>
+      <div class="sc-status-label">${c.label}</div>
+      <div class="sc-status-text">${c.text}</div>
+      <div class="sc-status-sub">${c.sub.replace(/\n/g,"<br>")}</div>
+    </div>
+    <div class="sc-timeline">
+      ${c.tl.map(t=>`
+        <div class="tl-item">
+          <div class="tl-dot ${t.dot}">${t.dot==="ok"?"✓":t.dot==="fail"?"✕":""}</div>
+          <div class="tl-info">
+            <div class="tl-title ${t.dot==="wait"?"muted":""}">${t.title}</div>
+            ${t.time?`<div class="tl-time">${t.time}</div>`:""}
+          </div>
+        </div>`).join("")}
+    </div>`;
+  document.getElementById("statusActions").innerHTML=c.actions;
+  document.getElementById("statusTip").innerHTML=c.tip;
+  document.getElementById("icExpiry").textContent=c.expiry;
+  document.querySelectorAll(".demo-btn").forEach((b,i)=>{
+    b.classList.toggle("active",["pending","approved","rejected"][i]===status);
+  });
+}
+
+function showToast(msg){
+  const t=document.createElement("div");
+  t.style.cssText=`position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(45,37,32,.9);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;letter-spacing:.5px;z-index:400;white-space:nowrap;`;
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);
+}
+function now(){const d=new Date();return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+function p(n){return String(n).padStart(2,"0");}
+</script>
+</body>
+</html>

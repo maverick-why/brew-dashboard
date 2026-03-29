@@ -1,5 +1,6 @@
 // /api/menu-public.js  —  public read, no auth
 const Redis = require("ioredis");
+const { getSupabase } = require("./_lib/supabase");
 
 const KEY = "brew_dash_menu_v1";
 
@@ -58,6 +59,22 @@ module.exports = async (req, res) => {
         special:     !!row.special,
         sponsor_name: safe(row.sponsor_name),
       });
+    }
+
+    // 覆盖 Supabase sponsor_records 中的活跃冠名（实时数据）
+    try {
+      const supabase = getSupabase();
+      const { data: sponsors } = await supabase
+        .from('sponsor_records')
+        .select('tap_no, sponsor_name')
+        .eq('status', 'live')
+        .gt('expire_at', new Date().toISOString());
+      for (const s of sponsors || []) {
+        const item = items.find(i => i.no === s.tap_no);
+        if (item) item.sponsor_name = s.sponsor_name;
+      }
+    } catch (_) {
+      // Supabase 不可用时不影响主菜单数据
     }
 
     return res.status(200).end(JSON.stringify({ ok: true, tapCount, items }));
