@@ -12,16 +12,17 @@ class PospalClient {
     }
   }
 
-  _sign(bodyJson, timestamp) {
+  _sign(bodyJson) {
     return crypto.createHash('md5')
-      .update(this.appKey + bodyJson + timestamp)
-      .digest('hex');
+      .update(this.appKey + bodyJson)
+      .digest('hex')
+      .toUpperCase();
   }
 
   async _request(path, body) {
     const timestamp = String(Date.now());
     const bodyJson = JSON.stringify(body);
-    const sign = this._sign(bodyJson, timestamp);
+    const sign = this._sign(bodyJson);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
@@ -30,10 +31,10 @@ class PospalClient {
       const res = await fetch(`${this.host}${path}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'User-Agent': 'openApi',
+          'Content-Type': 'application/json; charset=utf-8',
           'time-stamp': timestamp,
-          'access-token': sign,
-          'app-id': this.appId,
+          'data-signature': sign,
         },
         body: bodyJson,
         signal: controller.signal,
@@ -49,43 +50,39 @@ class PospalClient {
     }
   }
 
-  // 接口9：手机号查会员 → { customerUid, phone, ... }
+  // 手机号查会员 → { customerUid, ... }
   async getMemberByPhone(phone) {
-    return this._request('/openapi/customer/queryCustomerByPhone', {
+    return this._request('/pospal-api2/openapi/v1/customerOpenapi/queryBytel', {
       appId: this.appId,
-      customerPhone: phone,
+      customerTel: phone,
     });
   }
 
-  // 接口1：会员号查积分余额 → { point, balance, ... }
+  // UID 查积分余额 → { point, balance, ... }
   async getMemberBalance(customerUid) {
-    return this._request('/openapi/customer/queryCustomerByUid', {
+    return this._request('/pospal-api2/openapi/v1/customerOpenApi/queryByUid', {
       appId: this.appId,
       customerUid,
     });
   }
 
-  // 接口5：调整积分（delta 为负数则扣除）
+  // 调整积分（delta 为负数则扣除）
   async adjustPoints(customerUid, delta, dataChangeTime) {
-    return this._request('/openapi/customer/updateCustomerInfo', {
+    return this._request('/pospal-api2/openapi/v1/customerOpenApi/updateBalancePointByIncrement', {
       appId: this.appId,
-      customerInfo: {
-        customerUid,
-        pointIncrement: delta,
-        dataChangeTime,
-      },
+      customerUid,
+      pointIncrement: delta,
+      dataChangeTime,
     });
   }
 
-  // 接口5：调整余额（delta 为负数则扣除）
+  // 调整余额（delta 为负数则扣除）
   async adjustBalance(customerUid, delta, dataChangeTime) {
-    return this._request('/openapi/customer/updateCustomerInfo', {
+    return this._request('/pospal-api2/openapi/v1/customerOpenApi/updateBalancePointByIncrement', {
       appId: this.appId,
-      customerInfo: {
-        customerUid,
-        balanceIncrement: delta,
-        dataChangeTime,
-      },
+      customerUid,
+      balanceIncrement: delta,
+      dataChangeTime,
     });
   }
 }
