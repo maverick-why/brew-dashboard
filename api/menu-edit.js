@@ -1,5 +1,6 @@
 // /api/menu-edit.js  —  admin only, GET=load POST=save
 const Redis = require("ioredis");
+const { getSupabase } = require("./_lib/supabase");
 
 const KEY = "brew_dash_menu_v1";
 
@@ -39,6 +40,25 @@ module.exports = async (req, res) => {
       const r = getRedis();
       const val = await r.get(KEY);
       const data = val ? JSON.parse(val) : {};
+
+      // Merge active sponsors from Supabase
+      try {
+        const supabase = getSupabase();
+        const { data: sponsors } = await supabase
+          .from("sponsor_records")
+          .select("tap_no, sponsor_name")
+          .in("status", ["live", "pending"]);
+        if (sponsors) {
+          for (const s of sponsors) {
+            const key = String(s.tap_no);
+            if (!data[key]) data[key] = {};
+            data[key].sponsor_name = s.sponsor_name;
+          }
+        }
+      } catch {
+        // Supabase failure is non-fatal; return menu data as-is
+      }
+
       return res.status(200).end(JSON.stringify({ ok: true, ...data }));
     } catch (e) {
       return res.status(500).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
