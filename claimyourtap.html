@@ -161,6 +161,17 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
 .loading-spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* 非会员提示 */
+.non-member-mask{position:fixed;inset:0;z-index:200;background:rgba(45,37,32,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.non-member-mask.show{opacity:1;pointer-events:auto}
+.nm-box{background:#faf8f5;border-radius:20px;padding:28px 20px 20px;width:100%;max-width:320px;text-align:center}
+.nm-icon{font-size:44px;margin-bottom:12px}
+.nm-title{font-size:17px;font-weight:900;color:#2d2520;letter-spacing:2px;margin-bottom:8px}
+.nm-body{font-size:13px;color:#5a5048;line-height:1.8;letter-spacing:.3px;margin-bottom:14px}
+.nm-hint{background:#f5f0e8;border-radius:10px;padding:12px 14px;font-size:12px;color:#7a5820;line-height:1.8;letter-spacing:.3px;margin-bottom:18px;text-align:left}
+.nm-hint-label{font-size:10px;color:#b8a060;font-weight:700;letter-spacing:2px;display:block;margin-bottom:4px}
+.nm-close{width:100%;height:46px;border-radius:12px;background:#2d2520;border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans SC',sans-serif;letter-spacing:1.5px}
+
 /* 二次确认 */
 .confirm-mask{position:fixed;inset:0;z-index:200;background:rgba(45,37,32,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
 .confirm-mask.show{opacity:1;pointer-events:auto}
@@ -409,6 +420,20 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
   </div>
 </div>
 
+<!-- 非会员提示 -->
+<div class="non-member-mask" id="nonMemberMask">
+  <div class="nm-box">
+    <div class="nm-icon">🍺</div>
+    <div class="nm-title">仅限会员参与</div>
+    <div class="nm-body">本活动仅限时光酿造所会员参与。<br>请先在小程序完成注册，注册后需要有积分和余额才能参与冠名。</div>
+    <div class="nm-hint">
+      <span class="nm-hint-label">如何参与</span>
+      在微信中搜索「时光酿造所」小程序，完成会员注册并充值积分后即可回来参与冠名
+    </div>
+    <button class="nm-close" id="btnNonMemberClose">我知道了</button>
+  </div>
+</div>
+
 <!-- 二次确认 -->
 <div class="confirm-mask" id="confirmMask">
   <div class="confirm-box">
@@ -507,7 +532,11 @@ async function queryMemberInfo() {
     body: JSON.stringify({ openId }),
   });
   const json = await res.json();
-  if (json.code !== 0) throw new Error(json.message);
+  if (json.code !== 0) {
+    const err = new Error(json.message);
+    err.httpStatus = res.status;
+    throw err;
+  }
   return json.data; // { point, balance, customerUid }
 }
 
@@ -657,6 +686,9 @@ input.addEventListener("input",()=>{
 
 document.getElementById("btnCancel").addEventListener("click",closeModal);
 mask.addEventListener("click",e=>{if(e.target===mask)closeModal();});
+document.getElementById("btnNonMemberClose").addEventListener("click",()=>{
+  document.getElementById("nonMemberMask").classList.remove("show");
+});
 
 document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
   if(!input.value.trim()||!reviewResult||reviewResult.result==="fail") return;
@@ -669,8 +701,13 @@ document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
       fetchedUser = await queryMemberInfo();
     } catch(e) {
       btn.disabled=false;
-      btn.textContent="查询失败，请重试";
-      showToast("查询会员信息失败：" + (e.message || "网络错误"));
+      btn.textContent="查询积分并确认冠名";
+      if (e.httpStatus === 404 || /未找到会员|未绑定手机号|未找到银豹/.test(e.message)) {
+        closeModal();
+        document.getElementById("nonMemberMask").classList.add("show");
+      } else {
+        showToast("查询会员信息失败：" + (e.message || "网络错误"));
+      }
       return;
     }
     const ptEl=document.getElementById("uirPoint");
