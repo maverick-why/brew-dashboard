@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
     if (isChinese && [...content].length > 6) return error(res, 400, '中文冠名最多6个字');
     if (!isChinese && content.length > 12) return error(res, 400, '英文冠名最多12个字符');
 
-    const { result, reason } = await reviewContent(content);
+    const { result, reason, auto_passed } = await reviewContent(content);
 
     if (result === 'fail') {
       return ok(res, { result: 'fail', reason: reason || '不符合规范，请重新输入' });
@@ -27,6 +27,7 @@ module.exports = async function handler(req, res) {
       result,
       token,
       reason: result === 'edge' ? '内容存在歧义，提交后人工确认' : undefined,
+      ...(auto_passed ? { auto_passed: true } : {}),
     });
   } catch (err) {
     return error(res, 500, err.message || 'Internal server error');
