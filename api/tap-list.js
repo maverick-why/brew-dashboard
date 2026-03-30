@@ -2,6 +2,19 @@ const { handleOptions, ensureMethod } = require('./_lib/http');
 const { ok, error } = require('./_lib/response');
 const { getSupabase } = require('./_lib/supabase');
 const { TAPS } = require('./_lib/taps');
+const Redis = require('ioredis');
+
+const MENU_KEY = 'brew_dash_menu_v1';
+const MENU_EXTRA = ['abv', 'ibu', 'large_price', 'large_size', 'small_price', 'small_size'];
+
+let redis;
+function getRedis() {
+  if (!redis) {
+    if (!process.env.REDIS_URL) return null;
+    redis = new Redis(process.env.REDIS_URL, { maxRetriesPerRequest: 1, enableReadyCheck: false, lazyConnect: true });
+  }
+  return redis;
+}
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
@@ -21,8 +34,19 @@ module.exports = async function handler(req, res) {
       sponsorMap[s.tap_no] = s;
     }
 
+    // non-fatal: merge Redis menu data (prices, ABV, IBU)
+    let menuData = {};
+    try {
+      const r = getRedis();
+      if (r) {
+        const val = await r.get(MENU_KEY);
+        if (val) menuData = JSON.parse(val);
+      }
+    } catch { /* Redis failure is non-fatal */ }
+
     const result = TAPS.map(tap => {
       const sponsorRecord = sponsorMap[tap.no];
+      const menu = menuData[String(tap.no)] || {};
       const base = {
         no: tap.no,
         name: tap.name,
@@ -30,6 +54,9 @@ module.exports = async function handler(req, res) {
         style: tap.style,
         style_en: tap.style_en,
       };
+      for (const f of MENU_EXTRA) {
+        if (menu[f] !== undefined && menu[f] !== '') base[f] = menu[f];
+      }
       if (sponsorRecord) {
         return { ...base, sponsor: sponsorRecord.sponsor_name, expireAt: sponsorRecord.expire_at };
       }

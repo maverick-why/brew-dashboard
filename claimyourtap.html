@@ -237,6 +237,25 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
 .tip-dot-sm{width:4px;height:4px;border-radius:50%;background:#d4cfc7;flex-shrink:0;margin-top:6px}
 .tip-text{font-size:12px;color:#8a8078;line-height:1.7;letter-spacing:.3px}
 
+/* ── 酒头展示卡片（冠名成功页）── */
+.tap-preview-card{border-radius:12px;overflow:hidden;border:1px solid #e8e3dc;margin-bottom:14px;background:#fff}
+.tc-success-banner{font-size:13px;font-weight:700;color:#2e7d32;text-align:center;padding:9px 0 7px;background:#f0fff4;border-bottom:1px solid #d4f0d4;letter-spacing:1px}
+.tcp-inner{display:flex;min-height:96px}
+.tcp-left{flex-shrink:0;width:68px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 0 8px;background:#c8922a}
+.tcp-no{font-family:'Bebas Neue',sans-serif;font-size:38px;color:#fff;line-height:1;letter-spacing:-1px}
+.tcp-icon{width:40px;height:40px;object-fit:contain;margin-top:4px}
+.tcp-body{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.tcp-top{flex:1;display:flex;flex-direction:row;align-items:center;padding:10px 12px 8px;gap:8px}
+.tcp-name-block{flex:1;min-width:0}
+.tcp-name{font-size:17px;font-weight:900;color:#2d2520;letter-spacing:2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcp-sub{font-size:11px;color:#aaa;margin-top:3px;font-family:'Barlow Condensed',sans-serif;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcp-prices{flex-shrink:0;text-align:right;display:flex;flex-direction:column;gap:2px}
+.tcp-price{font-size:13px;font-weight:700;color:#2d2520;white-space:nowrap;letter-spacing:.3px}
+.tcp-divider{height:1px;background:#f0ece6;margin:0 12px}
+.tcp-bottom{display:flex;align-items:center;justify-content:space-between;padding:7px 12px}
+.tcp-sponsor-text{font-size:12px;color:#c8922a;font-weight:700;letter-spacing:.5px}
+.tcp-alc{font-size:11px;color:#aaa;font-family:'Barlow Condensed',sans-serif;font-weight:500;white-space:nowrap}
+
 </style>
 </head>
 <body>
@@ -336,20 +355,30 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
     </div>
     <div class="status-main">
       <div class="status-card" id="statusCard"></div>
-      <div class="info-card">
-        <div class="ic-head">
-          <span class="ic-head-label">冠名信息</span>
-          <span class="ic-tap-badge" id="icTapNo">—</span>
-        </div>
-        <div class="ic-body">
-          <div class="ic-row"><span class="ic-label">酒头</span><span class="ic-val" id="icBeerName">—</span></div>
-          <div class="ic-row"><span class="ic-label">风格</span><span class="ic-val" id="icStyle">—</span></div>
-          <div class="ic-row"><span class="ic-label">冠名内容</span><span class="ic-val gold name-val" id="icSponsorName">—</span></div>
-          <div class="ic-row"><span class="ic-label">有效期</span><span class="ic-val" id="icExpiry">—</span></div>
-          <div class="ic-row"><span class="ic-label">已扣积分</span><span class="ic-val">5 积分</span></div>
-          <div class="ic-row"><span class="ic-label">已扣余额</span><span class="ic-val">¥ 1.00</span></div>
+      <div class="tap-preview-card" id="tapPreviewCard">
+        <div class="tc-success-banner" id="tapCardBanner">🎉 酒头冠名成功！</div>
+        <div class="tcp-inner">
+          <div class="tcp-left" id="tcpLeft">
+            <span class="tcp-no" id="tcpNo">—</span>
+            <img class="tcp-icon" src="酒头.png" alt=""/>
+          </div>
+          <div class="tcp-body">
+            <div class="tcp-top">
+              <div class="tcp-name-block">
+                <div class="tcp-name" id="tcpName">—</div>
+                <div class="tcp-sub"  id="tcpSub">—</div>
+              </div>
+              <div class="tcp-prices" id="tcpPrices"></div>
+            </div>
+            <div class="tcp-divider"></div>
+            <div class="tcp-bottom">
+              <span class="tcp-sponsor-text" id="tcpSponsor">—</span>
+              <span class="tcp-alc" id="tcpAlc"></span>
+            </div>
+          </div>
         </div>
       </div>
+      <span id="icExpiry" style="display:none"></span>
       <div class="status-actions" id="statusActions"></div>
       <div id="statusTip"></div>
     </div>
@@ -721,10 +750,19 @@ document.getElementById("cbOk").addEventListener("click",async()=>{
   const sponsorName = input.value.trim();
   const order={
     tapNo,
-    beerName:selectedTap.name, style:selectedTap.style,
+    beerName: selectedTap.name || selectedTap.name_en,
+    nameEn: selectedTap.name_en,
+    style: selectedTap.style,
+    styleColor: getTapColor(selectedTap.style),
     sponsorName,
-    submitTime:now(),
+    submitTime: now(),
     reviewResult: reviewResult?.result,
+    abv: selectedTap.abv || null,
+    ibu: selectedTap.ibu || null,
+    large_price: selectedTap.large_price || null,
+    large_size: selectedTap.large_size || null,
+    small_price: selectedTap.small_price || null,
+    small_size: selectedTap.small_size || null,
   };
   const btn = document.getElementById("btnSubmitFlow");
   btn.disabled = true;
@@ -741,11 +779,8 @@ document.getElementById("cbOk").addEventListener("click",async()=>{
     return;
   }
   closeModal();
-  document.getElementById("icTapNo").textContent      = order.tapNo;
-  document.getElementById("icBeerName").textContent   = order.beerName;
-  document.getElementById("icStyle").textContent      = order.style;
-  document.getElementById("icSponsorName").textContent= order.sponsorName;
   window._order = order;
+  populateTapCard(order);
   // live → 直接上线；pending → 待人工审核
   const initialStatus = submitStatus === 'live'
     ? (order.reviewResult === 'pass' ? 'approved' : 'pending_edge')
@@ -864,6 +899,34 @@ document.getElementById("btnBackToSelect").addEventListener("click",()=>goScreen
 loadTaps();
 
 /* ══ 状态渲染 ══ */
+function getTapColor(style) {
+  const s = (style || '').toLowerCase();
+  if (/ipa|india/.test(s)) return '#d4800a';
+  if (/stout|porter/.test(s)) return '#3a2010';
+  if (/weiss|hefeweizen|白啤|小麦/.test(s)) return '#c0980a';
+  if (/sour|酸|gose/.test(s)) return '#c04060';
+  if (/lager|拉格/.test(s)) return '#b89020';
+  if (/saison|赛松/.test(s)) return '#a08040';
+  return '#c8922a';
+}
+
+function populateTapCard(order) {
+  document.getElementById("tcpNo").textContent = String(order.tapNo).padStart(2, "0");
+  document.getElementById("tcpLeft").style.background = order.styleColor || '#c8922a';
+  document.getElementById("tcpName").textContent = order.beerName || "—";
+  document.getElementById("tcpSub").textContent = [order.nameEn, order.style].filter(Boolean).join(" · ");
+  document.getElementById("tcpSponsor").textContent = "酒头冠名：" + (order.sponsorName || "—");
+  const abvIbu = [
+    order.abv ? `ALC ${order.abv}%` : "",
+    order.ibu ? `IBU ${order.ibu}` : ""
+  ].filter(Boolean).join("  ·  ");
+  document.getElementById("tcpAlc").textContent = abvIbu;
+  let pricesHtml = '';
+  if (order.large_price) pricesHtml += `<div class="tcp-price">¥${order.large_price}${order.large_size ? ' / ' + order.large_size : ''}</div>`;
+  if (order.small_price) pricesHtml += `<div class="tcp-price">¥${order.small_price}${order.small_size ? ' / ' + order.small_size : ''}</div>`;
+  document.getElementById("tcpPrices").innerHTML = pricesHtml;
+}
+
 function setStatus(status){
   const order=window._order||{tapNo:"07",beerName:"西海岸炸弹",style:"西海岸IPA",sponsorName:"天下无敌",submitTime:"2026-03-29 14:32"};
   const approveTime="2026-03-29 16:08",expiry="2026-04-28";
