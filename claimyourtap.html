@@ -20,7 +20,7 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
 #screenPoster{background:#faf8f5;position:relative}
 .poster-inner{display:flex;flex-direction:column;align-items:center;height:100%;padding:24px 24px 28px;position:relative}
 .poster-inner::before{display:none}
-.poster-tag{position:relative;z-index:1;background:#2d2520;color:#faf8f5;font-size:11px;font-weight:500;letter-spacing:2px;padding:6px 16px;border-radius:999px;margin-bottom:10px}
+.poster-tag{display:none}
 .poster-title{position:relative;z-index:1;font-family:'Noto Serif SC',serif;font-size:34px;font-weight:600;color:#2d2520;letter-spacing:4px;text-align:center;line-height:1.15;margin-bottom:4px}
 .poster-en{position:relative;z-index:1;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:400;color:rgba(45,37,32,.38);letter-spacing:5px;text-align:center;margin-bottom:12px;text-transform:uppercase}
 .poster-tap-wrap{position:relative;z-index:1;width:148px;height:148px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;flex-shrink:0}
@@ -31,7 +31,9 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
 .poster-card{position:relative;z-index:1;background:linear-gradient(135deg,#c9975b,#b8874d);border-radius:24px;padding:20px;width:100%;max-width:340px;overflow:hidden;box-shadow:0 10px 28px rgba(180,130,70,.28);margin-bottom:0}
 .poster-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07)}
 .poster-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:rgba(0,0,0,.06)}
-.pc-slogan{text-align:center;margin-bottom:14px;position:relative;z-index:1}
+.pc-stamp{position:absolute;top:-14px;left:14px;z-index:3;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+.pc-stamp svg{position:absolute;inset:0;width:100%;height:100%}
+.pc-stamp-text{position:relative;z-index:1;font-size:9px;font-weight:700;color:rgba(250,248,245,.9);letter-spacing:1.5px;text-align:center;line-height:1.4;writing-mode:horizontal-tb}
 .pc-slogan-main{font-size:18px;font-weight:600;color:#faf8f5;letter-spacing:10px;margin-bottom:3px}
 .pc-slogan-sub{font-size:11px;color:rgba(250,248,245,.75);letter-spacing:1px}
 .pc-divider{border:none;border-top:1px dashed rgba(250,248,245,.3);margin-bottom:14px}
@@ -254,6 +256,13 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
       <img class="poster-tap-img" src="酒头.png" alt="酒头"/>
     </div>
     <div class="poster-card">
+      <div class="pc-stamp">
+        <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="26" cy="26" r="23" stroke="rgba(250,248,245,0.55)" stroke-width="1.2" stroke-dasharray="2.5 2.5"/>
+          <circle cx="26" cy="26" r="19" stroke="rgba(250,248,245,0.35)" stroke-width="0.8"/>
+        </svg>
+        <div class="pc-stamp-text">会员<br>专享</div>
+      </div>
       <div class="pc-slogan">
         <div class="pc-slogan-main">花小钱 办大事</div>
         <div class="pc-slogan-sub">让你的名字永久展示在酒吧</div>
