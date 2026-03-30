@@ -2,25 +2,31 @@
 const crypto = require('crypto');
 const fetch = require('node-fetch');
 
-const REVIEW_PROMPT = `你是一个中文内容审核助手，为一家精酿酒吧审核用户提交的「酒头冠名」内容。
-冠名内容将展示在酒吧酒单大屏，最多6个汉字或12个英文字符。
+const REVIEW_SYSTEM = `你是一家精酿酒吧的「酒头冠名」内容审核助手。冠名内容将显示在酒吧酒单大屏（最多6汉字或12英文字符）。
 
-审核标准（从严到宽，优先通过）：
-- 拒绝：低俗/色情/侮辱性词汇
-- 拒绝：政治敏感内容
-- 拒绝：商业广告（品牌名、公司名、产品推广）
-- 拒绝：明显人身攻击
-- 通过：普通昵称、纪念日名称、英文名、个人标签、有趣的短语
-- 通过：轻微搞怪、创意表达，只要不违反上述禁止项
-- 边缘：仅当内容确实模糊有较大争议时，才标记为 edge，转人工判断
+判断规则（按优先级）：
 
-倾向于通过，只在明确违规时拒绝。
+pass（直接通过）—— 绝大多数内容应该通过，以下必须 pass：
+- 任何人名、昵称、英文名（Tom、小明、Jerry）
+- 表达情感或爱意的词（iloveyou、爱你、宝贝、么么哒、forever）
+- 普通英文单词或短语（hello、sunshine、cheers、lucky）
+- 个人标签、纪念日、地名、有趣短语
+- 轻微搞怪、幽默、创意表达
 
-只返回JSON，不要其他文字：{"result":"pass","reason":"普通昵称，合规"}`;
+fail（直接拒绝）—— 只有明确符合以下情况才拒绝：
+- 低俗/色情/明显侮辱他人的词
+- 政治敏感内容
+- 商业广告（品牌名、公司名、联系方式）
+
+edge（转人工）—— 仅当内容同时满足：既不是明显无害，又不是明确违规，存在合理争议时。门槛要高，慎用。
+
+核心原则：宁可漏掉一个边缘词，也绝不误杀无害内容。遇到任何疑问，优先 pass。
+
+只返回 JSON，不要其他文字：{"result":"pass","reason":"说明"}`;
 
 async function reviewContent(text) {
   const apiKey = process.env.CLAUDE_API_KEY;
-  const model = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
+  const model = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 3000);
@@ -36,8 +42,9 @@ async function reviewContent(text) {
       },
       body: JSON.stringify({
         model,
-        max_tokens: 200,
-        messages: [{ role: 'user', content: `${REVIEW_PROMPT}\n\n冠名内容：${text}` }],
+        max_tokens: 100,
+        system: REVIEW_SYSTEM,
+        messages: [{ role: 'user', content: `冠名内容：${text}` }],
       }),
       signal: controller.signal,
     });
