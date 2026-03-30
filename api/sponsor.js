@@ -92,7 +92,7 @@ module.exports = async function handler(req, res) {
       return error(res, 502, `扣款失败：${deductErr.message}`);
     }
 
-    const finalStatus = reviewResult === 'pass' ? 'live' : 'pending';
+    const finalStatus = 'live';
     await supabase
       .from('sponsor_records')
       .update({ status: finalStatus })
