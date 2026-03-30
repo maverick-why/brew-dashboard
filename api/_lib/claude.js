@@ -31,7 +31,7 @@ async function reviewContent(text) {
   const model = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
+  const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
     const baseUrl = (process.env.CLAUDE_BASE_URL || 'https://api.anthropic.com').replace(/\/$/, '');
