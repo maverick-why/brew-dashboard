@@ -507,8 +507,8 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
 <div class="confirm-mask" id="confirmMask">
   <div class="confirm-box">
     <div class="cb-title">确认冠名</div>
-    <div class="cb-sub">审核通过后将直接上线展示，无需等待人工审核</div>
-    <div class="cb-review-badge">✅ AI 审核通过 · 提交即上线</div>
+    <div class="cb-sub" id="cbSub">审核通过后将直接上线展示，无需等待人工审核</div>
+    <div class="cb-review-badge" id="cbReviewBadge">✅ AI 审核通过 · 提交即上线</div>
     <div class="cb-cost">
       <div class="cb-cost-row"><span class="cb-cost-label">冠名名称</span><span class="cb-cost-val" id="cbName">—</span></div>
       <div class="cb-cost-row"><span class="cb-cost-label">扣除积分</span><span class="cb-cost-val">5 积分</span></div>
@@ -739,6 +739,17 @@ document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
   if(!input.value.trim()||!reviewResult||reviewResult.result==="fail") return;
   // 积分/余额已在验证时获取，直接进入二次确认
   document.getElementById("cbName").textContent=input.value.trim();
+  // 根据审核结果更新确认弹窗提示
+  const isEdge = reviewResult.result === "edge";
+  document.getElementById("cbReviewBadge").textContent = isEdge
+    ? "⚠️ 需人工复核 · 提交后等待确认"
+    : "✅ AI 审核通过 · 提交即上线";
+  document.getElementById("cbReviewBadge").style.background = isEdge ? "#fff8f0" : "#f0fff4";
+  document.getElementById("cbReviewBadge").style.borderColor = isEdge ? "#e8b070" : "#a5d6a7";
+  document.getElementById("cbReviewBadge").style.color = isEdge ? "#a07040" : "#2e7d32";
+  document.getElementById("cbSub").textContent = isEdge
+    ? "提交后等待时光酿造所人工确认，通过后才会上线"
+    : "审核通过后将直接上线展示，无需等待人工审核";
   document.getElementById("confirmMask").classList.add("show");
 });
 
@@ -1023,6 +1034,9 @@ function setStatus(status){
   document.getElementById("statusActions").innerHTML=c.actions;
   document.getElementById("statusTip").innerHTML=c.tip;
   document.getElementById("icExpiry").textContent=c.expiry;
+  // 酒牌卡片仅在已通过/已上线时显示
+  const showCard = status === 'approved';
+  document.getElementById("tapPreviewCard").style.display = showCard ? "" : "none";
   document.querySelectorAll(".demo-btn").forEach((b,i)=>{
     b.classList.toggle("active",["pending","approved","rejected"][i]===status);
   });
