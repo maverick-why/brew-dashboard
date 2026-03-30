@@ -1137,8 +1137,8 @@
           <td>${s.sponsor_name}</td>
           <td>${new Date(s.created_at).toLocaleString('zh-CN')}</td>
           <td><div class="rowActions">
-            <button class="mini primary" onclick="reviewSponsor(${s.id},'approve')">通过</button>
-            <button class="mini danger" onclick="reviewSponsor(${s.id},'reject')">拒绝</button>
+            <button class="mini primary" onclick="reviewSponsor('${s.id}','approve')">通过</button>
+            <button class="mini danger" onclick="reviewSponsor('${s.id}','reject')">拒绝</button>
           </div></td>
         </tr>
       `).join('');
@@ -1181,7 +1181,7 @@
           <td>${s.status}</td>
           <td>${s.expire_at ? new Date(s.expire_at).toLocaleDateString('zh-CN') : '-'}</td>
           <td><div class="rowActions">
-            ${s.status === 'live' ? `<button class="mini danger" onclick="revokeSponsor(${s.id})">撤销</button>` : ''}
+            ${s.status === 'live' ? `<button class="mini danger" onclick="revokeSponsor('${s.id}')">撤销</button>` : ''}
           </div></td>
         </tr>
       `).join('');
