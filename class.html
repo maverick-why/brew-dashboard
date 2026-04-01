@@ -293,7 +293,8 @@ async function doVerify() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone }),
     });
-    const data = await res.json();
+    const json = await res.json();
+    const data = json.data;
 
     if (data.valid) {
       verifiedPhone = phone;
@@ -328,7 +329,8 @@ function hideVMsg() {
 async function loadCups() {
   try {
     const res = await fetch('/api/cup');
-    allCups = await res.json();
+    const json = await res.json();
+    allCups = json.data;
     renderGrid();
     updateStats();
   } catch (e) {
@@ -418,7 +420,8 @@ async function doClaim() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: verifiedPhone, cup_id: selectedCup.id, claimer_name: name }),
     });
-    const data = await res.json();
+    const json = await res.json();
+    const data = json.data;
 
     if (data.success) {
       document.getElementById('modalMask').classList.remove('show');
