@@ -30,7 +30,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 .screen{width:25%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
 /* ── Screen 0: Landing ── */
-#s0{background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 64px;gap:0;text-align:center;height:auto;min-height:100%}
+#s0{background:var(--ink)}
+.s0-inner{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 64px;text-align:center}
 .lp-badge{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(240,223,176,.55);text-transform:uppercase;margin-bottom:28px}
 .lp-cup{width:140px;height:auto;margin-bottom:32px;filter:drop-shadow(0 8px 24px rgba(200,151,42,.25))}
 .lp-title{font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,34px);font-weight:700;color:var(--cream);line-height:1.2;letter-spacing:.02em;margin-bottom:14px}
@@ -40,7 +41,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 .btn-cta{background:var(--gold-mid);color:var(--ink);font-family:'Noto Serif SC',serif;font-size:15px;font-weight:600;letter-spacing:4px;padding:16px 48px;border-radius:999px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s;width:100%;max-width:300px}
 .btn-cta:active{opacity:.8}
 .btn-cta .arrow{font-size:18px}
-.lp-footer{position:absolute;bottom:28px;left:0;right:0;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(240,223,176,.2);text-transform:uppercase}
+.lp-footer{margin-top:40px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(240,223,176,.2);text-transform:uppercase}
 
 /* ── Screen 1: Verify ── */
 #s1{background:var(--cream)}
@@ -85,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 .cup-cell.hidden{display:none}
 .cup-img{width:38px;height:auto}
 .cup-cell.claimed .cup-img{filter:none}
-.cup-cell.available .cup-img{filter:grayscale(1) opacity(.4)}
+.cup-cell.available .cup-img{filter:grayscale(1);opacity:.4}
 .cup-num{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.5px;color:var(--ink-mute)}
 .cup-name{font-size:9px;color:var(--gold-mid);letter-spacing:.3px;text-align:center;line-height:1.2;max-width:52px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .cup-cell.claimed .cup-num{color:var(--ink)}
@@ -135,6 +136,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 
 <!-- ── Screen 0: Landing ── -->
 <div class="screen" id="s0">
+<div class="s0-inner">
   <span class="lp-badge">限量 · 100 · Limited Edition</span>
   <img class="lp-cup" id="lpCup" alt="纪念杯"/>
   <h1 class="lp-title">认领一只<br><em>属于你的</em><br>纪念杯</h1>
@@ -145,6 +147,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
     <span class="arrow">→</span>
   </button>
   <div class="lp-footer">· 時光釀造所 · Timeless Brew ·</div>
+</div>
 </div>
 
 <!-- ── Screen 1: Verify ── -->
