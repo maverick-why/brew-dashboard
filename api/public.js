@@ -1,6 +1,6 @@
 // /api/public.js
 const Redis = require("ioredis");
-const { sanitizeState, safeStr } = require("./_schema");
+const { sanitizeState, safeStr } = require("./_lib/schema");
 
 const KEY = "brew_dash_records_v1";
 
