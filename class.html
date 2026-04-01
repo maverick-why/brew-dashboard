@@ -30,7 +30,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 .screen{width:25%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
 /* ── Screen 0: Landing ── */
-#s0{background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 64px;gap:0;text-align:center}
+#s0{background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 64px;gap:0;text-align:center;height:auto;min-height:100%}
 .lp-badge{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(240,223,176,.55);text-transform:uppercase;margin-bottom:28px}
 .lp-cup{width:140px;height:auto;margin-bottom:32px;filter:drop-shadow(0 8px 24px rgba(200,151,42,.25))}
 .lp-title{font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,34px);font-weight:700;color:var(--cream);line-height:1.2;letter-spacing:.02em;margin-bottom:14px}
@@ -305,7 +305,7 @@ async function doVerify() {
       showSuccess(data.cup.number, data.cup.claimer_name, phone);
       goScreen(3);
     } else {
-      showVMsg('error', '该手机号暂无会员资格，欢迎到店开通');
+      showVMsg('error', '该手机号暂无会员资格');
     }
   } catch (e) {
     showVMsg('error', '网络错误，请重试');
