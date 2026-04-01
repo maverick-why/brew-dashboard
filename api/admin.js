@@ -2,6 +2,22 @@ const { handleOptions, getQuery, readJsonBody } = require('./_lib/http');
 const { ok, error } = require('./_lib/response');
 const { getSupabase } = require('./_lib/supabase');
 const { verifyAdmin } = require('./_lib/admin-auth');
+const Redis = require('ioredis');
+
+const MENU_KEY = 'brew_dash_menu_v1';
+
+let redis;
+function getRedis() {
+  if (!redis) {
+    if (!process.env.REDIS_URL) return null;
+    redis = new Redis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: 1,
+      enableReadyCheck: false,
+      lazyConnect: true,
+    });
+  }
+  return redis;
+}
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
@@ -62,6 +78,38 @@ module.exports = async function handler(req, res) {
           throw dbError;
         }
         return ok(res, { status: 'live' });
+      }
+
+      if (op === 'remove') {
+        const { sponsorId } = body;
+        if (!sponsorId) return error(res, 400, '缺少 sponsorId');
+        const { data: record, error: fetchErr } = await supabase
+          .from('sponsor_records')
+          .select('id, tap_no')
+          .eq('id', sponsorId)
+          .maybeSingle();
+        if (fetchErr) throw fetchErr;
+        if (!record) return error(res, 404, '未找到冠名记录');
+        const { error: delErr } = await supabase
+          .from('sponsor_records')
+          .delete()
+          .eq('id', sponsorId);
+        if (delErr) throw delErr;
+        try {
+          const r = getRedis();
+          if (r) {
+            const val = await r.get(MENU_KEY);
+            if (val) {
+              const menuData = JSON.parse(val);
+              const key = String(record.tap_no);
+              if (menuData[key]?.sponsor_name) {
+                delete menuData[key].sponsor_name;
+                await r.set(MENU_KEY, JSON.stringify(menuData));
+              }
+            }
+          }
+        } catch { /* Redis failure is non-fatal */ }
+        return ok(res, { deleted: true, tap_no: record.tap_no });
       }
 
       return error(res, 400, '缺少 op 参数');
