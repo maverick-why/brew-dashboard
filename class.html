@@ -288,7 +288,7 @@ async function doVerify() {
   hideVMsg();
 
   try {
-    const res = await fetch('/api/verify-member', {
+    const res = await fetch('/api/cup/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone }),
@@ -327,7 +327,7 @@ function hideVMsg() {
 // ── Load cups ──
 async function loadCups() {
   try {
-    const res = await fetch('/api/cups');
+    const res = await fetch('/api/cup');
     allCups = await res.json();
     renderGrid();
     updateStats();
@@ -413,7 +413,7 @@ async function doClaim() {
   document.getElementById('modalErr').classList.remove('show');
 
   try {
-    const res = await fetch('/api/claim', {
+    const res = await fetch('/api/cup/claim', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: verifiedPhone, cup_id: selectedCup.id, claimer_name: name }),
