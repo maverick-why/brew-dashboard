@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/claimyourtap", "destination": "/claimyourtap.html" }
+    { "source": "/claimyourtap", "destination": "/claimyourtap.html" },
+    { "source": "/class", "destination": "/class.html" }
   ],
   "crons": [
     {
