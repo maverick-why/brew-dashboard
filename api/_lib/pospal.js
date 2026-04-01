@@ -25,7 +25,7 @@ class PospalClient {
     const sign = this._sign(bodyJson);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
     try {
       const res = await fetch(`${this.host}${path}`, {
