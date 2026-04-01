@@ -23,11 +23,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 
 /* ── screen system ── */
 .screens-wrap{position:fixed;inset:0;overflow:hidden}
-.screens{display:flex;flex-direction:row;width:400%;height:100%;transition:transform .42s cubic-bezier(.32,.72,0,1)}
-.screens.s1{transform:translateX(-25%)}
-.screens.s2{transform:translateX(-50%)}
-.screens.s3{transform:translateX(-75%)}
-.screen{width:25%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screens{display:flex;flex-direction:row;width:300%;height:100%;transition:transform .42s cubic-bezier(.32,.72,0,1)}
+.screens.s1{transform:translateX(-33.333%)}
+.screens.s2{transform:translateX(-66.666%)}
+.screen{width:33.333%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
 /* ── Screen 0: Landing ── */
 #s0{background:var(--ink)}
@@ -43,28 +42,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 .btn-cta .arrow{font-size:18px}
 .lp-footer{margin-top:40px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(240,223,176,.2);text-transform:uppercase}
 
-/* ── Screen 1: Verify ── */
+/* ── Screen 1: Grid ── */
 #s1{background:var(--cream)}
-.v-inner{padding:56px 28px 40px;max-width:480px;margin:0 auto}
-.v-back{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-mute);cursor:pointer;margin-bottom:36px;background:none;border:none;font-family:inherit;letter-spacing:.5px}
-.v-cup{width:64px;height:auto;margin-bottom:20px;opacity:.85}
-.v-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink);margin-bottom:6px}
-.v-sub{font-size:13px;color:var(--ink-mute);letter-spacing:.5px;margin-bottom:32px}
-.v-input-wrap{position:relative;margin-bottom:12px}
-.v-input{width:100%;padding:16px 18px;border:1.5px solid var(--cream-border);border-radius:14px;font-size:16px;font-family:'DM Mono',monospace;color:var(--ink);background:var(--cream-card);outline:none;transition:border-color .2s;letter-spacing:2px}
-.v-input:focus{border-color:var(--gold-mid)}
-.v-input::placeholder{color:rgba(28,22,16,.3);letter-spacing:1px;font-size:14px}
-.v-hint{font-size:12px;color:var(--ink-mute);letter-spacing:.5px;margin-bottom:24px}
-.btn-verify{width:100%;padding:15px;background:var(--ink);color:var(--cream);font-family:'Noto Serif SC',serif;font-size:15px;font-weight:600;letter-spacing:3px;border:none;border-radius:14px;cursor:pointer;transition:opacity .15s}
-.btn-verify:active{opacity:.8}
-.btn-verify:disabled{opacity:.45;cursor:not-allowed}
-.v-msg{margin-top:20px;padding:14px 16px;border-radius:12px;font-size:13px;letter-spacing:.5px;display:none}
-.v-msg.error{display:block;background:#fff3f3;color:#c0392b;border:1px solid #fcd0d0}
-.v-msg.info{display:block;background:var(--gold-bg);color:var(--ink);border:1px solid var(--gold-pale)}
-.v-msg strong{display:block;font-size:16px;margin-bottom:4px}
-
-/* ── Screen 2: Grid ── */
-#s2{background:var(--cream)}
 .grid-nav{background:var(--cream-card);border-bottom:1px solid var(--cream-border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
 .grid-nav-back{font-size:13px;color:var(--ink-mute);cursor:pointer;background:none;border:none;font-family:inherit;letter-spacing:.5px;display:flex;align-items:center;gap:4px}
 .grid-nav-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);letter-spacing:.5px}
@@ -112,8 +91,37 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 .modal-err{margin-top:12px;font-size:13px;color:#c0392b;text-align:center;display:none}
 .modal-err.show{display:block}
 
-/* ── Screen 3: Success ── */
-#s3{background:var(--cream)}
+/* ── Verify Sheet ── */
+.vs-top{padding:20px 24px 16px;border-bottom:1px solid var(--cream-border)}
+.vs-label{font-size:10px;color:var(--ink-mute);letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}
+.vs-title{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:2px;margin-bottom:3px}
+.vs-sub{font-size:12px;color:var(--ink-mute);letter-spacing:.3px}
+.vs-input-area{padding:16px 24px 0}
+.vs-input-label{font-size:11px;color:var(--ink-mute);letter-spacing:1.5px;margin-bottom:10px}
+.vs-phone-row{display:flex;align-items:center;background:#fff;border:1.5px solid var(--cream-border);border-radius:10px;padding:12px 14px;gap:8px;transition:border-color .2s}
+.vs-phone-row:focus-within{border-color:var(--gold-mid)}
+.vs-prefix{font-size:13px;color:var(--ink-mute);white-space:nowrap;flex-shrink:0;letter-spacing:.5px}
+.vs-sep{width:1px;height:16px;background:var(--cream-border);flex-shrink:0}
+.vs-input{flex:1;border:none;outline:none;background:transparent;font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:var(--gold-mid);letter-spacing:2px;caret-color:var(--gold-mid);min-width:0}
+.vs-input::placeholder{font-size:13px;color:rgba(28,22,16,.25);font-weight:400;letter-spacing:.5px}
+.vs-actions{padding:16px 24px 0;display:flex;flex-direction:column;gap:8px}
+.btn-vs-main{width:100%;height:50px;border-radius:12px;background:var(--ink);border:none;color:var(--cream);font-size:15px;font-weight:600;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif SC',serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center}
+.btn-vs-main:active{opacity:.8}
+.btn-vs-main:disabled{background:var(--cream-border);color:var(--ink-mute);cursor:not-allowed}
+.btn-vs-main.success{background:var(--gold-mid);color:var(--ink)}
+.btn-vs-ghost{width:100%;height:40px;border-radius:12px;background:transparent;border:none;color:var(--ink-mute);font-size:13px;cursor:pointer;font-family:'Noto Serif SC',serif;letter-spacing:.5px}
+.vs-success-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--cream-border)}
+.vs-success-icon{width:44px;height:44px;border-radius:10px;background:#2e7d32;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;color:#fff}
+.vs-success-info{flex:1;min-width:0}
+.vs-success-name{font-size:16px;font-weight:700;color:#2e7d32;letter-spacing:1px}
+.vs-success-phone{font-size:12px;color:var(--ink-mute);margin-top:2px;letter-spacing:.5px}
+.vm-nonmember-view{text-align:center;padding:24px 24px 0}
+.vm-nonmember-icon{font-size:42px;margin-bottom:12px}
+.vm-nonmember-title{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:2px;margin-bottom:8px}
+.vm-nonmember-body{font-size:13px;color:var(--ink-mute);line-height:1.8;letter-spacing:.3px}
+
+/* ── Screen 2: Success ── */
+#s2{background:var(--cream)}
 .suc-inner{padding:56px 28px 64px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center}
 .suc-cup{width:90px;height:auto;margin-bottom:24px}
 .suc-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--ink-mute);text-transform:uppercase;margin-bottom:14px}
@@ -142,7 +150,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
   <h1 class="lp-title">认领一只<br><em>属于你的</em><br>纪念杯</h1>
   <p class="lp-sub">开业限量版 · 会员专属 · LIMITED 100</p>
   <div class="lp-divider"></div>
-  <button class="btn-cta" onclick="goScreen(1)">
+  <button class="btn-cta" onclick="openVerifySheet()">
     <span>会员认领</span>
     <span class="arrow">→</span>
   </button>
@@ -150,26 +158,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
 </div>
 </div>
 
-<!-- ── Screen 1: Verify ── -->
+<!-- ── Screen 1: Grid ── -->
 <div class="screen" id="s1">
-  <div class="v-inner">
-    <button class="v-back" onclick="goScreen(0)">← 返回</button>
-    <img class="v-cup" id="vCup" alt="纪念杯"/>
-    <h2 class="v-title">验证会员身份</h2>
-    <p class="v-sub">每个会员手机号限认领一只</p>
-    <div class="v-input-wrap">
-      <input class="v-input" id="phoneInput" type="tel" inputmode="numeric" maxlength="11" placeholder="请输入手机号" autocomplete="off"/>
-    </div>
-    <p class="v-hint">· 仅限已注册会员参与 ·</p>
-    <button class="btn-verify" id="btnVerify" onclick="doVerify()">验证并选杯</button>
-    <div class="v-msg" id="vMsg"></div>
-  </div>
-</div>
-
-<!-- ── Screen 2: Grid ── -->
-<div class="screen" id="s2">
   <div class="grid-nav">
-    <button class="grid-nav-back" onclick="goScreen(1)">← 返回</button>
+    <button class="grid-nav-back" onclick="goScreen(0)">← 返回</button>
     <span class="grid-nav-title">选择你的杯</span>
     <div class="grid-nav-ph"></div>
   </div>
@@ -191,8 +183,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
   <div class="cup-grid" id="cupGrid"></div>
 </div>
 
-<!-- ── Screen 3: Success ── -->
-<div class="screen" id="s3">
+<!-- ── Screen 2: Success ── -->
+<div class="screen" id="s2">
   <div class="suc-inner">
     <img class="suc-cup" id="sucCup" alt="纪念杯"/>
     <p class="suc-tag">认领成功</p>
@@ -216,12 +208,70 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Noto Serif SC',ser
     <div class="suc-notice">
       开业当日到店出示此页面，即可领取您的专属纪念杯
     </div>
-    <button class="btn-back-grid" onclick="goScreen(2)">查看全部认领情况</button>
+    <button class="btn-back-grid" onclick="goScreen(1)">查看全部认领情况</button>
   </div>
 </div>
 
 </div><!-- /screens -->
 </div><!-- /screens-wrap -->
+
+<!-- ── Verify Sheet ── -->
+<div class="modal-mask" id="verifyMask">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <!-- State 1: Input -->
+    <div id="vstateInput">
+      <div class="vs-top">
+        <div class="vs-label">MEMBER VERIFICATION · 会员验证</div>
+        <div class="vs-title">验证会员身份</div>
+        <div class="vs-sub">本活动仅限时光酿造所会员参与</div>
+      </div>
+      <div class="vs-input-area">
+        <div class="vs-input-label">手机号</div>
+        <div class="vs-phone-row">
+          <span class="vs-prefix">+86</span>
+          <div class="vs-sep"></div>
+          <input class="vs-input" id="phoneInput" type="tel" maxlength="11" placeholder="请输入注册手机号" autocomplete="tel" inputmode="numeric"/>
+        </div>
+      </div>
+      <div class="vs-actions">
+        <button class="btn-vs-main" id="btnVerify" disabled>请输入手机号</button>
+        <button class="btn-vs-ghost" onclick="closeVerifySheet()">取消</button>
+      </div>
+    </div>
+
+    <!-- State 2: Verified -->
+    <div id="vstateSuccess" style="display:none">
+      <div class="vs-top">
+        <div class="vs-label">MEMBER VERIFIED · 验证通过</div>
+        <div class="vs-success-card">
+          <div class="vs-success-icon">✓</div>
+          <div class="vs-success-info">
+            <div class="vs-success-name">会员验证通过</div>
+            <div class="vs-success-phone" id="vsPhoneDisplay">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="vs-actions">
+        <button class="btn-vs-main success" onclick="onVerifySuccess()">选择你的纪念杯 →</button>
+      </div>
+    </div>
+
+    <!-- State 3: Not member -->
+    <div id="vstateNonMember" style="display:none">
+      <div class="vm-nonmember-view">
+        <div class="vm-nonmember-icon">🍺</div>
+        <div class="vm-nonmember-title">仅限会员参与</div>
+        <div class="vm-nonmember-body">未找到该手机号的会员记录。<br>请先在小程序完成注册后即可参与。</div>
+      </div>
+      <div class="vs-actions" style="margin-top:24px">
+        <button class="btn-vs-ghost" onclick="switchVState('vstateInput')">重新输入手机号</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- ── Modal ── -->
 <div class="modal-mask" id="modalMask" onclick="closeModal(event)">
@@ -253,13 +303,38 @@ let selectedCup = null;
 let currentFilter = 'all';
 
 // ── Init ──
-document.querySelectorAll('#lpCup,#vCup,#modalCupImg,#sucCup').forEach(el => el.src = CUP_IMG);
+document.querySelectorAll('#lpCup,#modalCupImg,#sucCup').forEach(el => el.src = CUP_IMG);
 
 // ── Navigation ──
 function goScreen(n) {
   const sc = document.getElementById('screens');
   sc.className = 'screens' + (n > 0 ? ' s' + n : '');
-  if (n === 2) loadCups();
+  if (n === 1) loadCups();
+}
+
+// ── Verify Sheet ──
+function openVerifySheet() {
+  switchVState('vstateInput');
+  document.getElementById('phoneInput').value = '';
+  document.getElementById('btnVerify').disabled = true;
+  document.getElementById('btnVerify').textContent = '请输入手机号';
+  document.getElementById('verifyMask').classList.add('show');
+  setTimeout(() => document.getElementById('phoneInput').focus(), 300);
+}
+
+function closeVerifySheet() {
+  document.getElementById('verifyMask').classList.remove('show');
+}
+
+function switchVState(state) {
+  ['vstateInput','vstateSuccess','vstateNonMember'].forEach(id => {
+    document.getElementById(id).style.display = id === state ? '' : 'none';
+  });
+}
+
+function onVerifySuccess() {
+  closeVerifySheet();
+  goScreen(1);
 }
 
 // ── Phone input ──
@@ -270,25 +345,21 @@ phoneInput.addEventListener('input', () => {
   const val = phoneInput.value.replace(/\D/g, '').slice(0, 11);
   phoneInput.value = val;
   btnVerify.disabled = val.length !== 11;
-  document.getElementById('vMsg').style.display = 'none';
+  btnVerify.textContent = val.length === 11 ? '验证会员身份' : '请输入手机号';
 });
 
 phoneInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !btnVerify.disabled) doVerify();
 });
 
-btnVerify.disabled = true;
+btnVerify.addEventListener('click', doVerify);
 
 // ── Verify ──
 async function doVerify() {
   const phone = phoneInput.value.trim();
-  if (!/^1[3-9]\d{9}$/.test(phone)) {
-    showVMsg('error', '请输入正确的手机号');
-    return;
-  }
+  if (!/^1[3-9]\d{9}$/.test(phone)) return;
   btnVerify.disabled = true;
   btnVerify.textContent = '验证中…';
-  hideVMsg();
 
   try {
     const res = await fetch('/api/cup/verify', {
@@ -302,30 +373,21 @@ async function doVerify() {
     if (data.valid) {
       verifiedPhone = phone;
       sessionStorage.setItem('cup_phone', phone);
-      goScreen(2);
+      document.getElementById('vsPhoneDisplay').textContent = phone.slice(0,3)+'****'+phone.slice(7);
+      switchVState('vstateSuccess');
     } else if (data.reason === 'already_claimed') {
       verifiedPhone = phone;
       myClaimedCup = data.cup;
       showSuccess(data.cup.number, data.cup.claimer_name, phone);
-      goScreen(3);
+      closeVerifySheet();
+      goScreen(2);
     } else {
-      showVMsg('error', '该手机号暂无会员资格');
+      switchVState('vstateNonMember');
     }
   } catch (e) {
-    showVMsg('error', '网络错误，请重试');
-  } finally {
     btnVerify.disabled = false;
-    btnVerify.textContent = '验证并选杯';
+    btnVerify.textContent = '验证会员身份';
   }
-}
-
-function showVMsg(type, html) {
-  const el = document.getElementById('vMsg');
-  el.className = 'v-msg ' + type;
-  el.innerHTML = html;
-}
-function hideVMsg() {
-  document.getElementById('vMsg').style.display = 'none';
 }
 
 // ── Load cups ──
@@ -438,7 +500,7 @@ async function doClaim() {
       renderGrid();
       updateStats();
       showSuccess(data.cup.number, name, verifiedPhone);
-      goScreen(3);
+      goScreen(2);
     } else {
       let msg = '认领失败，请重试';
       if (data.reason === 'cup_taken') msg = '这只杯子刚刚被人抢走了，请选择其他编号';
