@@ -3,7 +3,9 @@
     { "source": "/claimyourtap", "destination": "/claimyourtap.html" },
     { "source": "/class", "destination": "/class.html" },
     { "source": "/api/cup/verify", "destination": "/api/cup" },
-    { "source": "/api/cup/claim", "destination": "/api/cup" }
+    { "source": "/api/cup/claim", "destination": "/api/cup" },
+    { "source": "/api/cup/admin", "destination": "/api/cup" },
+    { "source": "/api/cup/sync-members", "destination": "/api/cup" }
   ],
   "crons": [
     {

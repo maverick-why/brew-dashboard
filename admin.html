@@ -368,6 +368,7 @@
       <button class="tab-btn" data-tab="menu">酒单管理</button>
       <button class="tab-btn" data-tab="sponsor-review">冠名审核</button>
       <button class="tab-btn" data-tab="sponsor-manage">冠名管理</button>
+      <button class="tab-btn" data-tab="cups">开业酒杯</button>
     </div>
 
     <!-- Tab: 发酵罐 -->
@@ -524,7 +525,43 @@
       </div>
     </div>
   </div>
+
+    <!-- Tab: 开业酒杯 -->
+    <div class="tab-pane" id="tab-cups">
+      <div class="toolbar">
+        <div class="btns">
+          <h3 style="margin:0;font-size:14px;font-weight:900">开业酒杯</h3>
+          <button onclick="loadCupAdmin()">刷新数据</button>
+          <button onclick="syncCupMembers()">同步会员白名单</button>
+          <button onclick="exportCupsCsv()">导出认领名单 CSV</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:32px;padding:12px 16px;border-bottom:1px solid var(--line)">
+        <div><span id="cups-stat-claimed" style="font-size:28px;font-weight:700;color:#4caf50">0</span> <span style="font-size:12px;color:var(--text-dim)">已认领</span></div>
+        <div><span id="cups-stat-avail"   style="font-size:28px;font-weight:700;color:var(--text-dim)">100</span> <span style="font-size:12px;color:var(--text-dim)">待认领</span></div>
+        <div><span style="font-size:28px;font-weight:700;color:var(--text-dim)">100</span> <span style="font-size:12px;color:var(--text-dim)">总数</span></div>
+      </div>
+      <div class="tableWrap">
+        <table id="cups-table">
+          <thead><tr><th>编号</th><th>状态</th><th>认领人</th><th>手机号</th><th>认领时间</th><th>操作</th></tr></thead>
+          <tbody id="cups-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </main>
+
+<!-- 修改认领人弹窗 -->
+<div id="cup-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center">
+  <div style="background:#1a1f2e;border:1px solid var(--line);border-radius:12px;padding:28px 24px;width:320px;max-width:90vw">
+    <div style="font-size:15px;font-weight:700;margin-bottom:16px">修改认领人 — <span id="cup-edit-num"></span></div>
+    <input id="cup-edit-name" type="text" maxlength="12" placeholder="认领人姓名（最多12字）" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0f1726;color:var(--text);font-size:14px;margin-bottom:16px"/>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeCupEditModal()">取消</button>
+      <button class="primary" onclick="confirmCupEdit()">确认</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1218,6 +1255,152 @@
     toast(json.code === 0 ? '已撤销' : `操作失败：${json.message}`, json.code === 0);
     if (json.code === 0) loadAllSponsors();
   }
+
+  // ====== 开业酒杯 ============================================================
+
+  let cupsData = [];
+  let cupEditId = null;
+
+  async function loadCupAdmin() {
+    if (!ADMIN_PASS) { toast("未登录", false); return; }
+    try {
+      const res = await fetch('/api/cup', { headers: { 'x-admin-pass': ADMIN_PASS } });
+      const json = await res.json();
+      if (json.code !== 0) { toast('加载失败', false); return; }
+      cupsData = json.data;
+      renderCupsTable();
+    } catch (e) {
+      toast('加载失败：' + e.message, false);
+    }
+  }
+
+  function maskPhone(p) {
+    if (!p) return '—';
+    return p.slice(0, 3) + '****' + p.slice(7);
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function renderCupsTable() {
+    const claimed = cupsData.filter(c => c.claimed).length;
+    document.getElementById('cups-stat-claimed').textContent = claimed;
+    document.getElementById('cups-stat-avail').textContent = 100 - claimed;
+
+    const tbody = document.getElementById('cups-tbody');
+    tbody.innerHTML = cupsData.map(c => `
+      <tr>
+        <td>${c.number}</td>
+        <td>${c.claimed ? '<span style="color:#4caf50">已认领</span>' : '<span style="color:var(--text-dim)">待认领</span>'}</td>
+        <td>${c.claimer_name || '—'}</td>
+        <td>${maskPhone(c.claimer_phone)}</td>
+        <td>${fmtDate(c.claimed_at)}</td>
+        <td>${c.claimed
+          ? `<button onclick="openCupEditModal(${c.id},'${c.number}','${(c.claimer_name||'').replace(/'/g,"\\'")}')">修改</button>
+             <button onclick="cancelCupClaim(${c.id},'${c.number}')" style="color:#e57373">取消认领</button>`
+          : '—'}</td>
+      </tr>`).join('');
+  }
+
+  function openCupEditModal(id, number, currentName) {
+    cupEditId = id;
+    document.getElementById('cup-edit-num').textContent = number;
+    document.getElementById('cup-edit-name').value = currentName;
+    document.getElementById('cup-edit-modal').style.display = 'flex';
+  }
+
+  function closeCupEditModal() {
+    document.getElementById('cup-edit-modal').style.display = 'none';
+    cupEditId = null;
+  }
+
+  async function confirmCupEdit() {
+    const name = document.getElementById('cup-edit-name').value.trim();
+    if (!name) { toast('请填写姓名', false); return; }
+    if (!ADMIN_PASS) { toast('未登录', false); return; }
+    try {
+      const res = await fetch('/api/cup/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify({ op: 'update', cup_id: cupEditId, claimer_name: name }),
+      });
+      const json = await res.json();
+      if (json.code === 0) {
+        toast('已修改');
+        closeCupEditModal();
+        loadCupAdmin();
+      } else {
+        toast('修改失败：' + json.message, false);
+      }
+    } catch (e) {
+      toast('修改失败：' + e.message, false);
+    }
+  }
+
+  async function cancelCupClaim(id, number) {
+    if (!confirm(`确认取消 ${number} 号杯的认领？操作不可逆。`)) return;
+    if (!ADMIN_PASS) { toast('未登录', false); return; }
+    try {
+      const res = await fetch('/api/cup/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify({ op: 'cancel', cup_id: id }),
+      });
+      const json = await res.json();
+      if (json.code === 0) { toast('已取消认领'); loadCupAdmin(); }
+      else toast('操作失败：' + json.message, false);
+    } catch (e) {
+      toast('操作失败：' + e.message, false);
+    }
+  }
+
+  async function syncCupMembers() {
+    if (!ADMIN_PASS) { toast('未登录', false); return; }
+    toast('同步中，请稍候…');
+    try {
+      const res = await fetch('/api/cup/sync-members', {
+        method: 'POST',
+        headers: { 'x-admin-pass': ADMIN_PASS },
+      });
+      const json = await res.json();
+      if (json.code === 0) {
+        toast(`同步了 ${json.data.count} 条会员，耗时 ${json.data.elapsed}`);
+      } else {
+        toast('同步失败：' + json.message, false);
+      }
+    } catch (e) {
+      toast('同步失败：' + e.message, false);
+    }
+  }
+
+  function exportCupsCsv() {
+    const claimed = cupsData.filter(c => c.claimed);
+    if (!claimed.length) { toast('暂无认领数据', false); return; }
+    const rows = [['编号', '认领人', '手机号', '认领时间']];
+    claimed.forEach(c => rows.push([
+      c.number,
+      c.claimer_name || '',
+      maskPhone(c.claimer_phone),
+      fmtDate(c.claimed_at),
+    ]));
+    const csv = '\uFEFF' + rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+    a.href = url; a.download = `cup-claims-${date}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Auto-load cups when switching to cups tab
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.tab === 'cups') loadCupAdmin();
+    });
+  });
 
   // ====== login on entry
   document.getElementById("loginBtn").addEventListener("click", doLogin);
