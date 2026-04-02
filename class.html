@@ -242,8 +242,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Hira
 .suc-row:last-child{border-bottom:none;padding-bottom:0}
 .suc-row-label{font-size:12px;color:var(--ink-mute);letter-spacing:.5px;white-space:nowrap;flex-shrink:0}
 .suc-row-val{font-size:13px;color:var(--ink);font-weight:600;letter-spacing:.5px;text-align:right}
+.suc-screenshot-tip{width:100%;margin-bottom:14px;padding:12px 16px;background:#fffbe6;border:1.5px solid #f0c040;border-radius:12px;font-size:13px;color:#7a5e1a;letter-spacing:.5px;line-height:1.6;text-align:center}
 .suc-notice{font-size:13px;color:var(--ink-mute);letter-spacing:.5px;line-height:1.7;margin-bottom:32px;padding:16px;background:var(--gold-bg);border-radius:12px;border:1px solid var(--gold-pale)}
-.btn-back-grid{width:100%;padding:14px;background:transparent;color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:14px;letter-spacing:2px;border:1.5px solid var(--cream-border);border-radius:14px;cursor:pointer}
+.btn-back-grid{width:100%;padding:14px;background:transparent;color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:14px;letter-spacing:2px;border:1.5px solid var(--cream-border);border-radius:14px;cursor:pointer;margin-bottom:12px}
+.btn-invite{width:100%;padding:14px;background:var(--gold-mid);color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;border:none;border-radius:14px;cursor:pointer}
+.btn-invite:active{opacity:.8}
 
 /* ══ Sheets & Modals ══ */
 .modal-mask{position:fixed;inset:0;background:rgba(28,22,16,.55);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -337,7 +340,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Hira
 <!-- ══════════════════════════════ Screen 1 · Grid ══════════════════════════════ -->
 <div class="screen" id="s1">
   <div class="grid-nav">
-    <button class="grid-nav-back" onclick="goScreen(0)">← 返回</button>
+    <button class="grid-nav-back" onclick="goScreen(prevScreen)">← 返回</button>
     <span class="grid-nav-title">选择你的杯</span>
     <div class="grid-nav-ph"></div>
   </div>
@@ -381,8 +384,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Hira
         <span class="suc-row-val" id="sucPhone">—</span>
       </div>
     </div>
+    <div class="suc-screenshot-tip">📸 请截图保存此页面，开业当日凭截图到店领杯</div>
     <div class="suc-notice">开业当日到店出示此页面，即可领取您的专属纪念杯</div>
     <button class="btn-back-grid" onclick="goScreen(1)">查看全部认领情况</button>
+    <button class="btn-invite" onclick="inviteFriend()">邀请朋友一起认领 →</button>
   </div>
 </div>
 
@@ -470,11 +475,27 @@ let allCups = [];
 let myClaimedCup = null;
 let selectedCup = null;
 let currentFilter = 'all';
+let currentScreen = 0;
+let prevScreen = 0;
 
 function goScreen(n){
+  prevScreen = currentScreen;
+  currentScreen = n;
   const sc = document.getElementById('screens');
   sc.className = 'screens' + (n > 0 ? ' s' + n : '');
   if(n === 1) loadCups();
+}
+
+function inviteFriend(){
+  if(navigator.share){
+    navigator.share({
+      title: '时光酿造所开业纪念杯',
+      text: '开业限量100只纪念杯，会员专属认领，先到先得！',
+      url: window.location.origin + '/class'
+    });
+  } else {
+    alert('请点击右上角「…」，选择「发送给朋友」或「分享到朋友圈」');
+  }
 }
 
 function openVerifySheet(){
