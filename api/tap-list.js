@@ -22,10 +22,15 @@ module.exports = async function handler(req, res) {
 
   try {
     const supabase = getSupabase();
-    const { data: active, error: dbError } = await supabase
-      .from('sponsor_records')
-      .select('tap_no, sponsor_name, expire_at')
-      .in('status', ['live', 'pending']);
+    const [{ data: active, error: dbError }, { data: settings }] = await Promise.all([
+      supabase
+        .from('sponsor_records')
+        .select('tap_no, sponsor_name, expire_at')
+        .in('status', ['live', 'pending']),
+      supabase
+        .from('tap_settings')
+        .select('tap_no, active'),
+    ]);
 
     if (dbError) throw dbError;
 
@@ -33,6 +38,8 @@ module.exports = async function handler(req, res) {
     for (const s of active || []) {
       sponsorMap[s.tap_no] = s;
     }
+
+    const activeSet = new Set((settings || []).filter(r => r.active).map(r => r.tap_no));
 
     // non-fatal: merge Redis menu data (prices, ABV, IBU)
     let menuData = {};
@@ -53,6 +60,7 @@ module.exports = async function handler(req, res) {
         name_en: tap.name_en,
         style: tap.style,
         style_en: tap.style_en,
+        active: activeSet.has(tap.no),
       };
       for (const f of MENU_EXTRA) {
         if (menu[f] !== undefined && menu[f] !== '') base[f] = menu[f];

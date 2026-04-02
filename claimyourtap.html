@@ -543,7 +543,7 @@ async function loadTaps() {
 }
 
 function renderTaps(taps) {
-  TAPS = taps;
+  TAPS = taps.filter(t => t.active);
   const takenN = TAPS.filter(t => t.sponsor).length;
   document.getElementById("takenCount").textContent = takenN;
   document.getElementById("vacantCount").textContent = TAPS.length - takenN;

@@ -523,10 +523,13 @@
           <button onclick="addSponsorManually()">添加</button>
         </div>
       </div>
+      <!-- Tap active/inactive toggles -->
+      <div style="padding:12px 16px;border-top:1px solid var(--line)">
+        <h4 style="margin:0 0 10px;font-size:13px;font-weight:900">开放冠名的酒头</h4>
+        <div id="tap-toggle-grid" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
     </div>
   </div>
-
-    <!-- Tab: 开业酒杯 -->
     <div class="tab-pane" id="tab-cups">
       <div class="toolbar">
         <div class="btns">
@@ -1242,6 +1245,43 @@
       `).join('');
   }
 
+  // Tap toggle helpers
+  let tapSettingsCache = {};
+
+  async function loadTapToggles() {
+    const res = await fetch('/api/tap-list');
+    const json = await res.json();
+    if (json.code !== 0) return;
+    const grid = document.getElementById('tap-toggle-grid');
+    if (!grid) return;
+    tapSettingsCache = {};
+    json.data.forEach(t => { tapSettingsCache[t.no] = t.active; });
+    grid.innerHTML = json.data.map(t => `
+      <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:${t.active ? 'rgba(74,222,128,.10)' : 'rgba(255,255,255,.03)'};" id="tap-toggle-cell-${t.no}">
+        <input type="checkbox" ${t.active ? 'checked' : ''} onchange="toggleTap(${t.no}, this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#4ade80">
+        <span style="font-size:13px;font-weight:800">${String(t.no).padStart(2,'0')}</span>
+      </label>
+    `).join('');
+  }
+
+  async function toggleTap(tapNo, active) {
+    const cell = document.getElementById(`tap-toggle-cell-${tapNo}`);
+    const res = await fetch('/api/admin?op=tap-toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+      body: JSON.stringify({ tapNo, active }),
+    });
+    const json = await res.json();
+    if (json.code === 0) {
+      if (cell) cell.style.background = active ? 'rgba(74,222,128,.10)' : 'rgba(255,255,255,.03)';
+      toast(`${String(tapNo).padStart(2,'0')}号酒头已${active ? '开放' : '关闭'}冠名`, true);
+    } else {
+      toast(`操作失败：${json.message}`, false);
+      // revert checkbox
+      if (cell) cell.querySelector('input').checked = !active;
+    }
+  }
+
   async function addSponsorManually() {
     const tapNo = parseInt(document.getElementById('add-tap-no').value, 10);
     const sponsorName = document.getElementById('add-sponsor-name').value.trim();
@@ -1417,6 +1457,7 @@
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       if (btn.dataset.tab === 'cups') loadCupAdmin();
+      if (btn.dataset.tab === 'sponsor-manage') { loadAllSponsors(); loadTapToggles(); }
     });
   });
 

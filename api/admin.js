@@ -112,6 +112,17 @@ module.exports = async function handler(req, res) {
         return ok(res, { deleted: true, tap_no: record.tap_no });
       }
 
+      if (op === 'tap-toggle') {
+        const { tapNo, active } = body;
+        if (!tapNo || typeof active !== 'boolean') return error(res, 400, '缺少 tapNo 或 active');
+        const { error: dbError } = await supabase
+          .from('tap_settings')
+          .update({ active })
+          .eq('tap_no', tapNo);
+        if (dbError) throw dbError;
+        return ok(res, { tapNo, active });
+      }
+
       return error(res, 400, '缺少 op 参数');
     }
 
