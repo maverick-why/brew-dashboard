@@ -2,22 +2,12 @@ const { handleOptions, readJsonBody } = require('./_lib/http');
 const { ok, error } = require('./_lib/response');
 const { getSupabase } = require('./_lib/supabase');
 const { PospalClient } = require('./_lib/pospal');
+const { lookupCache, writeCache } = require('./_lib/member-cache');
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function verifyAdminPass(req) {
   return req.headers['x-admin-pass'] === process.env.ADMIN_PASSWORD;
-}
-
-async function isCachedMember(supabase, phone) {
-  const { data } = await supabase
-    .from('cup_members').select('phone').eq('phone', phone).maybeSingle();
-  return !!data;
-}
-
-async function cacheMember(supabase, phone) {
-  await supabase.from('cup_members')
-    .upsert({ phone, synced_at: new Date().toISOString() }, { onConflict: 'phone' });
 }
 
 // ── handler ───────────────────────────────────────────────────────────────────
@@ -72,7 +62,8 @@ module.exports = async function handler(req, res) {
         cup: { number: cup.number, claimer_name: cup.claimer_name } });
 
       // Cache hit → skip Pospal
-      if (await isCachedMember(supabase, phone))
+      const cached = await lookupCache(supabase, phone);
+      if (cached.found)
         return ok(res, { valid: true });
 
       // Cache miss → call Pospal
@@ -81,7 +72,7 @@ module.exports = async function handler(req, res) {
       if (!customer?.customerUid)
         return ok(res, { valid: false, reason: 'not_member' });
 
-      await cacheMember(supabase, phone);
+      await writeCache(supabase, phone, customer.customerUid);
       return ok(res, { valid: true });
     } catch (err) {
       return error(res, 500, err.message);
@@ -104,12 +95,13 @@ module.exports = async function handler(req, res) {
       if (existing) return ok(res, { success: false, reason: 'already_claimed' });
 
       // Cache hit → skip Pospal
-      if (!(await isCachedMember(supabase, phone))) {
+      const cached2 = await lookupCache(supabase, phone);
+      if (!cached2.found) {
         const pospal = new PospalClient();
         const customer = await pospal.getMemberByPhone(phone);
         if (!customer?.customerUid)
           return ok(res, { success: false, reason: 'not_member' });
-        await cacheMember(supabase, phone);
+        await writeCache(supabase, phone, customer.customerUid);
       }
 
       const { data: updated, error: updateError } = await supabase
@@ -202,10 +194,13 @@ module.exports = async function handler(req, res) {
         );
         const records = Array.isArray(result?.result) ? result.result
                        : Array.isArray(result)         ? result : [];
-        const phones = records
-          .map(r => String(r.phone || r.customerTel || '').replace(/\D/g, ''))
-          .filter(p => /^1[3-9]\d{9}$/.test(p));
-        allPhones = allPhones.concat(phones);
+        const entries = records
+          .map(r => ({
+            phone: String(r.phone || r.customerTel || '').replace(/\D/g, ''),
+            uid:   String(r.customerUid || ''),
+          }))
+          .filter(e => /^1[3-9]\d{9}$/.test(e.phone));
+        allPhones = allPhones.concat(entries);
         hasMore = records.length >= pageSize;
         page++;
       }
@@ -214,7 +209,11 @@ module.exports = async function handler(req, res) {
       const chunkSize = 200;
       const now = new Date().toISOString();
       for (let i = 0; i < allPhones.length; i += chunkSize) {
-        const chunk = allPhones.slice(i, i + chunkSize).map(phone => ({ phone, synced_at: now }));
+        const chunk = allPhones.slice(i, i + chunkSize).map(e => ({
+          phone: e.phone,
+          customer_uid: e.uid || null,
+          synced_at: now,
+        }));
         const { error: upsertError } = await supabase
           .from('cup_members').upsert(chunk, { onConflict: 'phone' });
         if (upsertError) throw upsertError;

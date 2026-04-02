@@ -4,6 +4,7 @@ const { ok, error } = require('./_lib/response');
 const { getSupabase } = require('./_lib/supabase');
 const { PospalClient } = require('./_lib/pospal');
 const { verifyReviewToken } = require('./_lib/claude');
+const { lookupCache, writeCache } = require('./_lib/member-cache');
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
@@ -50,15 +51,22 @@ module.exports = async function handler(req, res) {
     if (!tokenCheck.valid) return error(res, 400, '审核 token 无效或已过期，请重新审核');
     const reviewResult = tokenCheck.reviewResult;
 
-    // 后端重新查 customerUid，防止客户端伪造
-    const pospal = new PospalClient();
-    const customerInfo = await pospal.getMemberByPhone(phone);
-    const customerUid = customerInfo?.customerUid;
-    if (!customerUid) {
-      return error(res, 404, '未找到银豹会员记录，请先注册');
-    }
-
+    // 后端查 customerUid：优先走缓存，缓存无 UID 时才调银豹
     const supabase = getSupabase();
+    const cached = await lookupCache(supabase, phone);
+    let customerUid = cached.found ? cached.customerUid : null;
+
+    if (!customerUid) {
+      // Cache miss 或缓存中 UID 为空 → 调银豹
+      const pospal = new PospalClient();
+      const customerInfo = await pospal.getMemberByPhone(phone);
+      customerUid = customerInfo?.customerUid;
+      if (!customerUid) {
+        return error(res, 404, '未找到银豹会员记录，请先注册');
+      }
+      // 写入缓存（含 UID）
+      await writeCache(supabase, phone, customerUid);
+    }
     const expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     const openId = `h5:${phone}`;
 
