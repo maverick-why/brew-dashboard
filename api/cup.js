@@ -6,7 +6,7 @@ const { PospalClient } = require('./_lib/pospal');
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function verifyAdminPass(req) {
-  return req.headers['x-admin-pass'] === process.env.ADMIN_PASS;
+  return req.headers['x-admin-pass'] === process.env.ADMIN_PASSWORD;
 }
 
 async function isCachedMember(supabase, phone) {
