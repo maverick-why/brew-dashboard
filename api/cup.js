@@ -131,7 +131,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'POST' && action === 'admin') {
     if (!verifyAdminPass(req)) return error(res, 401, 'Unauthorized');
     try {
-      const { op, cup_id, claimer_name } = await readJsonBody(req);
+      const { op, cup_id, claimer_name, claimer_phone } = await readJsonBody(req);
       const supabase = getSupabase();
 
       if (op === 'update') {
@@ -148,6 +148,29 @@ module.exports = async function handler(req, res) {
         const { error: dbError } = await supabase
           .from('cups')
           .update({ claimer_name: null, claimer_phone: null, claimed_at: null })
+          .eq('id', cup_id);
+        if (dbError) throw dbError;
+        return ok(res, { success: true });
+      }
+
+      if (op === 'add') {
+        if (!cup_id || !claimer_name) return error(res, 400, '缺少 cup_id 或 claimer_name');
+        if ([...claimer_name.trim()].length > 12) return error(res, 400, '姓名最多12个字符');
+        const phone = typeof claimer_phone === 'string' ? claimer_phone.trim() : '';
+        if (phone && !/^1[3-9]\d{9}$/.test(phone)) return error(res, 400, '手机号格式不正确');
+
+        // Ensure cup is not already claimed
+        const { data: existing } = await supabase
+          .from('cups').select('claimer_phone').eq('id', cup_id).maybeSingle();
+        if (existing?.claimer_phone) return error(res, 409, '该杯子已被认领');
+
+        const { error: dbError } = await supabase
+          .from('cups')
+          .update({
+            claimer_name: claimer_name.trim(),
+            claimer_phone: phone || null,
+            claimed_at: new Date().toISOString(),
+          })
           .eq('id', cup_id);
         if (dbError) throw dbError;
         return ok(res, { success: true });

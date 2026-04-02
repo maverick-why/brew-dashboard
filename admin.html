@@ -532,6 +532,7 @@
         <div class="btns">
           <h3 style="margin:0;font-size:14px;font-weight:900">开业酒杯</h3>
           <button onclick="loadCupAdmin()">刷新数据</button>
+          <button onclick="openCupAddModal()">手动添加认领</button>
           <button onclick="syncCupMembers()">同步会员白名单</button>
           <button onclick="exportCupsCsv()">导出认领名单 CSV</button>
         </div>
@@ -559,6 +560,23 @@
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button onclick="closeCupEditModal()">取消</button>
       <button class="primary" onclick="confirmCupEdit()">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 手动添加认领弹窗 -->
+<div id="cup-add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center">
+  <div style="background:#1a1f2e;border:1px solid var(--line);border-radius:12px;padding:28px 24px;width:340px;max-width:90vw">
+    <div style="font-size:15px;font-weight:700;margin-bottom:16px">手动添加认领</div>
+    <label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:6px">杯子编号</label>
+    <select id="cup-add-id" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0f1726;color:var(--text);font-size:14px;margin-bottom:14px"></select>
+    <label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:6px">认领人姓名（必填，最多12字）</label>
+    <input id="cup-add-name" type="text" maxlength="12" placeholder="姓名或昵称" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0f1726;color:var(--text);font-size:14px;margin-bottom:14px"/>
+    <label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:6px">手机号（选填）</label>
+    <input id="cup-add-phone" type="tel" maxlength="11" placeholder="11位手机号" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0f1726;color:var(--text);font-size:14px;margin-bottom:20px"/>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeCupAddModal()">取消</button>
+      <button class="primary" onclick="confirmCupAdd()">确认添加</button>
     </div>
   </div>
 </div>
@@ -1401,6 +1419,46 @@
       if (btn.dataset.tab === 'cups') loadCupAdmin();
     });
   });
+
+  function openCupAddModal() {
+    // Populate select with unclaimed cups
+    const select = document.getElementById('cup-add-id');
+    const unclaimed = cupsData.filter(c => !c.claimed);
+    if (!unclaimed.length) { toast('所有杯子都已认领', false); return; }
+    select.innerHTML = unclaimed.map(c => `<option value="${c.id}">${c.number}</option>`).join('');
+    document.getElementById('cup-add-name').value = '';
+    document.getElementById('cup-add-phone').value = '';
+    document.getElementById('cup-add-modal').style.display = 'flex';
+  }
+
+  function closeCupAddModal() {
+    document.getElementById('cup-add-modal').style.display = 'none';
+  }
+
+  async function confirmCupAdd() {
+    const cup_id = Number(document.getElementById('cup-add-id').value);
+    const claimer_name = document.getElementById('cup-add-name').value.trim();
+    const claimer_phone = document.getElementById('cup-add-phone').value.trim();
+    if (!claimer_name) { toast('请填写认领人姓名', false); return; }
+    if (!ADMIN_PASS) { toast('未登录', false); return; }
+    try {
+      const res = await fetch('/api/cup/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify({ op: 'add', cup_id, claimer_name, claimer_phone: claimer_phone || undefined }),
+      });
+      const json = await res.json();
+      if (json.code === 0) {
+        toast('已添加认领记录');
+        closeCupAddModal();
+        loadCupAdmin();
+      } else {
+        toast('添加失败：' + json.message, false);
+      }
+    } catch (e) {
+      toast('添加失败：' + e.message, false);
+    }
+  }
 
   // ====== login on entry
   document.getElementById("loginBtn").addEventListener("click", doLogin);
