@@ -312,8 +312,9 @@
       margin-left: calc(8px * var(--rs));
     }
     .info-en { flex: 1; min-width: 0; }
-    /* 有冠名时 info-en 不撑满，让冠名文字 flex:1 填中间 */
-    .row-bottom.has-sponsor .info-en { flex: 0 0 auto; max-width: 45%; }
+    /* 有冠名时：三块均匀分布 */
+    .row-bottom.has-sponsor { justify-content: space-between; align-items: center; }
+    .row-bottom.has-sponsor .info-en { flex: 0 0 auto; }
     .alc-info {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 400;
@@ -325,11 +326,10 @@
       letter-spacing: 0.5px;
       line-height: 1.05;
     }
-    /* 冠名信息：单行，紧跟英文名右侧，往参数方向自然延伸 */
+    /* 冠名信息：居中列 */
     .sponsor-inline {
-      flex: 1;
-      margin-left: calc(14px * var(--rs));
-      align-self: center;
+      flex: 0 0 auto;
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
