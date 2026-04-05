@@ -126,6 +126,7 @@ html,body{width:100%;height:100%;background:#faf8f5;font-family:'Noto Sans SC',s
 .mia-input-row.pass{border-color:#2e7d32;background:#f8fff8}
 .mia-input-row.fail{border-color:#c8252a;background:#fff8f8}
 .mia-prefix{font-size:13px;color:#b8b0a4;white-space:nowrap;flex-shrink:0;letter-spacing:.5px}
+.mia-dial-select{border:none;outline:none;background:transparent;font-size:13px;color:#b8b0a4;font-family:inherit;cursor:pointer;flex-shrink:0;padding:0;max-width:110px}
 .mia-sep{width:1px;height:16px;background:#e8e3dc;flex-shrink:0}
 .mia-input{flex:1;border:none;outline:none;background:transparent;font-family:'Noto Sans SC',sans-serif;font-size:17px;font-weight:700;color:#c8922a;letter-spacing:2px;caret-color:#c8922a;min-width:0}
 .mia-input::placeholder{font-size:13px;color:#d4cfc7;font-weight:400;letter-spacing:.5px}
@@ -451,9 +452,154 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
       <div class="modal-input-area">
         <div class="mia-label">手机号</div>
         <div class="mia-input-row" id="phoneInputRow">
-          <span class="mia-prefix">+86</span>
+          <select class="mia-dial-select" id="dialCode">
+            <option value="+86">+86 中国大陆</option>
+            <option value="+852">+852 香港</option>
+            <option value="+853">+853 澳门</option>
+            <option value="+886">+886 台湾</option>
+            <option value="+62">+62 印尼</option>
+            <option disabled>──────</option>
+            <option value="+65">+65 新加坡</option>
+            <option value="+60">+60 马来西亚</option>
+            <option value="+1">+1 美国/加拿大</option>
+            <option value="+44">+44 英国</option>
+            <option value="+61">+61 澳大利亚</option>
+            <option value="+81">+81 日本</option>
+            <option value="+82">+82 韩国</option>
+            <option disabled>── 亚洲 ──</option>
+            <option value="+63">+63 菲律宾</option>
+            <option value="+66">+66 泰国</option>
+            <option value="+84">+84 越南</option>
+            <option value="+91">+91 印度</option>
+            <option value="+92">+92 巴基斯坦</option>
+            <option value="+880">+880 孟加拉国</option>
+            <option value="+94">+94 斯里兰卡</option>
+            <option value="+95">+95 缅甸</option>
+            <option value="+855">+855 柬埔寨</option>
+            <option value="+856">+856 老挝</option>
+            <option value="+977">+977 尼泊尔</option>
+            <option value="+975">+975 不丹</option>
+            <option value="+960">+960 马尔代夫</option>
+            <option value="+673">+673 文莱</option>
+            <option value="+670">+670 东帝汶</option>
+            <option value="+993">+993 土库曼斯坦</option>
+            <option value="+998">+998 乌兹别克斯坦</option>
+            <option value="+996">+996 吉尔吉斯斯坦</option>
+            <option value="+992">+992 塔吉克斯坦</option>
+            <option value="+7">+7 哈萨克斯坦</option>
+            <option value="+374">+374 亚美尼亚</option>
+            <option value="+994">+994 阿塞拜疆</option>
+            <option value="+995">+995 格鲁吉亚</option>
+            <option value="+90">+90 土耳其</option>
+            <option value="+972">+972 以色列</option>
+            <option value="+962">+962 约旦</option>
+            <option value="+961">+961 黎巴嫩</option>
+            <option value="+963">+963 叙利亚</option>
+            <option value="+964">+964 伊拉克</option>
+            <option value="+98">+98 伊朗</option>
+            <option value="+966">+966 沙特阿拉伯</option>
+            <option value="+971">+971 阿联酋</option>
+            <option value="+965">+965 科威特</option>
+            <option value="+974">+974 卡塔尔</option>
+            <option value="+973">+973 巴林</option>
+            <option value="+968">+968 阿曼</option>
+            <option value="+967">+967 也门</option>
+            <option disabled>── 欧洲 ──</option>
+            <option value="+49">+49 德国</option>
+            <option value="+33">+33 法国</option>
+            <option value="+39">+39 意大利</option>
+            <option value="+34">+34 西班牙</option>
+            <option value="+351">+351 葡萄牙</option>
+            <option value="+31">+31 荷兰</option>
+            <option value="+32">+32 比利时</option>
+            <option value="+41">+41 瑞士</option>
+            <option value="+43">+43 奥地利</option>
+            <option value="+46">+46 瑞典</option>
+            <option value="+47">+47 挪威</option>
+            <option value="+45">+45 丹麦</option>
+            <option value="+358">+358 芬兰</option>
+            <option value="+354">+354 冰岛</option>
+            <option value="+353">+353 爱尔兰</option>
+            <option value="+48">+48 波兰</option>
+            <option value="+420">+420 捷克</option>
+            <option value="+421">+421 斯洛伐克</option>
+            <option value="+36">+36 匈牙利</option>
+            <option value="+40">+40 罗马尼亚</option>
+            <option value="+359">+359 保加利亚</option>
+            <option value="+30">+30 希腊</option>
+            <option value="+385">+385 克罗地亚</option>
+            <option value="+381">+381 塞尔维亚</option>
+            <option value="+386">+386 斯洛文尼亚</option>
+            <option value="+387">+387 波黑</option>
+            <option value="+382">+382 黑山</option>
+            <option value="+389">+389 北马其顿</option>
+            <option value="+355">+355 阿尔巴尼亚</option>
+            <option value="+373">+373 摩尔多瓦</option>
+            <option value="+380">+380 乌克兰</option>
+            <option value="+375">+375 白俄罗斯</option>
+            <option value="+7">+7 俄罗斯</option>
+            <option value="+372">+372 爱沙尼亚</option>
+            <option value="+371">+371 拉脱维亚</option>
+            <option value="+370">+370 立陶宛</option>
+            <option value="+352">+352 卢森堡</option>
+            <option value="+356">+356 马耳他</option>
+            <option value="+357">+357 塞浦路斯</option>
+            <option disabled>── 美洲 ──</option>
+            <option value="+52">+52 墨西哥</option>
+            <option value="+55">+55 巴西</option>
+            <option value="+54">+54 阿根廷</option>
+            <option value="+56">+56 智利</option>
+            <option value="+57">+57 哥伦比亚</option>
+            <option value="+51">+51 秘鲁</option>
+            <option value="+58">+58 委内瑞拉</option>
+            <option value="+593">+593 厄瓜多尔</option>
+            <option value="+591">+591 玻利维亚</option>
+            <option value="+595">+595 巴拉圭</option>
+            <option value="+598">+598 乌拉圭</option>
+            <option value="+503">+503 萨尔瓦多</option>
+            <option value="+502">+502 危地马拉</option>
+            <option value="+504">+504 洪都拉斯</option>
+            <option value="+505">+505 尼加拉瓜</option>
+            <option value="+506">+506 哥斯达黎加</option>
+            <option value="+507">+507 巴拿马</option>
+            <option value="+53">+53 古巴</option>
+            <option value="+1">+1 牙买加</option>
+            <option value="+509">+509 海地</option>
+            <option value="+1">+1 多米尼加</option>
+            <option value="+1868">+1868 特立尼达和多巴哥</option>
+            <option disabled>── 非洲 ──</option>
+            <option value="+20">+20 埃及</option>
+            <option value="+212">+212 摩洛哥</option>
+            <option value="+213">+213 阿尔及利亚</option>
+            <option value="+216">+216 突尼斯</option>
+            <option value="+218">+218 利比亚</option>
+            <option value="+249">+249 苏丹</option>
+            <option value="+251">+251 埃塞俄比亚</option>
+            <option value="+254">+254 肯尼亚</option>
+            <option value="+255">+255 坦桑尼亚</option>
+            <option value="+256">+256 乌干达</option>
+            <option value="+234">+234 尼日利亚</option>
+            <option value="+233">+233 加纳</option>
+            <option value="+225">+225 科特迪瓦</option>
+            <option value="+221">+221 塞内加尔</option>
+            <option value="+237">+237 喀麦隆</option>
+            <option value="+243">+243 刚果（金）</option>
+            <option value="+242">+242 刚果（布）</option>
+            <option value="+27">+27 南非</option>
+            <option value="+263">+263 津巴布韦</option>
+            <option value="+260">+260 赞比亚</option>
+            <option value="+258">+258 莫桑比克</option>
+            <option value="+261">+261 马达加斯加</option>
+            <option disabled>── 大洋洲 ──</option>
+            <option value="+64">+64 新西兰</option>
+            <option value="+679">+679 斐济</option>
+            <option value="+675">+675 巴布亚新几内亚</option>
+            <option value="+685">+685 萨摩亚</option>
+            <option value="+676">+676 汤加</option>
+            <option value="+678">+678 瓦努阿图</option>
+          </select>
           <div class="mia-sep"></div>
-          <input class="mia-input" id="phoneInput" type="tel" maxlength="11" placeholder="请输入注册手机号" autocomplete="tel"/>
+          <input class="mia-input" id="phoneInput" type="tel" placeholder="请输入手机号" autocomplete="tel"/>
         </div>
       </div>
       <div class="modal-actions">
@@ -843,18 +989,26 @@ document.getElementById("btnVerifyCancel").addEventListener("click", ()=>verifyM
 verifyMask.addEventListener("click", e=>{ if(e.target===verifyMask) verifyMask.classList.remove("show"); });
 
 document.getElementById("phoneInput").addEventListener("input", ()=>{
+  const dial = document.getElementById("dialCode").value;
   const val = document.getElementById("phoneInput").value.trim();
   const btn = document.getElementById("btnVerify");
-  if (/^1[3-9]\d{9}$/.test(val)) {
+  const isCN = dial === "+86";
+  const valid = isCN ? /^1[3-9]\d{9}$/.test(val) : /^\d{6,14}$/.test(val);
+  if (valid) {
     btn.disabled = false; btn.textContent = "查询会员";
   } else {
     btn.disabled = true;
-    btn.textContent = val.length === 0 ? "请输入手机号" : (val.length < 11 ? "请输入11位手机号" : "手机号格式不正确");
+    btn.textContent = val.length === 0 ? "请输入手机号" : (isCN && val.length < 11 ? "请输入11位手机号" : "手机号格式不正确");
   }
+});
+document.getElementById("dialCode").addEventListener("change", ()=>{
+  document.getElementById("phoneInput").dispatchEvent(new Event("input"));
 });
 
 document.getElementById("btnVerify").addEventListener("click", async()=>{
-  const phone = document.getElementById("phoneInput").value.trim();
+  const dial = document.getElementById("dialCode").value;
+  const raw = document.getElementById("phoneInput").value.trim();
+  const phone = dial + raw;
   const btn = document.getElementById("btnVerify");
   btn.disabled = true;
   btn.innerHTML = '<span class="loading-spin"></span>查询中…';
@@ -877,7 +1031,7 @@ document.getElementById("btnVerify").addEventListener("click", async()=>{
     verifiedPhone   = phone;
     verifiedPoint   = json.data.point;
     verifiedBalance = json.data.balance;
-    document.getElementById("verifyPhoneDisplay").textContent = phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
+    document.getElementById("verifyPhoneDisplay").textContent = phone.length > 7 ? phone.slice(0, 3) + '****' + phone.slice(-4) : phone;
     const ptEl = document.getElementById("verifyPointVal");
     const blEl = document.getElementById("verifyBalanceVal");
     ptEl.textContent = `${verifiedPoint} 积分`;
