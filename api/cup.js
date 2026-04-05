@@ -48,9 +48,10 @@ module.exports = async function handler(req, res) {
   // ── POST /api/cup/verify ──────────────────────────────────────────────────
   if (req.method === 'POST' && action === 'verify') {
     try {
-      const { phone } = await readJsonBody(req);
-      if (!phone || !/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, '')))
-        return error(res, 400, '请输入正确的手机号');
+      let { phone } = await readJsonBody(req);
+      if (!phone) return error(res, 400, '请输入正确的手机号');
+      phone = phone.replace(/^\+86/, '').trim();
+      if (phone.length < 6 || phone.length > 20) return error(res, 400, '请输入正确的手机号');
 
       const supabase = getSupabase();
 
@@ -68,7 +69,7 @@ module.exports = async function handler(req, res) {
 
       // Cache miss → call Pospal
       const pospal = new PospalClient();
-      const phoneForQuery = phone.replace(/^\+86/, '').replace(/^\+/, '');
+      const phoneForQuery = phone.replace(/^\+/, '');
       const customer = await pospal.getMemberByPhone(phoneForQuery);
       if (!customer?.customerUid)
         return ok(res, { valid: false, reason: 'not_member' });
@@ -83,9 +84,11 @@ module.exports = async function handler(req, res) {
   // ── POST /api/cup/claim ───────────────────────────────────────────────────
   if (req.method === 'POST' && action === 'claim') {
     try {
-      const { phone, cup_id, claimer_name } = await readJsonBody(req);
+      let { phone, cup_id, claimer_name } = await readJsonBody(req);
       if (!phone || !cup_id || !claimer_name)    return error(res, 400, '参数不完整');
-      if (phone.replace(/^\+/, '').length < 6 || phone.replace(/^\+/, '').length > 20) return error(res, 400, '手机号格式不正确');
+      phone = phone.replace(/^\+86/, '').trim();
+      if (phone.length < 6 || phone.length > 20) return error(res, 400, '手机号格式不正确');
+      const phoneForQuery = phone.replace(/^\+/, '');
       if (!claimer_name.trim())                   return error(res, 400, '请填写姓名');
       if ([...claimer_name.trim()].length > 12)   return error(res, 400, '姓名最多12个字符');
 
@@ -99,7 +102,6 @@ module.exports = async function handler(req, res) {
       const cached2 = await lookupCache(supabase, phone);
       if (!cached2.found) {
         const pospal = new PospalClient();
-        const phoneForQuery = phone.replace(/^\+86/, '').replace(/^\+/, '');
         const customer = await pospal.getMemberByPhone(phoneForQuery);
         if (!customer?.customerUid)
           return ok(res, { success: false, reason: 'not_member' });
