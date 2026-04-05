@@ -85,7 +85,7 @@ module.exports = async function handler(req, res) {
     try {
       const { phone, cup_id, claimer_name } = await readJsonBody(req);
       if (!phone || !cup_id || !claimer_name)    return error(res, 400, '参数不完整');
-      if (!/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, '')))          return error(res, 400, '手机号格式不正确');
+      if (phone.replace(/^\+/, '').length < 6 || phone.replace(/^\+/, '').length > 20) return error(res, 400, '手机号格式不正确');
       if (!claimer_name.trim())                   return error(res, 400, '请填写姓名');
       if ([...claimer_name.trim()].length > 12)   return error(res, 400, '姓名最多12个字符');
 
