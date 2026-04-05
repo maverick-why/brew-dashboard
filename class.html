@@ -689,28 +689,34 @@ phoneInput.addEventListener('keydown', e => {
 
 btnVerify.addEventListener('click', doVerify);
 
+function maskPhone(phone){
+  if(phone.length <= 6) return phone;
+  return phone.slice(0,3) + '****' + phone.slice(-3);
+}
+
 async function doVerify(){
-  const phone = phoneInput.value.trim();
-  if(!/^1[3-9]\d{9}$/.test(phone)) return;
+  const dial = document.getElementById('dialCode').value;
+  const raw = phoneInput.value.trim();
+  const fullPhone = dial + raw;
   btnVerify.disabled = true;
   btnVerify.textContent = '查询中…';
   try {
     const res = await fetch('/api/cup/verify', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({phone}),
+      body:JSON.stringify({phone: fullPhone}),
     });
     const json = await res.json();
     const data = json.data;
     if(data.valid){
-      verifiedPhone = phone;
-      sessionStorage.setItem('cup_phone', phone);
-      document.getElementById('vsPhoneDisplay').textContent = phone.slice(0,3)+'****'+phone.slice(7);
+      verifiedPhone = fullPhone;
+      sessionStorage.setItem('cup_phone', fullPhone);
+      document.getElementById('vsPhoneDisplay').textContent = maskPhone(fullPhone);
       switchVState('vstateSuccess');
     } else if(data.reason === 'already_claimed'){
-      verifiedPhone = phone;
+      verifiedPhone = fullPhone;
       myClaimedCup = data.cup;
-      showSuccess(data.cup.number, data.cup.claimer_name, phone);
+      showSuccess(data.cup.number, data.cup.claimer_name, fullPhone);
       closeVerifySheet();
       goScreen(2);
     } else {
@@ -842,7 +848,7 @@ function showSuccess(number, name, phone){
   document.getElementById('sucNum').textContent = number;
   document.getElementById('sucNumVal').textContent = number;
   document.getElementById('sucName').textContent = name;
-  document.getElementById('sucPhone').textContent = phone.slice(0,3)+'****'+phone.slice(7);
+  document.getElementById('sucPhone').textContent = maskPhone(phone);
 }
 </script>
 </body>
