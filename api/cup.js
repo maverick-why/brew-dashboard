@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
 
       // Cache miss → call Pospal
       const pospal = new PospalClient();
-      const phoneForQuery = phone.replace(/^\+/, '');
+      const phoneForQuery = phone.replace(/^\+86/, '').replace(/^\+/, '');
       const customer = await pospal.getMemberByPhone(phoneForQuery);
       if (!customer?.customerUid)
         return ok(res, { valid: false, reason: 'not_member' });
@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
       const cached2 = await lookupCache(supabase, phone);
       if (!cached2.found) {
         const pospal = new PospalClient();
-        const phoneForQuery = phone.replace(/^\+/, '');
+        const phoneForQuery = phone.replace(/^\+86/, '').replace(/^\+/, '');
         const customer = await pospal.getMemberByPhone(phoneForQuery);
         if (!customer?.customerUid)
           return ok(res, { success: false, reason: 'not_member' });
