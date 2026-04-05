@@ -12,7 +12,8 @@ module.exports = async function handler(req, res) {
     if (!/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, ''))) return error(res, 400, '手机号格式不正确');
 
     const pospal = new PospalClient();
-    const customerInfo = await pospal.getMemberByPhone(phone);
+    const phoneForQuery = phone.replace(/^\+/, '');
+    const customerInfo = await pospal.getMemberByPhone(phoneForQuery);
     if (!customerInfo?.customerUid) {
       return error(res, 404, '未找到会员记录，请先注册');
     }
