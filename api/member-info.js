@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
   try {
     const { phone } = await readJsonBody(req);
     if (!phone) return error(res, 400, '缺少手机号');
-    if (!/^1[3-9]\d{9}$/.test(phone)) return error(res, 400, '手机号格式不正确');
+    if (!/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, ''))) return error(res, 400, '手机号格式不正确');
 
     const pospal = new PospalClient();
     const customerInfo = await pospal.getMemberByPhone(phone);

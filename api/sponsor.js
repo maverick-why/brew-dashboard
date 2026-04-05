@@ -39,7 +39,7 @@ module.exports = async function handler(req, res) {
     if (!phone || !tapNo || !sponsorName || !reviewToken) {
       return error(res, 400, '参数不完整');
     }
-    if (!/^1[3-9]\d{9}$/.test(phone)) {
+    if (!/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, ''))) {
       return error(res, 400, '手机号格式不正确');
     }
     if (!Number.isInteger(tapNo) || tapNo < 1 || tapNo > 27) {

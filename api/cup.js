@@ -49,7 +49,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'POST' && action === 'verify') {
     try {
       const { phone } = await readJsonBody(req);
-      if (!phone || !/^1[3-9]\d{9}$/.test(phone))
+      if (!phone || !/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, '')))
         return error(res, 400, '请输入正确的手机号');
 
       const supabase = getSupabase();
@@ -84,7 +84,7 @@ module.exports = async function handler(req, res) {
     try {
       const { phone, cup_id, claimer_name } = await readJsonBody(req);
       if (!phone || !cup_id || !claimer_name)    return error(res, 400, '参数不完整');
-      if (!/^1[3-9]\d{9}$/.test(phone))          return error(res, 400, '手机号格式不正确');
+      if (!/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, '')))          return error(res, 400, '手机号格式不正确');
       if (!claimer_name.trim())                   return error(res, 400, '请填写姓名');
       if ([...claimer_name.trim()].length > 12)   return error(res, 400, '姓名最多12个字符');
 
@@ -149,7 +149,7 @@ module.exports = async function handler(req, res) {
         if (!cup_id || !claimer_name) return error(res, 400, '缺少 cup_id 或 claimer_name');
         if ([...claimer_name.trim()].length > 12) return error(res, 400, '姓名最多12个字符');
         const phone = typeof claimer_phone === 'string' ? claimer_phone.trim() : '';
-        if (phone && !/^1[3-9]\d{9}$/.test(phone)) return error(res, 400, '手机号格式不正确');
+        if (phone && !/^\+?\d{6,15}$/.test(phone.replace(/[\s\-()]/g, ''))) return error(res, 400, '手机号格式不正确');
 
         // Ensure cup is not already claimed
         const { data: existing } = await supabase
