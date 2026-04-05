@@ -671,11 +671,9 @@ const phoneInput = document.getElementById('phoneInput');
 const btnVerify = document.getElementById('btnVerify');
 
 phoneInput.addEventListener('input', () => {
-  const dial = document.getElementById('dialCode').value;
   const val = phoneInput.value.replace(/\D/g, '');
   phoneInput.value = val;
-  const isCN = dial === '+86';
-  const valid = isCN ? /^1[3-9]\d{9}$/.test(val) : val.length >= 6 && val.length <= 14;
+  const valid = val.length >= 6;
   btnVerify.disabled = !valid;
   btnVerify.textContent = valid ? '验证会员身份' : '请输入手机号';
 });
