@@ -581,15 +581,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Hira
     </div>
 
     <div id="vstateNonMember" style="display:none">
-      <div class="vm-nonmember-view">
-        <div class="vm-nonmember-icon">🍺</div>
-        <div class="vm-nonmember-title">仅限会员参与</div>
-        <div class="vm-nonmember-body">未找到该手机号的会员记录。<br>请先在小程序完成注册后即可参与。</div>
-      </div>
-      <div class="vs-actions" style="margin-top:24px">
-        <button class="btn-vs-ghost" onclick="switchVState('vstateInput')">重新输入手机号</button>
-      </div>
-    </div>
+  <div class="vm-nonmember-view">
+    <div class="vm-nonmember-icon">🍺</div>
+    <div class="vm-nonmember-title">仅限会员参与</div>
+    <div class="vm-nonmember-body">未找到该手机号的会员记录。<br>请先在小程序完成注册后即可参与。</div>
+  </div>
+  <div class="vs-actions" style="margin-top:24px">
+    <button class="btn-vs-main" onclick="window.open('https://pospal.cn/d/3760970','_blank')">立即注册成为会员</button>
+    <button class="btn-vs-ghost" onclick="switchVState('vstateInput')">重新输入手机号</button>
+  </div>
+</div>
   </div>
 </div>
 
