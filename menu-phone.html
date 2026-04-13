@@ -427,14 +427,36 @@ function makeCard(item) {
 </div>`;
 }
 
+// ?page=1/2/3 → TV 分屏模式；无参数 → 手机模式（全部列表）
+const rawPage = new URLSearchParams(location.search).get("page");
+const IS_TV   = !!rawPage;
+const TV_PAGE = IS_TV ? parseInt(rawPage, 10) : 1;
+
+let allItems            = [];
+let currentItemsPerPage = 8;
+let screenCount         = 2;
+
 async function load() {
   try {
     const res  = await fetch(API, { cache: "no-store" });
     const data = await res.json();
     if (!data.ok) return;
 
-    const items = data.items.filter(it => it.name || it.name_en);
-    document.getElementById("list").innerHTML = items.map(makeCard).join("") || '<div class="loading">暂无酒单</div>';
+    const tapCount      = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
+    screenCount         = tapCount > 20 ? 3 : 2;
+    const totalCols     = screenCount * 2;
+    const rows          = Math.min(5, Math.ceil(tapCount / totalCols));
+    currentItemsPerPage = rows * 2;
+
+    allItems = data.items.filter(it => it.name || it.name_en);
+
+    if (IS_TV) {
+      const offset = (TV_PAGE - 1) * currentItemsPerPage;
+      const slice  = allItems.slice(offset, offset + currentItemsPerPage);
+      document.getElementById("list").innerHTML = slice.map(makeCard).join("");
+    } else {
+      document.getElementById("list").innerHTML = allItems.map(makeCard).join("") || '<div class="loading">暂无酒单</div>';
+    }
   } catch(e) {
     console.warn("menu load error", e);
   }
