@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>酒单 · 时光酿造所</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;900&family=Barlow+Condensed:wght@500;700&family=Bebas+Neue&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box }
+
+    html, body {
+      background: #1c1c1c;
+      font-family: 'Noto Sans SC', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-header {
+      background: #111;
+      padding: 20px 16px 16px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .page-header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: #fff;
+      letter-spacing: 4px;
+    }
+    .page-header p {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 2px 0;
+    }
+
+    /* ── 卡片 ── */
+    .card {
+      background: #fff;
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+      position: relative;
+      min-height: 100px;
+    }
+    .card.special { background: #fdf8f0; }
+
+    /* 左侧彩色编号竖条 */
+    .card-num {
+      width: 64px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .card-num.sponsored {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 10px;
+      padding-bottom: 6px;
+    }
+    .card-num.sponsored .num {
+      font-size: 30px;
+    }
+    .sponsor-tap-icon {
+      flex: 1;
+      width: 76%;
+      min-height: 0;
+      object-fit: contain;
+      object-position: center 30%;
+    }
+    .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    /* 右侧内容 */
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* 上半 */
+    .row-top {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 12px 14px 8px 12px;
+      gap: 8px;
+    }
+    .info-left {
+      flex: 1;
+      min-width: 0;
+    }
+    .brewery-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      color: #666;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brewery-tag .flag {
+      margin-left: 4px;
+      font-style: normal;
+    }
+    .beer-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .beer-name {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 900;
+      font-size: 22px;
+      color: #111;
+      letter-spacing: 4px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card.special .beer-name { color: #8a5f00; }
+    .beer-style {
+      font-size: 13px;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    /* 标签 */
+    .beer-tags {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .beer-tag {
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 7px;
+    }
+    .beer-tag.award-gold   { background: linear-gradient(135deg,#f9e79f,#f4d03f); border:1px solid #d4af37; color:#7d6608 }
+    .beer-tag.award-silver { background: linear-gradient(135deg,#e8e8e8,#d0d0d0); border:1px solid #a8a8a8; color:#505050 }
+    .beer-tag.award-bronze { background: linear-gradient(135deg,#f5d5b8,#e0b088); border:1px solid #cd7f32; color:#6b4423 }
+    .beer-tag.ingredient   { background:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32 }
+    .card.special .beer-tag.ingredient { background:rgba(138,95,0,.08); border-color:rgba(138,95,0,.15); color:#8a5f00 }
+    .beer-tag.comment {
+      background:#37474f; border:1px solid #263238; color:#eceff1;
+      font-style:italic; font-weight:400;
+      white-space:normal; line-height:1.4;
+      height:auto; padding:4px 7px;
+      display:block; margin-top:4px;
+      font-size:12px;
+    }
+
+    /* 价格 */
+    .price-block {
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .price-line {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #222;
+      line-height: 1.5;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .card.special .price-line { color: #b07d00; }
+    .price-block.single .price-line { font-size: 28px; }
+
+    /* 分隔线 */
+    .divider { height: 1px; background: #e8e8e8; margin: 0 12px }
+
+    /* 下半 */
+    .row-bottom {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 6px 14px 10px 12px;
+      gap: 8px;
+    }
+    .info-en {
+      flex: 1;
+      min-width: 0;
+    }
+    .en-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .en-style {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      color: #bbb;
+    }
+    .alc-info {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      color: #aaa;
+      text-align: right;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sponsor-inline {
+      font-size: 13px;
+      color: #888;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+    .sponsor-inline .sp-prefix { color: #bbb }
+    .sponsor-inline .sp-name   { color: #666; font-weight: 500 }
+
+    /* 售罄印章 */
+    .sold-out-stamp {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+      background: rgba(255,255,255,.45);
+    }
+    .stamp-inner {
+      border: 4px solid #C8252A;
+      border-radius: 6px;
+      padding: 4px 16px;
+      transform: rotate(-18deg);
+      text-align: center;
+      opacity: .88;
+    }
+    .stamp-cn {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 900;
+      font-size: 28px;
+      color: #C8252A;
+      letter-spacing: 6px;
+    }
+    .stamp-en {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #C8252A;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* 加载状态 */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #555;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>时光酿造所</h1>
+  <p>ON TAP · 生啤酒单</p>
+</div>
+
+<div class="list" id="list">
+  <div class="loading">加载中…</div>
+</div>
+
+<script>
+const API     = "/api/menu-public";
+const REFRESH = 10000;
+
+const STYLE_COLORS = [
+  { keywords: ["ipa", "pale ale"],                         color: "#FDE9A0" },
+  { keywords: ["lager", "拉格"],                            color: "#F9D84A" },
+  { keywords: ["wheat", "小麦", "weiss", "白啤"],           color: "#E8C04A" },
+  { keywords: ["porter", "波特", "stout", "世涛"],          color: "#5A3018" },
+  { keywords: ["sour", "酸"],                               color: "#C8252A" },
+  { keywords: ["saison", "赛松"],                           color: "#2E7D32" },
+  { keywords: ["barleywine", "大麦酒"],                     color: "#6A1B9A" },
+  { keywords: ["belgian", "比利时"],                        color: "#1565C0" },
+  { keywords: ["ale", "艾尔"],                              color: "#F5C400" },
+  { keywords: ["cocktail", "鸡尾酒", "mojito", "莫吉托"],  color: "#00897B" },
+  { keywords: ["whisky", "威士忌", "bourbon"],              color: "#8D4B00" },
+  { keywords: ["gin", "金酒"],                              color: "#4A7C59" },
+  { keywords: ["rum", "朗姆"],                              color: "#C47D00" },
+  { keywords: ["coffee", "咖啡", "cold brew", "冷萃"],      color: "#4E342E" },
+  { keywords: ["latte", "拿铁"],                            color: "#A1887F" },
+  { keywords: ["espresso", "浓缩"],                         color: "#3E2723" },
+  { keywords: [],                                           color: "#2B2B2B" },
+];
+
+function getStyleColor(style, style_en) {
+  const hay = ((style || "") + " " + (style_en || "")).toLowerCase();
+  for (const entry of STYLE_COLORS) {
+    if (entry.keywords.length === 0) return entry.color;
+    if (entry.keywords.some(k => hay.includes(k.toLowerCase()))) return entry.color;
+  }
+  return "#2B2B2B";
+}
+
+function esc(s) {
+  return String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function getTagClass(text) {
+  if (!text) return "ingredient";
+  if (text.startsWith("🥇")) return "award-gold";
+  if (text.startsWith("🥈")) return "award-silver";
+  if (text.startsWith("🥉")) return "award-bronze";
+  if (text.startsWith("💬")) return "comment";
+  return "ingredient";
+}
+
+function makeCard(item) {
+  if (!item.name && !item.name_en) return "";
+
+  const no         = String(item.no).padStart(2, "0");
+  const blockColor = getStyleColor(item.style, item.style_en);
+
+  const hasLarge = item.large_price && item.large_price.trim();
+  const hasSmall = item.small_price && item.small_price.trim();
+  const priceL = hasLarge
+    ? `<div class="price-line">¥${esc(item.large_price)}${item.large_size ? " / "+esc(item.large_size) : ""}</div>` : "";
+  const priceS = hasSmall
+    ? `<div class="price-line">¥${esc(item.small_price)}${item.small_size ? " / "+esc(item.small_size) : ""}</div>` : "";
+  const singlePrice = !!hasLarge !== !!hasSmall;
+
+  const abvIbu = [
+    item.abv ? `ALC ${esc(item.abv)}%` : "",
+    item.ibu ? `IBU ${esc(item.ibu)}` : ""
+  ].filter(Boolean).join("  ·  ");
+
+  const allTags     = [item.tag1, item.tag2].filter(t => t && t.trim());
+  const inlineTags  = allTags.filter(t => !t.startsWith("💬"));
+  const commentTags = allTags.filter(t =>  t.startsWith("💬"));
+
+  const inlineTagsHtml  = inlineTags.map(t =>
+    `<span class="beer-tag ${getTagClass(t)}">${esc(t)}</span>`
+  ).join("");
+  const commentTagsHtml = commentTags.map(t =>
+    `<span class="beer-tag comment">${esc(t)}</span>`
+  ).join("");
+
+  const sponsored = item.sponsor_name && item.sponsor_name.trim();
+  const sponsorIconHtml = sponsored
+    ? `<img class="sponsor-tap-icon" src="/酒头.png" alt="酒头" />`
+    : "";
+  const sponsorInlineHtml = sponsored
+    ? `<span class="sponsor-inline"><span class="sp-prefix">冠名：</span><span class="sp-name">${esc(item.sponsor_name)}</span></span>`
+    : "";
+
+  return `
+<div class="card${item.special ? " special" : ""}">
+  ${item.sold_out ? `<div class="sold-out-stamp"><div class="stamp-inner"><div class="stamp-cn">售罄</div><div class="stamp-en">SOLD OUT</div></div></div>` : ""}
+  <div class="card-num${sponsored ? " sponsored" : ""}" style="background:${blockColor}">
+    <span class="num">${no}</span>
+    ${sponsorIconHtml}
+  </div>
+  <div class="card-body">
+    <div class="row-top">
+      <div class="info-left">
+        <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
+        <div class="beer-name-row">
+          <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
+        </div>
+        <div class="beer-style">${esc(item.style)}</div>
+        ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
+        ${commentTagsHtml ? `<div class="beer-tags">${commentTagsHtml}</div>` : ""}
+      </div>
+      <div class="price-block${singlePrice ? " single" : ""}">${priceL}${priceS}</div>
+    </div>
+    <div class="divider"></div>
+    <div class="row-bottom">
+      <div class="info-en">
+        <div class="en-name">${esc(item.name_en)}</div>
+        <div class="en-style">${esc(item.style_en)}</div>
+      </div>
+      ${sponsorInlineHtml}
+      <div class="alc-info">${abvIbu}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+async function load() {
+  try {
+    const res  = await fetch(API, { cache: "no-store" });
+    const data = await res.json();
+    if (!data.ok) return;
+
+    const items = data.items.filter(it => it.name || it.name_en);
+    document.getElementById("list").innerHTML = items.map(makeCard).join("") || '<div class="loading">暂无酒单</div>';
+  } catch(e) {
+    console.warn("menu load error", e);
+  }
+}
+
+let timer;
+document.addEventListener("visibilitychange", () =>
+  document.hidden ? clearInterval(timer) : (load(), timer = setInterval(load, REFRESH))
+);
+load();
+timer = setInterval(load, REFRESH);
+</script>
+</body>
+</html>
