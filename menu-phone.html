@@ -9,8 +9,6 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box }
 
-    :root { --rs: 0.46; }
-
     html, body {
       background: #1c1c1c;
       font-family: 'Noto Sans SC', sans-serif;
@@ -19,7 +17,7 @@
 
     .page-header {
       background: #111;
-      padding: 20px 16px 16px;
+      padding: 16px;
       text-align: center;
       border-bottom: 1px solid #333;
       position: sticky;
@@ -28,22 +26,26 @@
     }
     .page-header h1 {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px;
+      font-size: 26px;
       color: #fff;
       letter-spacing: 4px;
     }
     .page-header p {
-      font-size: 12px;
+      font-size: 11px;
       color: #666;
-      margin-top: 4px;
+      margin-top: 2px;
       letter-spacing: 1px;
     }
 
+    /* 默认单列，宽屏两列 */
     .list {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 2px;
       padding: 2px 0;
+    }
+    @media (min-width: 768px) {
+      .list { grid-template-columns: 1fr 1fr; }
     }
 
     /* ── 卡片 ── */
@@ -58,7 +60,7 @@
 
     /* 左侧彩色编号竖条 */
     .card-num {
-      width: calc(96px * var(--rs));
+      width: 52px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -70,13 +72,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding-top: calc(14px * var(--rs));
-      padding-bottom: calc(8px * var(--rs));
+      padding-top: 8px;
+      padding-bottom: 6px;
     }
-    .card-num.sponsored .num {
-      flex-shrink: 0;
-      font-size: calc(44px * var(--rs));
-    }
+    .card-num.sponsored .num { font-size: 26px; }
     .sponsor-tap-icon {
       flex: 1;
       width: 78%;
@@ -87,7 +86,7 @@
     .num {
       font-family: 'Bebas Neue', sans-serif;
       font-weight: 400;
-      font-size: calc(72px * var(--rs));
+      font-size: 40px;
       color: #fff;
       letter-spacing: -1px;
       line-height: 1;
@@ -104,14 +103,11 @@
 
     /* 上半 */
     .row-top {
-      flex: 1;
-      min-height: 0;
-      overflow: hidden;
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: calc(14px * var(--rs)) 20px max(10px, calc(10px * var(--rs))) 16px;
-      gap: calc(12px * var(--rs));
+      padding: 10px 12px 6px 10px;
+      gap: 8px;
     }
     .info-left {
       flex: 1;
@@ -123,23 +119,19 @@
     .brewery-tag {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 500;
-      font-size: calc(30px * var(--rs));
+      font-size: 14px;
       color: #666;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .brewery-tag .flag {
-      margin-left: 6px;
-      margin-right: 0;
-      font-style: normal;
-    }
+    .brewery-tag .flag { margin-left: 4px; font-style: normal; }
     .beer-name-row {
       display: flex;
       align-items: center;
-      gap: calc(10px * var(--rs));
+      gap: 6px;
       min-width: 0;
     }
     .beer-tags {
@@ -147,15 +139,15 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: calc(6px * var(--rs));
+      gap: 4px;
     }
     .beer-name {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 900;
-      font-size: calc(46px * var(--rs));
+      font-size: 20px;
       color: #111;
-      letter-spacing: calc(8px * var(--rs));
-      line-height: 1.05;
+      letter-spacing: 3px;
+      line-height: 1.1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -165,25 +157,24 @@
     .beer-style {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 400;
-      font-size: calc(20px * var(--rs));
+      font-size: 11px;
       color: #888;
-      letter-spacing: 0.5px;
       white-space: nowrap;
-      margin-top: calc(8px * var(--rs));
+      margin-top: 3px;
     }
 
     /* 标签 */
     .beer-tag {
-      border-radius: calc(4px * var(--rs));
+      border-radius: 3px;
       font-family: 'Noto Sans SC', sans-serif;
-      font-size: calc(20px * var(--rs));
+      font-size: 11px;
       font-weight: 500;
       line-height: 1;
       white-space: nowrap;
-      height: calc(32px * var(--rs));
+      height: 18px;
       display: flex;
       align-items: center;
-      padding: 0 calc(10px * var(--rs));
+      padding: 0 5px;
     }
     .beer-tag.award-gold   { background: linear-gradient(135deg,#f9e79f,#f4d03f); border:1px solid #d4af37; color:#7d6608 }
     .beer-tag.award-silver { background: linear-gradient(135deg,#e8e8e8,#d0d0d0); border:1px solid #a8a8a8; color:#505050 }
@@ -193,51 +184,42 @@
     .beer-tag.comment {
       background:#37474f; border:1px solid #263238; color:#eceff1;
       font-style:italic; font-weight:400;
-      white-space:normal; line-height:1.5;
-      height:auto; padding:calc(4px * var(--rs)) calc(10px * var(--rs));
-      display:block;
-    }
-    .comment-tag-row {
-      margin-top: calc(5px * var(--rs));
+      white-space:normal; line-height:1.4;
+      height:auto; padding:3px 6px;
+      display:block; margin-top:3px;
     }
 
     /* 价格 */
-    .price-block {
-      flex-shrink: 0;
-      text-align: right;
-    }
+    .price-block { flex-shrink: 0; text-align: right; }
     .price-line {
       font-family: 'Barlow', sans-serif;
       font-weight: 700;
-      font-size: calc(41px * var(--rs));
+      font-size: 20px;
       color: #222;
-      line-height: 1.6;
+      line-height: 1.5;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
     }
     .card.special .price-line { color: #b07d00; }
-    .price-block.single .price-line { font-size: calc(52px * var(--rs)); line-height: 1.3; }
+    .price-block.single .price-line { font-size: 24px; line-height: 1.3; }
 
     /* 分隔线 */
-    .divider { height: 1px; background: #e0e0e0; margin: 0 16px }
+    .divider { height: 1px; background: #e0e0e0; margin: 0 10px }
 
     /* 下半 */
     .row-bottom {
       display: flex;
       flex-direction: row;
-      align-items: flex-start;
-      padding: max(8px, calc(8px * var(--rs))) 20px calc(12px * var(--rs)) 16px;
-      gap: calc(10px * var(--rs));
+      align-items: center;
+      padding: 5px 12px 8px 10px;
+      gap: 8px;
     }
-    .row-bottom.has-sponsor { justify-content: space-between; align-items: center; }
+    .row-bottom.has-sponsor { justify-content: space-between; }
     .row-bottom.has-sponsor .info-en { flex: 0 0 auto; }
-    .info-en {
-      flex: 1;
-      min-width: 0;
-    }
+    .info-en { flex: 1; min-width: 0; }
     .en-name {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: calc(28px * var(--rs));
+      font-size: 13px;
       color: #999;
       white-space: nowrap;
       overflow: hidden;
@@ -245,18 +227,17 @@
     }
     .en-style {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: calc(24px * var(--rs));
+      font-size: 11px;
       color: #bbb;
     }
     .alc-info {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 400;
       flex-shrink: 0;
-      font-size: calc(39px * var(--rs));
+      font-size: 18px;
       color: #aaa;
       text-align: right;
       white-space: nowrap;
-      letter-spacing: 0.5px;
       line-height: 1.05;
     }
     .sponsor-inline {
@@ -266,7 +247,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       font-family: 'Noto Sans SC', sans-serif;
-      font-size: calc(30px * var(--rs));
+      font-size: 12px;
       line-height: 1;
     }
     .sponsor-inline .sp-prefix { color: #bbb; font-weight: 400; }
@@ -284,9 +265,9 @@
       background: rgba(255,255,255,.45);
     }
     .stamp-inner {
-      border: calc(6px * var(--rs)) solid #C8252A;
-      border-radius: calc(8px * var(--rs));
-      padding: calc(6px * var(--rs)) calc(22px * var(--rs));
+      border: 3px solid #C8252A;
+      border-radius: 5px;
+      padding: 3px 12px;
       transform: rotate(-18deg);
       text-align: center;
       opacity: .88;
@@ -294,21 +275,20 @@
     .stamp-cn {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 900;
-      font-size: calc(52px * var(--rs));
+      font-size: 26px;
       color: #C8252A;
-      letter-spacing: calc(8px * var(--rs));
+      letter-spacing: 5px;
       line-height: 1.1;
     }
     .stamp-en {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 700;
-      font-size: calc(22px * var(--rs));
+      font-size: 11px;
       color: #C8252A;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       text-transform: uppercase;
     }
 
-    /* 加载状态 */
     .loading {
       text-align: center;
       padding: 60px 20px;
@@ -329,13 +309,6 @@
 </div>
 
 <script>
-function updateRS() {
-  const w = document.querySelector('.list').offsetWidth || document.body.offsetWidth;
-  document.documentElement.style.setProperty('--rs', w / 840);
-}
-updateRS();
-window.addEventListener('resize', updateRS);
-
 const API     = "/api/menu-public";
 const REFRESH = 10000;
 
@@ -434,15 +407,15 @@ function makeCard(item) {
         <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
         <div class="beer-name-row">
           <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
+          ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
         </div>
         <div class="beer-style">${esc(item.style)}</div>
-        ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
         ${commentTagsHtml ? `<div class="beer-tags">${commentTagsHtml}</div>` : ""}
       </div>
       <div class="price-block${singlePrice ? " single" : ""}">${priceL}${priceS}</div>
     </div>
     <div class="divider"></div>
-    <div class="row-bottom">
+    <div class="row-bottom${sponsored ? " has-sponsor" : ""}">
       <div class="info-en">
         <div class="en-name">${esc(item.name_en)}</div>
         <div class="en-style">${esc(item.style_en)}</div>
