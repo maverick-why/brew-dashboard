@@ -1441,7 +1441,7 @@
     claimed.forEach(c => rows.push([
       c.number,
       c.claimer_name || '',
-      maskPhone(c.claimer_phone),
+      c.claimer_phone || '',
       fmtDate(c.claimed_at),
     ]));
     const csv = '\uFEFF' + rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
