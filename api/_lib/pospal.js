@@ -55,11 +55,23 @@ class PospalClient {
 
   // 手机号查会员 → { customerUid, point, balance, ... }
   async getMemberByPhone(phone) {
-    const list = await this._request('/pospal-api2/openapi/v1/customerOpenapi/queryBytel', {
-      appId: this.appId,
-      customerTel: phone,
-    });
-    return Array.isArray(list) ? list[0] : list;
+    const digits = String(phone || '').replace(/\D/g, '');
+    if (!digits) return null;
+
+    // CN mobile: support both 159xxxx and 86159xxxx input shapes.
+    const cnLocal = /^86(1[3-9]\d{9})$/.test(digits) ? digits.slice(2) : digits;
+    const candidates = Array.from(new Set([cnLocal, digits].filter(Boolean)));
+
+    for (const customerTel of candidates) {
+      const list = await this._request('/pospal-api2/openapi/v1/customerOpenapi/queryBytel', {
+        appId: this.appId,
+        customerTel,
+      });
+      const member = Array.isArray(list) ? list[0] : list;
+      if (member?.customerUid) return member;
+    }
+
+    return null;
   }
 
   // UID 查积分余额 → { point, balance, ... }

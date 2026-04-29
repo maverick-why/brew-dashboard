@@ -55,10 +55,10 @@ module.exports = async function handler(req, res) {
     const supabase = getSupabase();
     const cached = await lookupCache(supabase, phone);
     let customerUid = cached.found ? cached.customerUid : null;
+    const pospal = new PospalClient();
 
     if (!customerUid) {
       // Cache miss 或缓存中 UID 为空 → 调银豹
-      const pospal = new PospalClient();
       const customerInfo = await pospal.getMemberByPhone(phone);
       customerUid = customerInfo?.customerUid;
       if (!customerUid) {
