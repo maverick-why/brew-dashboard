@@ -369,6 +369,7 @@
       <button class="tab-btn" data-tab="sponsor-review">冠名审核</button>
       <button class="tab-btn" data-tab="sponsor-manage">冠名管理</button>
       <button class="tab-btn" data-tab="cups">开业酒杯</button>
+      <button class="tab-btn" data-tab="run-review">跑量审核</button>
     </div>
 
     <!-- Tab: 发酵罐 -->
@@ -552,6 +553,26 @@
         </table>
       </div>
     </div>
+
+    <div class="tab-pane" id="tab-run-review">
+      <div class="toolbar">
+        <div class="btns">
+          <h3 style="margin:0;font-size:14px;font-weight:900">跑量审核</h3>
+          <button onclick="refreshRunReviewFrame()">刷新</button>
+          <button class="blue" onclick="openRunReviewInNewTab()">新窗口打开 ↗</button>
+        </div>
+        <div class="muted">内嵌 run.dbbrewbeer.com 的审核后台，审核通过后会发券到银豹。</div>
+      </div>
+      <div style="height:min(75vh,860px);padding:12px;border-top:1px solid var(--line)">
+        <iframe
+          id="run-review-frame"
+          title="跑量审核后台"
+          src="about:blank"
+          style="width:100%;height:100%;border:1px solid rgba(255,255,255,.10);border-radius:12px;background:#0b1220"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -589,6 +610,7 @@
 <script>
   const LOAD_URL  = "/api/load";
   const SAVE_URL  = "/api/save";
+  const RUN_REVIEW_URL = "https://run.dbbrewbeer.com/admin/run-voucher";
   const KEY_PREFIX = "F";
 
   let ADMIN_PASS = "";
@@ -1453,11 +1475,36 @@
     URL.revokeObjectURL(url);
   }
 
+  // ====== 跑量审核（run.dbbrewbeer.com 内嵌）===============================
+  function refreshRunReviewFrame() {
+    const frame = document.getElementById('run-review-frame');
+    if (!frame) return;
+    const src = frame.getAttribute('src');
+    if (!src || src === 'about:blank') {
+      frame.setAttribute('src', RUN_REVIEW_URL);
+      return;
+    }
+    frame.setAttribute('src', `${RUN_REVIEW_URL}?t=${Date.now()}`);
+  }
+
+  function openRunReviewInNewTab() {
+    window.open(RUN_REVIEW_URL, '_blank', 'noopener,noreferrer');
+  }
+
+  function ensureRunReviewFrameLoaded() {
+    const frame = document.getElementById('run-review-frame');
+    if (!frame) return;
+    if (!frame.getAttribute('src') || frame.getAttribute('src') === 'about:blank') {
+      frame.setAttribute('src', RUN_REVIEW_URL);
+    }
+  }
+
   // Auto-load cups when switching to cups tab
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       if (btn.dataset.tab === 'cups') loadCupAdmin();
       if (btn.dataset.tab === 'sponsor-manage') { loadAllSponsors(); loadTapToggles(); }
+      if (btn.dataset.tab === 'run-review') ensureRunReviewFrameLoaded();
     });
   });
 
