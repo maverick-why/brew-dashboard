@@ -560,10 +560,9 @@
           <h3 style="margin:0;font-size:14px;font-weight:900">跑量审核</h3>
           <button onclick="openRunReviewInNewTab()">审核后台 ↗</button>
           <button class="blue" onclick="openRunVoucherFrontInNewTab()">活动前台 ↗</button>
-          <button onclick="configureRunBaseUrl()">设置系统地址</button>
           <button onclick="toggleRunReviewEmbed()">尝试内嵌</button>
         </div>
-        <div class="muted">若内嵌被浏览器安全策略拦截，请优先使用“审核后台 ↗ / 活动前台 ↗”。当前地址：<span id="run-url-current"></span></div>
+        <div class="muted">若内嵌被浏览器安全策略拦截，请优先使用“审核后台 ↗ / 活动前台 ↗”。</div>
       </div>
       <div style="padding:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)">
         <div style="font-size:13px;color:rgba(234,240,255,.82);line-height:1.65">
@@ -619,8 +618,9 @@
 <script>
   const LOAD_URL  = "/api/load";
   const SAVE_URL  = "/api/save";
-  const RUN_BASE_URL_DEFAULT = "https://run.dbbrewbeer.com";
-  const RUN_BASE_URL_KEY = "runReviewBaseUrl";
+  // Route through dashboard domain to avoid DNS and iframe cross-origin issues.
+  const RUN_REVIEW_URL = "/run-review/admin/run-voucher";
+  const RUN_VOUCHER_FRONT_URL = "/run-review/run-voucher";
   const KEY_PREFIX = "F";
 
   let ADMIN_PASS = "";
@@ -638,48 +638,6 @@
   window.addEventListener("beforeunload", e => {
     if(isDirty) e.preventDefault();
   });
-
-  function normalizeRunBaseUrl(url) {
-    return String(url || "").trim().replace(/\/+$/, "");
-  }
-
-  function getRunBaseUrl() {
-    const saved = localStorage.getItem(RUN_BASE_URL_KEY);
-    return normalizeRunBaseUrl(saved || RUN_BASE_URL_DEFAULT);
-  }
-
-  function setRunBaseUrl(url) {
-    const normalized = normalizeRunBaseUrl(url);
-    localStorage.setItem(RUN_BASE_URL_KEY, normalized);
-    renderRunBaseUrl();
-  }
-
-  function getRunReviewUrl() {
-    return `${getRunBaseUrl()}/admin/run-voucher`;
-  }
-
-  function getRunVoucherFrontUrl() {
-    return `${getRunBaseUrl()}/run-voucher`;
-  }
-
-  function renderRunBaseUrl() {
-    const el = document.getElementById("run-url-current");
-    if (!el) return;
-    el.textContent = getRunBaseUrl();
-  }
-
-  function configureRunBaseUrl() {
-    const current = getRunBaseUrl();
-    const input = window.prompt("请输入跑量系统域名（例如 https://run.dbbrewbeer.com 或可用的 vercel.app 地址）", current);
-    if (!input) return;
-    const normalized = normalizeRunBaseUrl(input);
-    if (!/^https?:\/\//i.test(normalized)) {
-      toast("地址格式不正确，请包含 http:// 或 https://", false);
-      return;
-    }
-    setRunBaseUrl(normalized);
-    toast("跑量系统地址已更新", true);
-  }
 
   // Ctrl+S 在各 tab 中分别处理（见底部）
   // document.addEventListener("keydown", ...) 已移至底部统一处理
@@ -1531,21 +1489,20 @@
   function refreshRunReviewFrame() {
     const frame = document.getElementById('run-review-frame');
     if (!frame) return;
-    const runReviewUrl = getRunReviewUrl();
     const src = frame.getAttribute('src');
     if (!src || src === 'about:blank') {
-      frame.setAttribute('src', runReviewUrl);
+      frame.setAttribute('src', RUN_REVIEW_URL);
       return;
     }
-    frame.setAttribute('src', `${runReviewUrl}?t=${Date.now()}`);
+    frame.setAttribute('src', `${RUN_REVIEW_URL}?t=${Date.now()}`);
   }
 
   function openRunReviewInNewTab() {
-    window.open(getRunReviewUrl(), '_blank', 'noopener,noreferrer');
+    window.open(RUN_REVIEW_URL, '_blank', 'noopener,noreferrer');
   }
 
   function openRunVoucherFrontInNewTab() {
-    window.open(getRunVoucherFrontUrl(), '_blank', 'noopener,noreferrer');
+    window.open(RUN_VOUCHER_FRONT_URL, '_blank', 'noopener,noreferrer');
   }
 
   function toggleRunReviewEmbed() {
@@ -1555,7 +1512,7 @@
     const isHidden = wrap.style.display === 'none';
     wrap.style.display = isHidden ? 'block' : 'none';
     if (isHidden && (!frame.getAttribute('src') || frame.getAttribute('src') === 'about:blank')) {
-      frame.setAttribute('src', getRunReviewUrl());
+      frame.setAttribute('src', RUN_REVIEW_URL);
     }
   }
 
@@ -1563,7 +1520,7 @@
     const frame = document.getElementById('run-review-frame');
     if (!frame) return;
     if (!frame.getAttribute('src') || frame.getAttribute('src') === 'about:blank') {
-      frame.setAttribute('src', getRunReviewUrl());
+      frame.setAttribute('src', RUN_REVIEW_URL);
     }
   }
 
@@ -1629,7 +1586,6 @@
 
   // 初始：显示未登录，等待登录蒙层操作
   setAuthUI(false);
-  renderRunBaseUrl();
   renderMenu(); // 初始渲染空酒单表格
 </script>
 </body>
