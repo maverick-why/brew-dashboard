@@ -2,7 +2,6 @@
   "rewrites": [
     { "source": "/claimyourtap", "destination": "/claimyourtap.html" },
     { "source": "/class", "destination": "/class.html" },
-    { "source": "/run-review/:path*", "destination": "https://run-git-main-mavericks-projects-728ea7ac.vercel.app/:path*" },
     { "source": "/api/cup/verify", "destination": "/api/cup" },
     { "source": "/api/cup/claim", "destination": "/api/cup" },
     { "source": "/api/cup/admin", "destination": "/api/cup" },
