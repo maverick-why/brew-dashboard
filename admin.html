@@ -610,8 +610,8 @@
 <script>
   const LOAD_URL  = "/api/load";
   const SAVE_URL  = "/api/save";
-  // Use Vercel production alias as fallback while custom domain DNS propagates.
-  const RUN_REVIEW_URL = "https://run-git-main-mavericks-projects-728ea7ac.vercel.app/admin/run-voucher";
+  // Route through dashboard domain to avoid DNS and iframe cross-origin issues.
+  const RUN_REVIEW_URL = "/run-review/admin/run-voucher";
   const KEY_PREFIX = "F";
 
   let ADMIN_PASS = "";
