@@ -10,10 +10,14 @@ module.exports = async function handler(req, res) {
     const { content, phone } = await readJsonBody(req);
     if (!content || !phone) return error(res, 400, '缺少 content 或 phone');
 
-    // 长度校验
-    const isChinese = /[\u4e00-\u9fa5]/.test(content);
-    if (isChinese && [...content].length > 6) return error(res, 400, '中文冠名最多6个字');
-    if (!isChinese && content.length > 12) return error(res, 400, '英文冠名最多12个字符');
+    // 长度校验：与前端 countInput() 保持一致
+    // 中文字符算 2 单位，其余算 1 单位；中文字符数 ≤ 6，总单位 ≤ 12
+    let cnCount = 0, totalUnits = 0;
+    for (const ch of [...content]) {
+      if (/[\u4e00-\u9fa5]/.test(ch)) { cnCount++; totalUnits += 2; }
+      else { totalUnits += 1; }
+    }
+    if (cnCount > 6 || totalUnits > 12) return error(res, 400, '冠名内容过长，中文最多6字或英文最多12字符');
 
     const { result, reason, auto_passed } = await reviewContent(content);
 

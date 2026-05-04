@@ -316,7 +316,7 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
     <div class="nav-bar">
       <button class="nav-back" id="btnBackToPoster">← 返回</button>
       <div class="nav-title">选择酒头</div>
-      <div class="nav-ph"></div>
+      <button class="nav-back" id="btnRefreshTaps" style="color:#c8922a;width:60px;text-align:right">↻ 刷新</button>
     </div>
     <div class="page-header">
       <div class="ph-title">霸占一支酒头</div>
@@ -680,11 +680,20 @@ let reviewToken = null;
 /* ══ 数据 ══ */
 let TAPS = [];
 
-async function loadTaps() {
-  const res = await fetch('/api/tap-list');
-  const json = await res.json();
-  if (json.code === 0) {
-    renderTaps(json.data);
+async function loadTaps(showRefreshFeedback = false) {
+  const refreshBtn = document.getElementById('btnRefreshTaps');
+  if (refreshBtn) { refreshBtn.textContent = '刷新中…'; refreshBtn.disabled = true; }
+  try {
+    const res = await fetch('/api/tap-list');
+    const json = await res.json();
+    if (json.code === 0) {
+      renderTaps(json.data);
+      if (showRefreshFeedback) showToast('酒头列表已更新');
+    }
+  } catch (e) {
+    if (showRefreshFeedback) showToast('刷新失败，请重试');
+  } finally {
+    if (refreshBtn) { refreshBtn.textContent = '↻ 刷新'; refreshBtn.disabled = false; }
   }
 }
 
@@ -755,6 +764,39 @@ async function pollStatus(tapNo, maxMs = 2 * 60 * 60 * 1000) {
     }
   }
   return 'timeout';
+}
+
+/* ══ 手动刷新状态（状态页刷新按钮调用）══ */
+async function doRefreshStatus() {
+  const order = window._order;
+  if (!order || !verifiedPhone) { showToast('无法获取冠名信息，请重试'); return; }
+  const btn = document.querySelector('#statusActions .btn-secondary');
+  if (btn) { btn.textContent = '查询中…'; btn.disabled = true; }
+  try {
+    const res = await fetch(`/api/sponsor?phone=${encodeURIComponent(verifiedPhone)}&tapNo=${order.tapNo}`);
+    const json = await res.json();
+    if (json.code === 0) {
+      const s = json.data.status;
+      if (s === 'live' || s === 'approved') {
+        setStatus('approved');
+        loadTaps();
+        showToast('🎉 冠名已上线！');
+      } else if (s === 'rejected') {
+        setStatus('rejected');
+        loadTaps();
+        showToast('冠名审核未通过');
+      } else {
+        showToast('仍在审核中，请稍后再试');
+        if (btn) { btn.textContent = '刷新状态'; btn.disabled = false; }
+      }
+    } else {
+      showToast('查询失败：' + (json.message || '网络错误'));
+      if (btn) { btn.textContent = '刷新状态'; btn.disabled = false; }
+    }
+  } catch (e) {
+    showToast('查询失败，请重试');
+    if (btn) { btn.textContent = '刷新状态'; btn.disabled = false; }
+  }
 }
 let reviewResult = null; // null | {result, reason}
 let fetchedUser  = null;
@@ -944,6 +986,7 @@ document.getElementById("cbOk").addEventListener("click",async()=>{
     : 'pending';
   setStatus(initialStatus);
   goScreen(2);
+  loadTaps(); // 冠名成功后立即刷新酒头列表
   // 如果是 pending，开始轮询
   if (submitStatus === 'pending' || initialStatus === 'pending' || initialStatus === 'pending_edge') {
     pollStatus(tapNo).then(finalStatus => {
@@ -1058,7 +1101,8 @@ document.getElementById("btnRetryPhone").addEventListener("click", ()=>{
 });
 
 document.getElementById("btnBackToPoster").addEventListener("click",()=>goScreen(-1));
-document.getElementById("btnBackToSelect").addEventListener("click",()=>goScreen(1));
+document.getElementById("btnBackToSelect").addEventListener("click",()=>{ goScreen(1); loadTaps(); });
+document.getElementById("btnRefreshTaps").addEventListener("click",()=>loadTaps(true));
 
 /* ══ 初始化：加载酒头列表 ══ */
 loadTaps();
@@ -1105,7 +1149,7 @@ function setStatus(status){
         {dot:"active",title:"人工确认中", time:"预计24小时内"},
         {dot:"wait", title:"大屏上线展示",time:""},
       ],
-      actions:`<button class="btn-secondary" onclick="showToast('当前仍在审核中，请耐心等待')">刷新状态</button>`,
+      actions:`<button class="btn-secondary" onclick="doRefreshStatus()">刷新状态</button>`,
       tip:`<div class="tip-box"><div class="tip-title">温馨提示</div>
         <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">内容已通过 AI 初审，人工确认通常在24小时内完成</div></div>
         <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">审核结果将通过公众号消息通知您</div></div>
@@ -1122,7 +1166,7 @@ function setStatus(status){
         {dot:"active",title:"人工审核中", time:"预计24小时内"},
         {dot:"wait", title:"大屏上线展示",time:""},
       ],
-      actions:`<button class="btn-secondary" onclick="showToast('当前仍在审核中，请耐心等待')">刷新状态</button>`,
+      actions:`<button class="btn-secondary" onclick="doRefreshStatus()">刷新状态</button>`,
       tip:`<div class="tip-box"><div class="tip-title">温馨提示</div>
         <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">您的冠名内容由 AI 标记为边缘内容，已转人工复核</div></div>
         <div class="tip-item"><div class="tip-dot-sm"></div><div class="tip-text">通过后将立即上线，拒绝则积分与余额不退还</div></div>
@@ -1138,7 +1182,7 @@ function setStatus(status){
         {dot:"ok",  title:"大屏已展示", time:"已上线"},
       ],
       actions:`
-        <p style="font-size:12px;color:#999;text-align:center;margin:4px 0 0;line-height:1.6"> </p>
+        <button class="btn-main green" onclick="goScreen(1);loadTaps()">← 返回查看酒头列表</button>
         <button class="btn-secondary"  onclick="showToast('已复制分享链接')">分享给朋友</button>`,
       tip:`
         <div class="tip-box"><div class="tip-title">冠名权益</div>
