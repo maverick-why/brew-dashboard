@@ -5,12 +5,14 @@
       "use": "@vercel/static-build",
       "config": { "distDir": "brewops/dist" }
     },
-    { "src": "api/**/*.js", "use": "@vercel/node" }
+    { "src": "api/*.js",         "use": "@vercel/node" },
+    { "src": "api/brewops/*.js", "use": "@vercel/node" },
+    { "src": "api/cron/*.js",    "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/brewops",             "dest": "/brewops/dist/index.html" },
     { "src": "/brewops/assets/(.*)", "dest": "/brewops/dist/assets/$1" },
     { "src": "/brewops/(.*)",        "dest": "/brewops/dist/index.html" },
-    { "src": "/brewops",             "dest": "/brewops/dist/index.html" },
     { "src": "/api/cup/verify",      "dest": "/api/cup" },
     { "src": "/api/cup/claim",       "dest": "/api/cup" },
     { "src": "/api/cup/admin",       "dest": "/api/cup" },
