@@ -24,13 +24,10 @@ export default function LogSheet({ logForm, ops, onSave, onClose }) {
   }
 
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:100, display:'flex', alignItems:'flex-end', justifyContent:'center' }}
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:100, display:'flex', alignItems:'center', justifyContent:'center', padding:'16px' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div style={{ width:'100%', maxWidth:700, maxHeight:'88%', overflowY:'auto', background:C.card, borderRadius:'20px 20px 0 0', paddingBottom:28 }}
+      <div style={{ width:'100%', maxWidth:600, maxHeight:'90vh', overflowY:'auto', background:C.card, borderRadius:20, paddingBottom:28 }}
         onClick={e => e.stopPropagation()}>
-        <div style={{ display:'flex', justifyContent:'center', padding:'10px 0 0' }}>
-          <div style={{ width:32, height:4, borderRadius:2, background:C.bd }} />
-        </div>
         <div style={{ padding:'14px 18px 12px', borderBottom:`1px solid ${C.bd}`, display:'flex', alignItems:'center', gap:10 }}>
           <div style={{ width:34, height:34, borderRadius:'50%', background:step.c+'18', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, fontSize:12, color:step.c }}>{step.s}</div>
           <div>
