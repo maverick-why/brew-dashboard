@@ -3,7 +3,7 @@
     {
       "src": "brewops/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "brewops/dist" }
+      "config": { "distDir": "dist" }
     },
     { "src": "api/*.js",         "use": "@vercel/node" },
     { "src": "api/brewops/*.js", "use": "@vercel/node" },
@@ -11,8 +11,8 @@
   ],
   "routes": [
     { "src": "/brewops",             "headers": { "Location": "/brewops/" }, "status": 301 },
-    { "src": "/brewops/assets/(.*)", "dest": "/brewops/dist/assets/$1" },
-    { "src": "/brewops/(.*)",        "dest": "/brewops/dist/index.html" },
+    { "src": "/brewops/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/brewops/(.*)",        "dest": "/index.html" },
     { "src": "/api/cup/verify",      "dest": "/api/cup" },
     { "src": "/api/cup/claim",       "dest": "/api/cup" },
     { "src": "/api/cup/admin",       "dest": "/api/cup" },
