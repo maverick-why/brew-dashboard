@@ -23,8 +23,28 @@ export default function SetupPage() {
     e.preventDefault()
     if (!slug.match(/^[a-z0-9-]+$/)) return setErr('英文标识只能包含小写字母、数字和连字符')
     setErr(''); setLoading(true)
-    try { await createBrewery(name, slug, displayName) }
-    catch (e) { setErr(e.message) }
+    try {
+      // Try with current slug; if collision, append random 4-char suffix and retry once
+      try {
+        await createBrewery(name, slug, displayName)
+      } catch (e1) {
+        if (e1.message?.includes('breweries_slug_key') || e1.code === '23505') {
+          const suffix = Math.random().toString(36).slice(2, 6)
+          const newSlug = `${slug}-${suffix}`
+          setSlug(newSlug)
+          await createBrewery(name, newSlug, displayName)
+        } else {
+          throw e1
+        }
+      }
+    }
+    catch (e) {
+      if (e.message?.includes('breweries_slug_key') || e.code === '23505') {
+        setErr('该英文标识已被使用，请在下方修改后重试')
+      } else {
+        setErr(e.message)
+      }
+    }
     finally { setLoading(false) }
   }
 
