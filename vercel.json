@@ -3,7 +3,7 @@
     {
       "src": "brewops/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": { "distDir": "brewops/dist" }
     },
     { "src": "api/*.js",         "use": "@vercel/node" },
     { "src": "api/brewops/*.js", "use": "@vercel/node" },
