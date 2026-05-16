@@ -61,7 +61,7 @@ function MainApp() {
         const st = stepStatus(d)
         const done = batch.logs.some(l => l.step_key === s.k && !l.is_defer)
         const task = { batch, step: s, date: new Date(d), st, done }
-        if (st === 'today') today.push(task)
+        if (st === 'today' || st === 'overdue') today.push(task)
         else if (st === 'tomorrow') tomorrow.push(task)
         else if (st === 'soon') soon.push(task)
       })
@@ -70,7 +70,7 @@ function MainApp() {
   }
 
   const { today: todayT, tomorrow: tomT, soon: soonT } = getTasks()
-  const urgentN = [...todayT, ...tomT].filter(t => !t.done).length
+  const urgentN = todayT.filter(t => !t.done).length
 
   function openLog(batch, step) {
     const ex = batch.logs.find(l => l.step_key === step.k && !l.is_defer) ?? null

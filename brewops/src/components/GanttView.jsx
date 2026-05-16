@@ -173,7 +173,7 @@ export default function GanttView({ batches, ganttStart, ganttDays, setGanttStar
               if (mx < LW - 2 || mx > TOTAL_W + 2) return null
               const st = stepStatus(mDate)
               const log = batch.logs.find(l => l.step_key === s.k && !l.is_defer)
-              const mode = log ? 'logged' : st==='today' ? 'urgent' : st==='tomorrow' ? 'tomorrow' : st==='soon' ? 'soon' : st==='done' ? 'done' : 'future'
+              const mode = log ? 'logged' : st==='today' ? 'urgent' : st==='tomorrow' ? 'tomorrow' : st==='soon' ? 'soon' : st==='overdue' ? 'done' : 'future'
               const leftPct = (mx / TOTAL_W * 100) + '%'
               const topPx = barY - 28
               const scaledTop = (topPx / totalH * 100) + '%'

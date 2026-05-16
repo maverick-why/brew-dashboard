@@ -9,7 +9,7 @@ export const parseD = s => { if(!s) return null; const d=new Date(s); d.setHours
 export function stepStatus(dateVal) {
   if (!dateVal) return 'future'
   const diff = diffD(tod(), new Date(dateVal))
-  if (diff < 0)  return 'done'
+  if (diff < 0)  return 'overdue'
   if (diff === 0) return 'today'
   if (diff === 1) return 'tomorrow'
   if (diff <= 3)  return 'soon'

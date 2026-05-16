@@ -52,7 +52,7 @@ export default function EditSheet({ batch, onSave, onDelete, onDeleteLog, onLog,
             )
             const st = stepStatus(parseD(plan[s.k]))
             const log = batch.logs.find(l => l.step_key === s.k)
-            const hl = st==='today'?'#fef2f2':st==='tomorrow'?'#fffbeb':'transparent'
+            const hl = (st==='today'||st==='overdue')?'#fef2f2':st==='tomorrow'?'#fffbeb':'transparent'
             return (
               <div key={s.k} style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10, background:hl, borderRadius:10, padding:'7px 10px', marginLeft:-10, marginRight:-10 }}>
                 <span style={{ width:8, height:8, borderRadius:'50%', background:s.c, flexShrink:0 }} />
@@ -66,11 +66,11 @@ export default function EditSheet({ batch, onSave, onDelete, onDeleteLog, onLog,
                           style={{ background:'none', border:'none', color:'#aaa', fontSize:12, cursor:'pointer', lineHeight:1, padding:'0 2px' }} title="删除此记录">×</button>
                       </span>
                     )}
-                    {st==='today' && !log && <span style={{ fontSize:10, color:C.red, fontWeight:700 }}>今天!</span>}
+                    {(st==='today'||st==='overdue') && !log && <span style={{ fontSize:10, color:C.red, fontWeight:700 }}>{st==='overdue'?'已逾期!':'今天!'}</span>}
                   </div>
                   <input type="date" value={plan[s.k]||''} onChange={e=>setPlan(prev=>({...prev,[s.k]:e.target.value}))}
                     disabled={!!log}
-                    style={{ width:'100%', boxSizing:'border-box', background: log?C.fa:'#fff', border:`1px solid ${st==='today'?C.red+'88':C.bd}`, borderRadius:8, padding:'8px 10px', fontSize:13, color: log?C.mu:C.tx, cursor: log?'not-allowed':'auto' }} />
+                    style={{ width:'100%', boxSizing:'border-box', background: log?C.fa:'#fff', border:`1px solid ${(st==='today'||st==='overdue')?C.red+'88':C.bd}`, borderRadius:8, padding:'8px 10px', fontSize:13, color: log?C.mu:C.tx, cursor: log?'not-allowed':'auto' }} />
                 </div>
                 <button onClick={()=>{ onClose(); setTimeout(()=>onLog(batch, s), 80) }}
                   style={{ flexShrink:0, background:C.fa, border:`1px solid ${C.bd}`, borderRadius:8, padding:'7px 10px', color:'#555', fontSize:12, cursor:'pointer' }}>记录</button>
