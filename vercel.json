@@ -1,16 +1,16 @@
 {
   "buildCommand": "cd brewops && npm install && npm run build && cp -n ../*.html dist/ 2>/dev/null; true",
   "outputDirectory": "brewops/dist",
-  "redirects": [
-    { "source": "/brewops", "destination": "/brewops/", "permanent": true }
-  ],
   "rewrites": [
     { "source": "/api/cup/verify",       "destination": "/api/cup" },
     { "source": "/api/cup/claim",        "destination": "/api/cup" },
     { "source": "/api/cup/admin",        "destination": "/api/cup" },
     { "source": "/api/cup/sync-members", "destination": "/api/cup" },
     { "source": "/claimyourtap",         "destination": "/claimyourtap.html" },
-    { "source": "/class(/?)",            "destination": "/class.html" },
+    { "source": "/class",                "destination": "/class.html" },
+    { "source": "/brewops/assets/:file*","destination": "/assets/:file*" },
+    { "source": "/brewops",              "destination": "/index.html" },
+    { "source": "/brewops/",             "destination": "/index.html" },
     { "source": "/brewops/:path*",       "destination": "/index.html" }
   ],
   "crons": [
