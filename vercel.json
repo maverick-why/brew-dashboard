@@ -1,20 +1,6 @@
 {
   "buildCommand": "cd brewops && npm install && npm run build && cp -n ../*.html dist/ 2>/dev/null; true",
   "outputDirectory": "brewops/dist",
-  "functions": {
-    "api/admin.js":            {},
-    "api/cup.js":              {},
-    "api/load.js":             {},
-    "api/member-info.js":      {},
-    "api/menu-edit.js":        {},
-    "api/menu-public.js":      {},
-    "api/public.js":           {},
-    "api/save.js":             {},
-    "api/sponsor.js":          {},
-    "api/tap-list.js":         {},
-    "api/brewops/invite.js":   {},
-    "api/cron/sponsor-expiry.js": {}
-  },
   "redirects": [
     { "source": "/brewops", "destination": "/brewops/", "permanent": true }
   ],

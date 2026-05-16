@@ -1,0 +1,3 @@
+# Hobby plan 限额 12 个 Serverless Function
+# review-content 无显式路由，暂时排除以保持总数 ≤ 12
+api/review-content.js
