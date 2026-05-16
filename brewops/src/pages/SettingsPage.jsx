@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { useBrewery } from '../hooks/useBrewery.jsx'
@@ -12,6 +12,7 @@ export default function SettingsPage() {
   const [inviteErr, setInviteErr]     = useState('')
   const [inviteOk, setInviteOk]       = useState(false)
   const [loading, setLoading]         = useState(false)
+  const [confirmId, setConfirmId]     = useState(null)  // 待确认移除的成员 id
 
   async function sendInvite(e) {
     e.preventDefault()
@@ -55,10 +56,19 @@ export default function SettingsPage() {
               <div style={{ fontSize:11, color:C.mu }}>{roleLabel[m.role]} · {statusLabel[m.status]}</div>
             </div>
             {m.role !== 'owner' && (
-              <button onClick={()=>{ if(confirm(`移除 ${m.display_name}？`)) removeMember(m.id) }}
-                style={{ fontSize:12, color:C.red, background:'none', border:`1px solid ${C.red}44`, borderRadius:8, padding:'5px 10px', cursor:'pointer' }}>
-                移除
-              </button>
+              confirmId === m.id ? (
+                <div style={{ display:'flex', gap:6 }}>
+                  <button onClick={() => setConfirmId(null)}
+                    style={{ fontSize:11, color:C.mu, background:'none', border:`1px solid ${C.bd}`, borderRadius:8, padding:'4px 8px', cursor:'pointer' }}>取消</button>
+                  <button onClick={() => { removeMember(m.id); setConfirmId(null) }}
+                    style={{ fontSize:11, color:'#fff', background:C.red, border:'none', borderRadius:8, padding:'4px 10px', cursor:'pointer', fontWeight:700 }}>确认</button>
+                </div>
+              ) : (
+                <button onClick={() => setConfirmId(m.id)}
+                  style={{ fontSize:12, color:C.red, background:'none', border:`1px solid ${C.red}44`, borderRadius:8, padding:'5px 10px', cursor:'pointer' }}>
+                  移除
+                </button>
+              )
             )}
           </div>
         ))}

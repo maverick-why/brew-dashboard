@@ -31,10 +31,27 @@ module.exports = async (req, res) => {
 
   const admin = getAdminClient()
 
-  const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(email, {
+  // 邀请用户（Supabase 创建 auth 账号并发邮件）
+  const { data: invited, error: inviteErr } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { brewery_id: member.brewery_id, role: 'brewer' },
+    redirectTo: (process.env.APP_URL || 'https://why.beer') + '/brewops/',
   })
   if (inviteErr) return res.status(500).json({ error: inviteErr.message })
+
+  // 预建 pending 成员记录，避免被邀请人登录后找不到酒厂
+  const { error: memErr } = await admin
+    .from('brewery_members')
+    .upsert(
+      {
+        brewery_id: member.brewery_id,
+        user_id:    invited.user.id,
+        role:       'brewer',
+        display_name: email.split('@')[0],   // 临时昵称，接受邀请时可改
+        status:     'pending',
+      },
+      { onConflict: 'user_id,brewery_id' }
+    )
+  if (memErr) return res.status(500).json({ error: memErr.message })
 
   return res.status(200).json({ ok: true })
 }

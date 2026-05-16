@@ -3,9 +3,10 @@ import { useAuth } from './hooks/useAuth.jsx'
 import { useBrewery } from './hooks/useBrewery.jsx'
 import { useBatches } from './hooks/useBatches.js'
 import { useState } from 'react'
-import LoginPage    from './pages/LoginPage.jsx'
-import SetupPage    from './pages/SetupPage.jsx'
-import SettingsPage from './pages/SettingsPage.jsx'
+import LoginPage         from './pages/LoginPage.jsx'
+import SetupPage         from './pages/SetupPage.jsx'
+import SettingsPage      from './pages/SettingsPage.jsx'
+import AcceptInvitePage  from './pages/AcceptInvitePage.jsx'
 import GanttView    from './components/GanttView.jsx'
 import TodayView    from './components/TodayView.jsx'
 import LogsView     from './components/LogsView.jsx'
@@ -34,7 +35,7 @@ function Spinner() {
 }
 
 function MainApp() {
-  const { brewery, members, loading: breweryLoading } = useBrewery()
+  const { brewery, members, pendingMember, loading: breweryLoading } = useBrewery()
   const { batches, loading, addBatch, updateBatch, archiveBatch, saveLog, deferStep, clearLog, deleteLog } = useBatches(brewery?.id)
   const navigate = useNavigate()
 
@@ -47,6 +48,7 @@ function MainApp() {
   const [ganttDays, setGanttDays]   = useState(18)
 
   if (breweryLoading) return <Spinner />
+  if (!brewery && pendingMember) return <Navigate to="/brewops/accept" replace />
   if (!brewery) return <Navigate to="/brewops/setup" replace />
 
   const OPS = members.filter(m => m.status === 'active').map(m => m.display_name)
@@ -147,6 +149,7 @@ export default function App() {
     <Routes>
       <Route path="/brewops/login"    element={<LoginPage />} />
       <Route path="/brewops/setup"    element={<RequireAuth><SetupPage /></RequireAuth>} />
+      <Route path="/brewops/accept"   element={<RequireAuth><AcceptInvitePage /></RequireAuth>} />
       <Route path="/brewops/settings" element={<RequireOwner><SettingsPage /></RequireOwner>} />
       <Route path="/brewops/*"        element={<RequireAuth><MainApp /></RequireAuth>} />
     </Routes>
