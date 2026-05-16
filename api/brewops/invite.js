@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
   // 邀请用户（Supabase 创建 auth 账号并发邮件）
   const { data: invited, error: inviteErr } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { brewery_id: member.brewery_id, role: 'brewer' },
-    redirectTo: (process.env.APP_URL || 'https://why.beer') + '/brewops/',
+    redirectTo: (process.env.APP_URL || 'https://dashboard.dbbrewbeer.com') + '/brewops/',
   })
   if (inviteErr) return res.status(500).json({ error: inviteErr.message })
 
