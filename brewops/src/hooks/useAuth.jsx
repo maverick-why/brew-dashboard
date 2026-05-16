@@ -17,6 +17,11 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }
 
+  async function signUp(email, password) {
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) throw error
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
@@ -29,7 +34,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthCtx.Provider value={{ session, user: session?.user ?? null, loading: session === undefined, signIn, signOut, resetPassword }}>
+    <AuthCtx.Provider value={{ session, user: session?.user ?? null, loading: session === undefined, signIn, signUp, signOut, resetPassword }}>
       {children}
     </AuthCtx.Provider>
   )
