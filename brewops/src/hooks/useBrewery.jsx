@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
-import { useAuth } from './useAuth.js'
+import { useAuth } from './useAuth.jsx'
 
 const BreweryCtx = createContext(null)
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth.js'
-import { useBrewery } from '../hooks/useBrewery.js'
+import { useAuth } from '../hooks/useAuth.jsx'
+import { useBrewery } from '../hooks/useBrewery.jsx'
 import { C } from '../constants.js'
 
 export default function SettingsPage() {

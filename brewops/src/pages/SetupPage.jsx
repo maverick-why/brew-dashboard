@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useBrewery } from '../hooks/useBrewery.js'
+import { useBrewery } from '../hooks/useBrewery.jsx'
 import { C } from '../constants.js'
 
 export default function SetupPage() {
