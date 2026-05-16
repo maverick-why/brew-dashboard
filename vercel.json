@@ -1,25 +1,17 @@
 {
-  "builds": [
-    {
-      "src": "brewops/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "brewops/dist" }
-    },
-    { "src": "api/*.js",         "use": "@vercel/node" },
-    { "src": "api/brewops/*.js", "use": "@vercel/node" },
-    { "src": "api/cron/*.js",    "use": "@vercel/node" }
+  "buildCommand": "cd brewops && npm install && npm run build && cp -n ../*.html dist/ 2>/dev/null; true",
+  "outputDirectory": "brewops/dist",
+  "redirects": [
+    { "source": "/brewops", "destination": "/brewops/", "permanent": true }
   ],
-  "routes": [
-    { "src": "/brewops",             "headers": { "Location": "/brewops/" }, "status": 301 },
-    { "src": "/brewops/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "/brewops/(.*)",        "dest": "/index.html" },
-    { "src": "/api/cup/verify",      "dest": "/api/cup" },
-    { "src": "/api/cup/claim",       "dest": "/api/cup" },
-    { "src": "/api/cup/admin",       "dest": "/api/cup" },
-    { "src": "/api/cup/sync-members","dest": "/api/cup" },
-    { "src": "/claimyourtap",        "dest": "/claimyourtap.html" },
-    { "src": "/class(/?)",           "dest": "/class.html" },
-    { "src": "/(.*)",                "dest": "/$1" }
+  "rewrites": [
+    { "source": "/api/cup/verify",       "destination": "/api/cup" },
+    { "source": "/api/cup/claim",        "destination": "/api/cup" },
+    { "source": "/api/cup/admin",        "destination": "/api/cup" },
+    { "source": "/api/cup/sync-members", "destination": "/api/cup" },
+    { "source": "/claimyourtap",         "destination": "/claimyourtap.html" },
+    { "source": "/class(/?)",            "destination": "/class.html" },
+    { "source": "/brewops/:path*",       "destination": "/index.html" }
   ],
   "crons": [
     { "path": "/api/cron/sponsor-expiry", "schedule": "0 2 * * *" }
