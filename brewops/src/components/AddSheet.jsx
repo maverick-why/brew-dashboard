@@ -6,7 +6,7 @@ export default function AddSheet({ onAdd, onClose, count }) {
   const n = count + 1
   const [tank, setTank]   = useState(`FV-0${n}`)
   const [beer, setBeer]   = useState('')
-  const [batchNo, setBatchNo] = useState(`B2025-0${n}`)
+  const [batchNo, setBatchNo] = useState(`B${new Date().getFullYear()}-0${n}`)
   const [color, setColor] = useState(TCOLS[count % TCOLS.length])
   const [og, setOg]       = useState('')
   const [yeast, setYeast] = useState('')
@@ -30,9 +30,9 @@ export default function AddSheet({ onAdd, onClose, count }) {
   }
 
   return (
-    <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.35)', zIndex:100, display:'flex', alignItems:'flex-end' }}
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:100, display:'flex', alignItems:'flex-end', justifyContent:'center' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div style={{ width:'100%', maxHeight:'92%', overflowY:'auto', background:C.card, borderRadius:'20px 20px 0 0', paddingBottom:28 }}
+      <div style={{ width:'100%', maxWidth:700, maxHeight:'92%', overflowY:'auto', background:C.card, borderRadius:'20px 20px 0 0', paddingBottom:28 }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display:'flex', justifyContent:'center', padding:'10px 0 0' }}>
           <div style={{ width:32, height:4, borderRadius:2, background:C.bd }} />
@@ -74,6 +74,8 @@ export default function AddSheet({ onAdd, onClose, count }) {
               </div>
             ))}
           </div>
+        </div>
+        <div style={{ position:'sticky', bottom:0, background:C.card, padding:'10px 18px 24px', borderTop:`1px solid ${C.bd}` }}>
           <button onClick={submit}
             style={{ width:'100%', padding:15, borderRadius:12, fontSize:15, fontWeight:700, background:C.g, color:'#fff', border:'none', cursor:'pointer' }}>
             创建批次

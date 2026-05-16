@@ -11,14 +11,22 @@ export default function LogSheet({ logForm, ops, onSave, onClose }) {
   const [ph, setPh]     = useState(logForm.ph)
   const [mDate, setMDate] = useState(fmtFull(batch.plan[step.k]))
 
+  // 仅调整排期，不创建完成记录
+  function reschedule() {
+    onSave({ stepKey: step.k, rescheduleOnly: true, newDate: parseD(mDate) })
+  }
+
+  // 确认完成，创建操作记录，时间戳用填写的执行日期
   function submit() {
-    onSave({ stepKey: step.k, operator: op, ts: Date.now(), temp, brix, ph, note, newDate: parseD(mDate) })
+    const execDate = parseD(mDate)
+    const ts = execDate ? execDate.getTime() : Date.now()
+    onSave({ stepKey: step.k, operator: op, ts, temp, brix, ph, note, newDate: execDate })
   }
 
   return (
-    <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.35)', zIndex:100, display:'flex', alignItems:'flex-end' }}
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', zIndex:100, display:'flex', alignItems:'flex-end', justifyContent:'center' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div style={{ width:'100%', maxHeight:'88%', overflowY:'auto', background:C.card, borderRadius:'20px 20px 0 0', paddingBottom:28 }}
+      <div style={{ width:'100%', maxWidth:700, maxHeight:'88%', overflowY:'auto', background:C.card, borderRadius:'20px 20px 0 0', paddingBottom:28 }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display:'flex', justifyContent:'center', padding:'10px 0 0' }}>
           <div style={{ width:32, height:4, borderRadius:2, background:C.bd }} />
@@ -33,7 +41,7 @@ export default function LogSheet({ logForm, ops, onSave, onClose }) {
         </div>
         <div style={{ padding:'16px 18px 0' }}>
           <div style={{ marginBottom:14 }}>
-            <div style={{ fontSize:10, color:C.mu, marginBottom:6, textTransform:'uppercase', letterSpacing:'0.05em' }}>执行日期</div>
+            <div style={{ fontSize:10, color:C.mu, marginBottom:6, textTransform:'uppercase', letterSpacing:'0.05em' }}>执行日期（调整排期或记录实际执行日）</div>
             <input type="date" value={mDate} onChange={e=>setMDate(e.target.value)}
               style={{ width:'100%', boxSizing:'border-box', background:'#fff', border:`1px solid ${C.bd}`, borderRadius:8, padding:'10px 12px', fontSize:14, color:C.tx }} />
           </div>
@@ -67,9 +75,17 @@ export default function LogSheet({ logForm, ops, onSave, onClose }) {
             <textarea value={note} onChange={e=>setNote(e.target.value)} rows={3} placeholder="操作备注、异常情况…"
               style={{ width:'100%', boxSizing:'border-box', background:'#fff', border:`1px solid ${C.bd}`, borderRadius:8, padding:'10px 12px', fontSize:14, color:C.tx, resize:'none' }} />
           </div>
-          <button onClick={submit} style={{ width:'100%', padding:15, borderRadius:12, fontSize:15, fontWeight:700, border:'none', background:step.c, color:'#fff', cursor:'pointer' }}>
-            ✓ 确认完成
-          </button>
+        </div>
+        <div style={{ position:'sticky', bottom:0, background:C.card, padding:'10px 18px 24px', borderTop:`1px solid ${C.bd}` }}>
+          <div style={{ display:'flex', gap:10, marginBottom:10 }}>
+            <button onClick={reschedule} style={{ flex:1, padding:13, borderRadius:12, fontSize:14, fontWeight:600, border:`1px solid ${C.bd}`, background:C.fa, color:C.tx, cursor:'pointer' }}>
+              📅 仅调整排期
+            </button>
+            <button onClick={submit} style={{ flex:1, padding:13, borderRadius:12, fontSize:14, fontWeight:700, border:'none', background:step.c, color:'#fff', cursor:'pointer' }}>
+              ✓ 确认完成
+            </button>
+          </div>
+          <div style={{ fontSize:11, color:C.mu, textAlign:'center' }}>调整排期 = 改计划日期不留记录 · 确认完成 = 已执行留下操作记录</div>
         </div>
       </div>
     </div>

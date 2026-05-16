@@ -10,7 +10,7 @@
     { "src": "api/cron/*.js",    "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/brewops",             "dest": "/brewops/dist/index.html" },
+    { "src": "/brewops",             "headers": { "Location": "/brewops/" }, "status": 301 },
     { "src": "/brewops/assets/(.*)", "dest": "/brewops/dist/assets/$1" },
     { "src": "/brewops/(.*)",        "dest": "/brewops/dist/index.html" },
     { "src": "/api/cup/verify",      "dest": "/api/cup" },

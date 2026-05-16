@@ -4,18 +4,19 @@ import { C } from '../constants.js'
 export default function BlinkPill({ label, color, mode, onClick }) {
   const [bright, setBright] = useState(true)
   useEffect(() => {
-    if (mode !== 'urgent' && mode !== 'soon') return
+    if (mode !== 'urgent' && mode !== 'tomorrow') return
     const spd = mode === 'urgent' ? 550 : 1100
     const id = setInterval(() => setBright(v => !v), spd)
     return () => clearInterval(id)
   }, [mode])
 
   const styles = {
-    urgent: { bg:color,       text:'#fff', border:color,      scale:bright?1:0.88, opacity:bright?1:0.45 },
-    soon:   { bg:color+'22',  text:color,  border:color+'88', scale:bright?1:0.96, opacity:bright?1:0.6  },
-    done:   { bg:'#00000008', text:'#aaa', border:C.bd,       scale:1, opacity:1 },
-    logged: { bg:color+'22',  text:color,  border:color+'66', scale:1, opacity:1 },
-    future: { bg:color+'15',  text:color,  border:color+'44', scale:1, opacity:1 },
+    urgent:   { bg:color,       text:'#fff', border:color,      scale:bright?1:0.88, opacity:bright?1:0.45 },
+    tomorrow: { bg:color+'22',  text:color,  border:color+'88', scale:bright?1:0.96, opacity:bright?1:0.6  },
+    soon:     { bg:color+'15',  text:color,  border:color+'44', scale:1, opacity:1 },
+    done:     { bg:'#00000008', text:'#aaa', border:C.bd,       scale:1, opacity:1 },
+    logged:   { bg:color+'22',  text:color,  border:color+'66', scale:1, opacity:1 },
+    future:   { bg:color+'15',  text:color,  border:color+'44', scale:1, opacity:1 },
   }[mode] || { bg:color+'15', text:color, border:color+'44', scale:1, opacity:1 }
 
   return (

@@ -34,16 +34,20 @@ function Spinner() {
 }
 
 function MainApp() {
-  const { brewery, members } = useBrewery()
-  const { batches, loading, addBatch, updateBatch, archiveBatch, saveLog, deferStep } = useBatches(brewery?.id)
+  const { brewery, members, loading: breweryLoading } = useBrewery()
+  const { batches, loading, addBatch, updateBatch, archiveBatch, saveLog, deferStep, clearLog, deleteLog } = useBatches(brewery?.id)
   const navigate = useNavigate()
 
+  // ⚠️ 所有 useState 必须在任何 early return 之前
   const [view, setView]             = useState('today')
   const [logForm, setLogForm]       = useState(null)
   const [editBatch, setEditBatch]   = useState(null)
   const [addModal, setAddModal]     = useState(false)
   const [ganttStart, setGanttStart] = useState(() => addD(tod(), -4))
   const [ganttDays, setGanttDays]   = useState(18)
+
+  if (breweryLoading) return <Spinner />
+  if (!brewery) return <Navigate to="/brewops/setup" replace />
 
   const OPS = members.filter(m => m.status === 'active').map(m => m.display_name)
 
@@ -80,9 +84,9 @@ function MainApp() {
   if (loading) return <Spinner />
 
   return (
-    <div style={{ background:C.bg, minHeight:'100%', fontFamily:'system-ui,-apple-system,sans-serif', color:C.tx, maxWidth:460, margin:'0 auto', position:'relative' }}>
+    <div style={{ background:C.bg, height:'100dvh', display:'flex', flexDirection:'column', fontFamily:'system-ui,-apple-system,sans-serif', color:C.tx, position:'relative', overflow:'hidden' }}>
       {/* Header */}
-      <div style={{ padding:'18px 16px 0', background:C.bg, position:'sticky', top:0, zIndex:10 }}>
+      <div style={{ padding:'18px 16px 0', background:C.bg, flexShrink:0, zIndex:10 }}>
         <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:10, color:C.mu, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:2 }}>{brewery?.name}</div>
@@ -103,7 +107,7 @@ function MainApp() {
           </button>
         </div>
         <div style={{ display:'flex', borderBottom:`1px solid ${C.bd}` }}>
-          {[['today', `今日任务${urgentN > 0 ? ` (${urgentN})` : ''}`], ['gantt','总览'], ['logs','记录']].map(([t, lbl]) => (
+          {[['today', `今日任务${urgentN > 0 ? ` (${urgentN})` : ''}`], ['gantt','总览'], ['logs','历史记录']].map(([t, lbl]) => (
             <button key={t} onClick={() => setView(t)} style={{
               flex:1, padding:'11px 0', fontSize:13, fontWeight:600, border:'none', background:'none', cursor:'pointer',
               color: view === t ? C.tx : C.mu,
@@ -113,14 +117,26 @@ function MainApp() {
         </div>
       </div>
 
-      <div style={{ overflowY:'auto', maxHeight:520, paddingBottom:20 }}>
+      <div style={{ flex:1, overflowY:'auto', paddingBottom:20 }}>
         {view === 'today' && <TodayView batches={batches} todayT={todayT} tomT={tomT} soonT={soonT} onLog={openLog} onEdit={b => setEditBatch({ ...b })} />}
-        {view === 'gantt' && <GanttView batches={batches} ganttStart={ganttStart} ganttDays={ganttDays} setGanttStart={setGanttStart} setGanttDays={setGanttDays} onLog={openLog} onEdit={b => setEditBatch({ ...b })} />}
+        {view === 'gantt' && <GanttView batches={batches} ganttStart={ganttStart} ganttDays={ganttDays} setGanttStart={setGanttStart} setGanttDays={setGanttDays} onLog={openLog} onEdit={b => setEditBatch({ ...b })} onReschedule={async (batchId, stepKey, newDate) => {
+          const batch = batches.find(b => b.id === batchId)
+          if (!batch) return
+          await updateBatch(batchId, { plan: { ...batch.plan, [stepKey]: newDate } })
+        }} />}
         {view === 'logs'  && <LogsView batches={batches} />}
       </div>
 
-      {logForm   && <LogSheet   logForm={logForm} ops={OPS} onSave={async d => { await saveLog({ batchId: logForm.batch.id, ...d }); setLogForm(null) }} onClose={() => setLogForm(null)} />}
-      {editBatch && <EditSheet  batch={editBatch} onSave={async u => { await updateBatch(u.id, u); setEditBatch(null) }} onDelete={async id => { await archiveBatch(id); setEditBatch(null) }} onLog={openLog} onClose={() => setEditBatch(null)} />}
+      {logForm   && <LogSheet   logForm={logForm} ops={OPS} onSave={async d => {
+        if (d.rescheduleOnly) {
+          await clearLog(logForm.batch.id, d.stepKey)   // 清除已有的完成记录
+          await updateBatch(logForm.batch.id, { plan: { ...logForm.batch.plan, [d.stepKey]: d.newDate } })
+        } else {
+          await saveLog({ batchId: logForm.batch.id, ...d })
+        }
+        setLogForm(null)
+      }} onClose={() => setLogForm(null)} />}
+      {editBatch && <EditSheet  batch={editBatch} onSave={async u => { await updateBatch(u.id, u); setEditBatch(null) }} onDelete={async id => { await archiveBatch(id); setEditBatch(null) }} onDeleteLog={async (logId) => { await deleteLog(logId, editBatch.id); setEditBatch(b => ({ ...b, logs: b.logs.filter(l => l.id !== logId) })) }} onLog={openLog} onClose={() => setEditBatch(null)} />}
       {addModal  && <AddSheet   onAdd={async d => { await addBatch(d); setAddModal(false) }} onClose={() => setAddModal(false)} count={batches.length} />}
     </div>
   )

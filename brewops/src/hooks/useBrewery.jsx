@@ -14,40 +14,50 @@ export function BreweryProvider({ children }) {
   useEffect(() => {
     if (!user) { setBrewery(null); setRole(null); setLoading(false); return }
     load()
-  }, [user])
+  }, [user?.id])
 
   async function load() {
     setLoading(true)
-    const { data: mem } = await supabase
+    const { data: mem, error: memErr } = await supabase
       .from('brewery_members')
-      .select('role, brewery_id, display_name, breweries(id, name, slug)')
+      .select('role, brewery_id, display_name')
       .eq('user_id', user.id)
       .eq('status', 'active')
-      .single()
+      .maybeSingle()
+
 
     if (!mem) { setBrewery(null); setRole(null); setLoading(false); return }
 
     setRole(mem.role)
-    setBrewery(mem.breweries)
+
+    const { data: b, error: bErr } = await supabase
+      .from('breweries')
+      .select('id, name, slug')
+      .eq('id', mem.brewery_id)
+      .maybeSingle()
+
+
+    setBrewery(b)
 
     const { data: all } = await supabase
       .from('brewery_members')
       .select('id, display_name, role, status, user_id')
+      .eq('brewery_id', mem.brewery_id)   // 显式 scope，不只依赖 RLS
     setMembers(all ?? [])
     setLoading(false)
   }
 
   async function createBrewery(name, slug, displayName) {
-    const { data: b, error: be } = await supabase
+    const breweryId = crypto.randomUUID()
+
+    const { error: be } = await supabase
       .from('breweries')
-      .insert({ name, slug })
-      .select()
-      .single()
+      .insert({ id: breweryId, name, slug })
     if (be) throw be
 
     const { error: me } = await supabase
       .from('brewery_members')
-      .insert({ brewery_id: b.id, user_id: user.id, role: 'owner', display_name: displayName, status: 'active' })
+      .insert({ brewery_id: breweryId, user_id: user.id, role: 'owner', display_name: displayName, status: 'active' })
     if (me) throw me
 
     await load()

@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useBrewery } from '../hooks/useBrewery.jsx'
 import { C } from '../constants.js'
 
 export default function SetupPage() {
-  const { createBrewery } = useBrewery()
+  const { createBrewery, brewery, loading: breweryLoading } = useBrewery()
+
+  if (breweryLoading) return <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:C.bg, fontSize:14, color:C.mu }}>加载中…</div>
+  if (brewery) return <Navigate to="/brewops/" replace />
   const [name, setName]               = useState('')
   const [slug, setSlug]               = useState('')
   const [displayName, setDisplayName] = useState('')
