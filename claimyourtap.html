@@ -877,6 +877,7 @@ function countInput(val){
 }
 
 function openModal(tap){
+  if (!verifiedPhone) { openVerifyModal(); return; }
   selectedTap=tap; fetchedUser=null; reviewResult=null;
   document.getElementById("modalNo").textContent   =String(tap.no).padStart(2,"0");
   document.getElementById("modalName").textContent =tap.name||tap.name_en;
