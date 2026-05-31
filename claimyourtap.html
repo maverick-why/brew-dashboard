@@ -273,7 +273,7 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
     <div class="poster-tap-wrap">
       <div class="poster-ring-outer"></div>
       <div class="poster-ring-inner"></div>
-      <img class="poster-tap-img" src="酒头.png" alt="酒头"/>
+      <img class="poster-tap-img" src="jiu-tou.png" alt="酒头"/>
     </div>
     <div class="poster-card">
       <div class="pc-slogan">
@@ -361,7 +361,7 @@ a.btn-main{text-decoration:none;display:flex;align-items:center;justify-content:
         <div class="tcp-inner">
           <div class="tcp-left" id="tcpLeft">
             <span class="tcp-no" id="tcpNo">—</span>
-            <img class="tcp-icon" src="酒头.png" alt=""/>
+            <img class="tcp-icon" src="jiu-tou.png" alt=""/>
           </div>
           <div class="tcp-body">
             <div class="tcp-top">
@@ -709,7 +709,7 @@ function renderTaps(taps) {
     const no = String(tap.no).padStart(2, "0");
     const btn = document.createElement("button");
     btn.className = `tap-item ${taken ? "taken" : "vacant"}`;
-    btn.innerHTML = `<div class="ti-badge">${no}</div><img class="ti-img" src="酒头.png" alt=""/><div class="ti-line"></div><div class="ti-name">${taken ? tap.sponsor : ""}</div>`;
+    btn.innerHTML = `<div class="ti-badge">${no}</div><img class="ti-img" src="jiu-tou.png" alt=""/><div class="ti-line"></div><div class="ti-name">${taken ? tap.sponsor : ""}</div>`;
     if (!taken) btn.addEventListener("click", () => openModal(tap));
     grid.appendChild(btn);
   });
