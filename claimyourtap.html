@@ -944,9 +944,17 @@ document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
 const confirmMask=document.getElementById("confirmMask");
 document.getElementById("cbCancel").addEventListener("click",()=>confirmMask.classList.remove("show"));
 document.getElementById("cbOk").addEventListener("click",async()=>{
-  if (!reviewToken) {
+  const _tapNo = selectedTap?.no;
+  const _sponsorName = input.value.trim();
+  const missing = [
+    !verifiedPhone && 'phone',
+    !_tapNo && 'tapNo',
+    !_sponsorName && 'sponsorName',
+    !reviewToken && 'reviewToken',
+  ].filter(Boolean);
+  if (missing.length) {
     confirmMask.classList.remove("show");
-    showToast("审核 token 已失效，请重新输入冠名内容");
+    showToast(`缺少参数：${missing.join(', ')}，请重新操作`);
     return;
   }
   confirmMask.classList.remove("show");
