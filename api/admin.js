@@ -120,6 +120,29 @@ module.exports = async function handler(req, res) {
           .update({ active })
           .eq('tap_no', tapNo);
         if (dbError) throw dbError;
+        // 关闭冠名时，同时撤销该酒头所有已有的 live/pending 冠名记录
+        if (!active) {
+          await supabase
+            .from('sponsor_records')
+            .delete()
+            .eq('tap_no', tapNo)
+            .in('status', ['live', 'pending']);
+          // 清 Redis 缓存中的 sponsor_name
+          try {
+            const r = getRedis();
+            if (r) {
+              const val = await r.get(MENU_KEY);
+              if (val) {
+                const menuData = JSON.parse(val);
+                const key = String(tapNo);
+                if (menuData[key]?.sponsor_name) {
+                  delete menuData[key].sponsor_name;
+                  await r.set(MENU_KEY, JSON.stringify(menuData));
+                }
+              }
+            }
+          } catch { /* Redis failure is non-fatal */ }
+        }
         return ok(res, { tapNo, active });
       }
 

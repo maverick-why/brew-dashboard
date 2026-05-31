@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // 覆盖 Supabase sponsor_records 中的活跃冠名（实时数据）
+    // 以 Supabase sponsor_records 为唯一权威来源，先清空再覆盖
     try {
       const supabase = getSupabase();
       const { data: sponsors } = await supabase
@@ -69,6 +69,8 @@ module.exports = async (req, res) => {
         .select('tap_no, sponsor_name')
         .eq('status', 'live')
         .gt('expire_at', new Date().toISOString());
+      // 清空所有 sponsor_name（防止 Redis 缓存残留旧数据）
+      for (const item of items) item.sponsor_name = null;
       for (const s of sponsors || []) {
         const item = items.find(i => i.no === s.tap_no);
         if (item) item.sponsor_name = s.sponsor_name;
