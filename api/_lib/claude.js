@@ -87,7 +87,7 @@ async function reviewContent(text) {
 }
 
 function generateReviewToken(content, reviewResult, openId) {
-  const secret = process.env.REVIEW_SECRET;
+  const secret = process.env.REVIEW_SECRET || 'fallback-secret';
   const ts = Date.now();
   const payload = JSON.stringify({ content, result: reviewResult, openId, ts });
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
@@ -96,7 +96,7 @@ function generateReviewToken(content, reviewResult, openId) {
 
 function verifyReviewToken(token, content, openId) {
   try {
-    const secret = process.env.REVIEW_SECRET;
+    const secret = process.env.REVIEW_SECRET || 'fallback-secret';
     const { payload, sig } = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
     const expectedSig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
     if (sig !== expectedSig) return { valid: false };
