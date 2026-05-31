@@ -1,3 +1,1 @@
-# Hobby plan 限额 12 个 Serverless Function
-# review-content 逻辑已合并进 sponsor.js，不再需要独立部署
-api/review-content.js
+# Hobby plan 限额 12 个 Serverless Function（现共 12 个，review-content 可以部署）
