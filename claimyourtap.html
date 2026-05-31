@@ -944,6 +944,11 @@ document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
 const confirmMask=document.getElementById("confirmMask");
 document.getElementById("cbCancel").addEventListener("click",()=>confirmMask.classList.remove("show"));
 document.getElementById("cbOk").addEventListener("click",async()=>{
+  if (!reviewToken) {
+    confirmMask.classList.remove("show");
+    showToast("审核 token 已失效，请重新输入冠名内容");
+    return;
+  }
   confirmMask.classList.remove("show");
   const tapNo = selectedTap.no;
   const sponsorName = input.value.trim();
