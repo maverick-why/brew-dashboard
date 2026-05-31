@@ -33,13 +33,11 @@ fail（拒绝）：
 - 明确针对他人的侮辱性词汇
 edge（转人工）：
 - 内容本身不违规，但包含有歧义的双关语，且歧义指向色情/政治方向
-- 注意：edge 仅用于歧义"极其明显"的情况，不确定时一律 pass
 所有其他内容一律 pass，包括但不限于：
 - 任何普通人名、昵称、绰号、称谓
-- 任何表达情感/爱意的词（你好、爱你、想你等）
+- 任何表达情感/爱意的词
 - 任何普通英文单词、短语
 - 个人标签、纪念日、口头禅、玩笑话、创意表达
-- 看起来无害但你不确定含义的词
 只返回 JSON，不要其他文字：{"result":"pass","reason":"说明"}`;
 
 async function reviewContent(text) {
@@ -87,7 +85,7 @@ async function reviewContent(text) {
 }
 
 function generateReviewToken(content, reviewResult, openId) {
-  const secret = process.env.REVIEW_SECRET || 'fallback-secret';
+  const secret = process.env.REVIEW_SECRET;
   const ts = Date.now();
   const payload = JSON.stringify({ content, result: reviewResult, openId, ts });
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
@@ -96,7 +94,7 @@ function generateReviewToken(content, reviewResult, openId) {
 
 function verifyReviewToken(token, content, openId) {
   try {
-    const secret = process.env.REVIEW_SECRET || 'fallback-secret';
+    const secret = process.env.REVIEW_SECRET;
     const { payload, sig } = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
     const expectedSig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
     if (sig !== expectedSig) return { valid: false };

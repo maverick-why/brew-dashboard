@@ -877,7 +877,6 @@ function countInput(val){
 }
 
 function openModal(tap){
-  if (!verifiedPhone) { openVerifyModal(); return; }
   selectedTap=tap; fetchedUser=null; reviewResult=null;
   document.getElementById("modalNo").textContent   =String(tap.no).padStart(2,"0");
   document.getElementById("modalName").textContent =tap.name||tap.name_en;
@@ -945,19 +944,6 @@ document.getElementById("btnSubmitFlow").addEventListener("click",async()=>{
 const confirmMask=document.getElementById("confirmMask");
 document.getElementById("cbCancel").addEventListener("click",()=>confirmMask.classList.remove("show"));
 document.getElementById("cbOk").addEventListener("click",async()=>{
-  const _tapNo = selectedTap?.no;
-  const _sponsorName = input.value.trim();
-  const missing = [
-    !verifiedPhone && 'phone',
-    !_tapNo && 'tapNo',
-    !_sponsorName && 'sponsorName',
-    !reviewToken && 'reviewToken',
-  ].filter(Boolean);
-  if (missing.length) {
-    confirmMask.classList.remove("show");
-    showToast(`缺少参数：${missing.join(', ')}，请重新操作`);
-    return;
-  }
   confirmMask.classList.remove("show");
   const tapNo = selectedTap.no;
   const sponsorName = input.value.trim();
