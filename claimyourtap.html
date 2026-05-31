@@ -857,9 +857,6 @@ function updateSubmitBtn() {
   if(reviewResult.result === "fail") {
     btn.disabled=true; btn.textContent="内容不合规，请修改"; return;
   }
-  if(!reviewToken) {
-    btn.disabled=true; btn.textContent="审核异常，请重新输入"; return;
-  }
   // 验证时已拿到积分/余额，直接检查
   if(verifiedPoint < 5) { btn.disabled=true; btn.textContent="积分不足，无法冠名"; return; }
   if(verifiedBalance < 1){ btn.disabled=true; btn.innerHTML='余额不足，<a href="https://pospal.cn/d/3736044" target="_blank" style="color:#c8922a">前往充值 →</a>'; return; }
