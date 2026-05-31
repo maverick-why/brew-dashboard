@@ -717,7 +717,7 @@ function renderTaps(taps) {
 
 /* ══ 机器审核（调用后端 /api/review-content）══ */
 async function reviewContent(content) {
-  const res = await fetch('/api/review-content', {
+  const res = await fetch('/api/sponsor?op=review', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content, phone: verifiedPhone }),

@@ -3,11 +3,34 @@ const { handleOptions, getQuery, readJsonBody } = require('./_lib/http');
 const { ok, error } = require('./_lib/response');
 const { getSupabase } = require('./_lib/supabase');
 const { PospalClient } = require('./_lib/pospal');
-const { verifyReviewToken } = require('./_lib/claude');
+const { verifyReviewToken, reviewContent, generateReviewToken } = require('./_lib/claude');
 const { lookupCache, writeCache } = require('./_lib/member-cache');
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
+
+  // POST op=review → 内容审核
+  if (req.method === 'POST') {
+    const { op } = getQuery(req);
+    if (op === 'review') {
+      try {
+        const { content, phone } = await readJsonBody(req);
+        if (!content || !phone) return error(res, 400, '缺少 content 或 phone');
+        let cnCount = 0, totalUnits = 0;
+        for (const ch of [...content]) {
+          if (/[一-龥]/.test(ch)) { cnCount++; totalUnits += 2; }
+          else { totalUnits += 1; }
+        }
+        if (cnCount > 6 || totalUnits > 12) return error(res, 400, '冠名内容过长');
+        const { result, reason, auto_passed } = await reviewContent(content);
+        if (result === 'fail') return ok(res, { result: 'fail', reason: reason || '不符合规范，请重新输入' });
+        const token = generateReviewToken(content, result, phone);
+        return ok(res, { result, token, reason: result === 'edge' ? '内容存在歧义，提交后人工确认' : undefined, ...(auto_passed ? { auto_passed: true } : {}) });
+      } catch (err) {
+        return error(res, 500, err.message || 'Internal server error');
+      }
+    }
+  }
 
   // GET → 查状态
   if (req.method === 'GET') {
