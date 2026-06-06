@@ -32,7 +32,15 @@ function getRedis() {
 async function ensurePosterBucket(supabase) {
   const { data: buckets, error: listError } = await supabase.storage.listBuckets();
   if (listError) throw listError;
-  if ((buckets || []).some(bucket => bucket.name === POSTER_BUCKET)) return;
+  if ((buckets || []).some(bucket => bucket.name === POSTER_BUCKET)) {
+    const { error: updateError } = await supabase.storage.updateBucket(POSTER_BUCKET, {
+      public: true,
+      allowedMimeTypes: Object.keys(POSTER_IMAGE_TYPES),
+      fileSizeLimit: POSTER_IMAGE_MAX_BYTES,
+    });
+    if (updateError) throw updateError;
+    return;
+  }
 
   const { error: createError } = await supabase.storage.createBucket(POSTER_BUCKET, {
     public: true,
@@ -42,24 +50,16 @@ async function ensurePosterBucket(supabase) {
   if (createError && !/already exists/i.test(createError.message || '')) throw createError;
 }
 
-function normalizePosterImageUpload(body) {
+function normalizePosterImageMeta(body) {
   const mimeType = body.mimeType || body.mime_type || '';
-  const dataUrl = body.dataUrl || body.data_url || '';
   if (!POSTER_IMAGE_TYPES[mimeType]) {
     const err = new Error('只支持 JPG / PNG / WebP 图片');
     err.status = 400;
     throw err;
   }
 
-  const prefix = `data:${mimeType};base64,`;
-  if (!dataUrl.startsWith(prefix)) {
-    const err = new Error('图片数据格式不正确');
-    err.status = 400;
-    throw err;
-  }
-
-  const buffer = Buffer.from(dataUrl.slice(prefix.length), 'base64');
-  if (!buffer.length || buffer.length > POSTER_IMAGE_MAX_BYTES) {
+  const size = Number(body.size || body.fileSize || body.file_size || 0);
+  if (!Number.isFinite(size) || size <= 0 || size > POSTER_IMAGE_MAX_BYTES) {
     const err = new Error('图片不能超过 5MB');
     err.status = 400;
     throw err;
@@ -69,8 +69,8 @@ function normalizePosterImageUpload(body) {
   const id = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
   const date = new Date().toISOString().slice(0, 10);
   return {
-    buffer,
     mimeType,
+    size,
     path: `poster-items/${date}/${Date.now()}-${id}.${ext}`,
   };
 }
@@ -264,20 +264,21 @@ module.exports = async function handler(req, res) {
       }
 
       if (op === 'poster-upload') {
-        const upload = normalizePosterImageUpload(body);
+        const upload = normalizePosterImageMeta(body);
         await ensurePosterBucket(supabase);
-        const { error: uploadError } = await supabase.storage
+        const { data: signedData, error: signedError } = await supabase.storage
           .from(POSTER_BUCKET)
-          .upload(upload.path, upload.buffer, {
-            contentType: upload.mimeType,
-            cacheControl: '31536000',
-            upsert: false,
-          });
-        if (uploadError) throw uploadError;
+          .createSignedUploadUrl(upload.path);
+        if (signedError) throw signedError;
         const { data: publicData } = supabase.storage
           .from(POSTER_BUCKET)
           .getPublicUrl(upload.path);
-        return ok(res, { url: publicData.publicUrl, path: upload.path });
+        return ok(res, {
+          signedUrl: signedData.signedUrl,
+          token: signedData.token,
+          url: publicData.publicUrl,
+          path: upload.path,
+        });
       }
 
       if (op === 'poster-upsert') {

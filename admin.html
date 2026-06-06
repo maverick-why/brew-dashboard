@@ -1520,13 +1520,13 @@
     preview.style.display = "block";
   }
 
-  function readFileAsDataUrl(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("读取图片失败"));
-      reader.readAsDataURL(file);
-    });
+  async function readJsonResponse(res) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text || "{}");
+    } catch {
+      throw new Error(text ? text.slice(0, 120) : `HTTP ${res.status}`);
+    }
   }
 
   async function uploadPosterImage() {
@@ -1549,19 +1549,33 @@
         return previewUrl;
       }
 
-      setPosterUploadStatus("正在上传图片…");
-      const dataUrl = await readFileAsDataUrl(file);
-      const res = await fetch('/api/admin?op=poster-upload', {
+      setPosterUploadStatus("正在准备上传地址…");
+      const signRes = await fetch('/api/admin?op=poster-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
-        body: JSON.stringify({ fileName: file.name, mimeType: file.type, dataUrl }),
+        body: JSON.stringify({ fileName: file.name, mimeType: file.type, size: file.size }),
       });
-      const json = await res.json();
+      const json = await readJsonResponse(signRes);
       if (json.code !== 0) {
-        setPosterUploadStatus(`上传失败：${json.message || res.status}`, false);
-        toast(`上传失败：${json.message || res.status}`, false);
+        setPosterUploadStatus(`上传失败：${json.message || signRes.status}`, false);
+        toast(`上传失败：${json.message || signRes.status}`, false);
         return "";
       }
+
+      setPosterUploadStatus("正在上传图片到存储空间…");
+      const formData = new FormData();
+      formData.append("cacheControl", "31536000");
+      formData.append("", file);
+      const uploadRes = await fetch(json.data.signedUrl, {
+        method: "PUT",
+        headers: { "x-upsert": "false" },
+        body: formData,
+      });
+      if (!uploadRes.ok) {
+        const text = await uploadRes.text();
+        throw new Error(text ? text.slice(0, 120) : `Storage ${uploadRes.status}`);
+      }
+
       document.getElementById("poster-image-url").value = json.data.url;
       input.value = "";
       syncPosterImagePreviewFromUrl();
