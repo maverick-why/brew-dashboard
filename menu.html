@@ -971,8 +971,18 @@ function renderDualLayout(items, tapCount) {
   const grid = document.getElementById("grid");
 
   root.style.setProperty("--dual-gap", `${gap}px`);
-  root.style.setProperty("--rs", Math.min(1, 4 / rows));
-  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+  // 4:1 宽高比：卡宽由布局决定，高 = 宽 / 4，行高固定像素不拉伸
+  const rootW   = IS_DUAL_PREVIEW ? 3840 : 1920;
+  const cardW   = Math.round(rootW / 3 - gap);      // ≈600px (gap=40)
+  const availH  = 1080 - 2 * gap;
+  const targetH = Math.round(cardW / 4);             // 4:1 理想高 ≈150px
+  const maxH    = Math.floor((availH - (rows - 1) * gap) / rows);
+  const cardH   = Math.min(targetH, maxH);
+
+  root.style.setProperty("--rs", Math.min(1, cardH / targetH));
+  grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
+  grid.style.alignContent = "start";
 
   if (IS_DUAL_PREVIEW) {
     grid.innerHTML = renderSlice(items.slice(0, rows * 4));
