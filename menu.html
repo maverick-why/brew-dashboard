@@ -978,7 +978,7 @@ function renderDualLayout(items, tapCount) {
   // 高度平均填满屏幕，不强制 4:1；--rs 以 4 行时的卡高（220px）为基准缩放字体
   const availH = 1080 - 2 * gap;
   const cardH  = Math.floor((availH - (rows - 1) * gap) / rows);
-  const refH   = 220;  // 4 行 gap=40 时的卡高，此时 --rs=1 字体正好合适
+  const refH   = 300;  // --rs 基准：超过此卡高时 --rs=1，低于时按比例缩小字体
 
   root.style.setProperty("--rs", Math.min(1, cardH / refH));
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
