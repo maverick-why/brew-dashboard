@@ -2,6 +2,7 @@
   "buildCommand": "cd brewops && npm install && npm run build && cp -n ../*.html dist/ 2>/dev/null; cp -n ../*.png ../*.svg ../*.ico ../*.webp dist/ 2>/dev/null; true",
   "outputDirectory": "brewops/dist",
   "rewrites": [
+    { "source": "/api/review-content",   "destination": "/api/sponsor?op=review" },
     { "source": "/api/cup/verify",       "destination": "/api/cup" },
     { "source": "/api/cup/claim",        "destination": "/api/cup" },
     { "source": "/api/cup/admin",        "destination": "/api/cup" },
