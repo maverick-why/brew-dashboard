@@ -100,85 +100,89 @@
     }
 
     #root.dual-menu .card-num {
-      width: calc(108px * var(--rs));
+      width: calc(92px * var(--rs));
     }
     #root.dual-menu .num {
-      font-size: calc(78px * var(--rs));
+      font-size: calc(70px * var(--rs));
     }
     #root.dual-menu .row-top {
-      padding: calc(16px * var(--rs)) calc(22px * var(--rs)) calc(8px * var(--rs)) calc(16px * var(--rs));
-      gap: calc(12px * var(--rs));
+      padding: calc(12px * var(--rs)) calc(14px * var(--rs)) calc(6px * var(--rs)) calc(12px * var(--rs));
+      gap: calc(8px * var(--rs));
       align-items: flex-start;
     }
     #root.dual-menu .brewery-tag {
-      font-size: calc(32px * var(--rs));
+      font-size: calc(28px * var(--rs));
       line-height: 1;
     }
     #root.dual-menu .beer-name-row {
-      align-items: center;
-      gap: calc(8px * var(--rs));
-      margin-top: calc(5px * var(--rs));
-      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: calc(5px * var(--rs));
+      margin-top: calc(4px * var(--rs));
+      flex-direction: column;
     }
     #root.dual-menu .beer-name {
       max-width: 100%;
-      font-size: calc(52px * var(--rs));
+      font-size: calc(42px * var(--rs));
       letter-spacing: calc(1px * var(--rs));
-      line-height: 1.05;
+      line-height: 1;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
     #root.dual-menu .beer-tags {
       max-width: 100%;
       flex-wrap: wrap;
-      gap: calc(4px * var(--rs));
+      gap: calc(3px * var(--rs));
     }
     #root.dual-menu .beer-tag {
-      height: calc(28px * var(--rs));
-      max-width: calc(150px * var(--rs));
-      padding: 0 calc(8px * var(--rs));
-      font-size: calc(20px * var(--rs));
+      height: calc(22px * var(--rs));
+      max-width: calc(128px * var(--rs));
+      padding: 0 calc(6px * var(--rs));
+      font-size: calc(16px * var(--rs));
       overflow: hidden;
       text-overflow: ellipsis;
     }
     #root.dual-menu .beer-style {
-      margin-top: calc(6px * var(--rs));
-      font-size: calc(25px * var(--rs));
+      margin-top: calc(4px * var(--rs));
+      font-size: calc(22px * var(--rs));
       line-height: 1.1;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     #root.dual-menu .price-block {
-      width: calc(220px * var(--rs));
-      flex: 0 0 calc(220px * var(--rs));
-      padding-top: calc(10px * var(--rs));
+      width: calc(168px * var(--rs));
+      flex: 0 0 calc(168px * var(--rs));
+      padding-top: calc(6px * var(--rs));
     }
     #root.dual-menu .price-line {
-      font-size: calc(42px * var(--rs));
-      line-height: 1.28;
+      font-size: calc(34px * var(--rs));
+      line-height: 1.2;
     }
     #root.dual-menu .price-block.single .price-line {
-      font-size: calc(50px * var(--rs));
-      line-height: 1.15;
+      font-size: calc(40px * var(--rs));
+      line-height: 1.1;
     }
     #root.dual-menu .divider {
-      margin: 0 calc(16px * var(--rs));
+      margin: 0 calc(12px * var(--rs));
     }
     #root.dual-menu .row-bottom {
-      padding: calc(8px * var(--rs)) calc(22px * var(--rs)) calc(12px * var(--rs)) calc(16px * var(--rs));
+      padding: calc(6px * var(--rs)) calc(14px * var(--rs)) calc(9px * var(--rs)) calc(12px * var(--rs));
       align-items: flex-end;
-      gap: calc(10px * var(--rs));
+      gap: calc(6px * var(--rs));
     }
     #root.dual-menu .en-name,
     #root.dual-menu .en-style {
-      font-size: calc(22px * var(--rs));
-      line-height: 1.2;
+      font-size: calc(18px * var(--rs));
+      line-height: 1.12;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     #root.dual-menu .alc-info {
-      width: calc(220px * var(--rs));
-      flex: 0 0 calc(220px * var(--rs));
-      font-size: calc(38px * var(--rs));
+      width: calc(168px * var(--rs));
+      flex: 0 0 calc(168px * var(--rs));
+      font-size: calc(30px * var(--rs));
       line-height: 1;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -967,7 +971,7 @@ function renderDualLayout(items, tapCount) {
   const grid = document.getElementById("grid");
 
   root.style.setProperty("--dual-gap", `${gap}px`);
-  root.style.setProperty("--rs", Math.min(1, 4.35 / rows));
+  root.style.setProperty("--rs", Math.min(1, 4 / rows));
   grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
   if (IS_DUAL_PREVIEW) {
