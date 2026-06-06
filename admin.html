@@ -168,7 +168,7 @@
     .center{display:flex; align-items:center; gap:8px}
     .chk{width:18px; height:18px}
 
-    input, select{
+    input, select, textarea{
       width:100%;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
@@ -182,8 +182,9 @@
       font-variant-numeric: tabular-nums;
       font-family:inherit;
     }
-    input::placeholder{color:rgba(234,240,255,.35)}
-    input:focus, select:focus{border-color: rgba(123,211,255,.35); background: rgba(255,255,255,.06)}
+    textarea{resize:vertical; line-height:1.45; min-height:96px}
+    input::placeholder, textarea::placeholder{color:rgba(234,240,255,.35)}
+    input:focus, select:focus, textarea:focus{border-color: rgba(123,211,255,.35); background: rgba(255,255,255,.06)}
 
     /* 温度字段：标注「手动」，未来探头接入后会变只读 */
     .temp-wrap{position:relative}
@@ -327,6 +328,78 @@
     .tl-bronze { background:#f5d5b8; border:1px solid #cd7f32; color:#6b4423; }
     .tl-green  { background:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32; }
     .tl-dark   { background:#37474f; border:1px solid #263238; color:#eceff1; font-style:italic; }
+
+    /* ── TV dynamic area admin ── */
+    .tv-layout{
+      display:grid;
+      grid-template-columns:minmax(360px,460px) minmax(580px,1fr);
+      gap:12px;
+      padding:12px;
+    }
+    .tv-note{
+      margin:10px 12px 0;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+    }
+    .tv-note-card{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+      border-radius:14px;
+      padding:10px 12px;
+      min-height:86px;
+    }
+    .tv-note-title{font-weight:900;font-size:13px;margin-bottom:6px}
+    .tv-note-desc{color:var(--sub);font-size:12px;line-height:1.55;font-weight:650}
+    .field-hint{color:rgba(234,240,255,.52);font-size:11px;line-height:1.45;margin-top:4px}
+    .poster-help{
+      border:1px solid rgba(123,211,255,.16);
+      background:rgba(59,130,246,.08);
+      border-radius:12px;
+      padding:9px 10px;
+      color:rgba(234,240,255,.74);
+      font-size:12px;
+      line-height:1.55;
+      font-weight:650;
+    }
+    .template-row{display:flex;gap:6px;flex-wrap:wrap}
+    .poster-type-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:82px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+    }
+    .poster-type-pill.image{border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.14)}
+    .poster-type-pill.beer_recommend{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.14)}
+    .poster-type-pill.info_card{border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.12)}
+    .status-dot{display:inline-flex;align-items:center;gap:6px;font-weight:900}
+    .status-dot::before{content:"";width:7px;height:7px;border-radius:99px;background:#64748b}
+    .status-dot.on::before{background:var(--green)}
+    .status-dot.off{color:rgba(234,240,255,.45)}
+    .status-dot.off::before{background:#64748b}
+    .poster-upload-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+    .poster-upload-status{color:rgba(234,240,255,.58);font-size:11px;line-height:1.45}
+    .poster-image-preview{
+      display:none;
+      width:100%;
+      max-height:160px;
+      object-fit:contain;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      background:rgba(0,0,0,.22);
+      padding:6px;
+    }
+
+    @media (max-width: 980px){
+      .tv-layout{grid-template-columns:1fr}
+      .tv-note{grid-template-columns:1fr}
+    }
 
     @media (max-width: 560px){
       header{padding:8px 12px}
@@ -475,48 +548,62 @@
     <div class="tab-pane" id="tab-tv">
       <div class="toolbar">
         <div class="btns">
-          <h3 style="margin:0;font-size:14px;font-weight:900">电视展示 · 右屏动态区域</h3>
+          <h3 style="margin:0;font-size:14px;font-weight:900">电视展示 · 动态区海报管理</h3>
           <button onclick="loadPosterItems()">刷新</button>
+          <button class="blue" onclick="window.open('/menu.html','_blank')">总预览 ↗</button>
           <button class="blue" onclick="window.open('/menu.html?screen=left','_blank')">左电视 ↗</button>
           <button class="blue" onclick="window.open('/menu.html?screen=right','_blank')">右电视 ↗</button>
         </div>
         <div class="muted" style="line-height:1.7">
-          左电视显示酒单第 1-3 栏；右电视显示第 4 栏 + 动态区域。图片海报会完整显示，不裁切，背景自动模糊填充。
+          双电视共 6 等份：第 1-2 列为海报轮播区，第 3-6 列为酒单。这里只管理海报，不影响酒单管理。
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:minmax(340px,440px) minmax(520px,1fr);gap:12px;padding:12px">
+      <div class="tv-note">
+        <div class="tv-note-card">
+          <div class="tv-note-title">上传海报</div>
+          <div class="tv-note-desc">活动、会员、Wi-Fi、营业时间、公众号都做成图片上传，电视端完整等比显示。</div>
+        </div>
+        <div class="tv-note-card">
+          <div class="tv-note-title">自动背景</div>
+          <div class="tv-note-desc">系统用同一张图做模糊背景铺满，前景海报不裁切，横版竖版都能放。</div>
+        </div>
+        <div class="tv-note-card">
+          <div class="tv-note-title">轮播控制</div>
+          <div class="tv-note-desc">每张海报单独设置排序、停留秒数、启用/停用，按顺序自动轮播。</div>
+        </div>
+      </div>
+      <div class="tv-layout">
         <div class="panel" style="box-shadow:none">
           <div class="toolbar" style="border-bottom:1px solid var(--line)">
-            <h4 style="margin:0;font-size:13px;font-weight:900">编辑动态内容</h4>
+            <div>
+              <h4 style="margin:0;font-size:13px;font-weight:900">编辑海报</h4>
+              <div class="muted" style="margin-top:4px">保存后进入左侧两列海报轮播区。</div>
+            </div>
           </div>
           <div style="padding:12px;display:grid;gap:10px">
             <input type="hidden" id="poster-id">
-            <label class="muted">内容类型</label>
-            <select id="poster-type" onchange="syncPosterFormMode()">
-              <option value="beer_recommend">推荐酒款</option>
-              <option value="image">图片海报</option>
-              <option value="info_card">固定信息卡</option>
-            </select>
+            <input type="hidden" id="poster-type" value="image">
+            <div class="poster-help">动态区统一使用图片海报。活动说明、会员二维码、Wi-Fi、营业时间等都请做成图片上传。</div>
 
             <label class="muted">标题</label>
-            <input id="poster-title" type="text" placeholder="例如：今日推荐">
+            <input id="poster-title" type="text" placeholder="例如：周末活动 / 会员二维码 / Wi-Fi 信息">
+            <input id="poster-tap-no" type="hidden">
 
-            <div id="poster-tap-wrap">
-              <label class="muted">推荐酒头编号</label>
-              <input id="poster-tap-no" type="number" min="1" max="64" placeholder="1">
+            <div id="poster-image-wrap">
+              <label class="muted">上传图片</label>
+              <div class="poster-upload-row">
+                <input id="poster-image-file" type="file" accept="image/jpeg,image/png,image/webp" onchange="previewPosterImageFile()">
+                <button type="button" class="blue" onclick="uploadPosterImage()">上传</button>
+              </div>
+              <img id="poster-image-preview" class="poster-image-preview" alt="图片预览">
+              <div class="poster-upload-status" id="poster-upload-status">支持 JPG / PNG / WebP，单张不超过 3MB；保存时如已选择文件，会自动上传并保存图片地址。</div>
+              <label class="muted">图片 URL（系统自动生成，可手动备用）</label>
+              <input id="poster-image-url" type="text" placeholder="上传后自动生成，或粘贴外部图片 URL" oninput="syncPosterImagePreviewFromUrl()">
+              <div class="field-hint">管理员正常只需要选择图片；URL 是数据库内部保存值，也是外部图片的备用入口。</div>
             </div>
 
-            <div id="poster-image-wrap" style="display:none">
-              <label class="muted">图片 URL</label>
-              <input id="poster-image-url" type="text" placeholder="https://...">
-            </div>
-
-            <div id="poster-body-wrap" style="display:none">
-              <label class="muted">信息卡 JSON</label>
-              <textarea id="poster-body" rows="5" placeholder='{"notice":"本周五 8PM 精酿之夜"}'></textarea>
-              <label class="muted">二维码 URL（可选）</label>
-              <input id="poster-qr-url" type="text" placeholder="https://...">
-            </div>
+            <textarea id="poster-body" style="display:none"></textarea>
+            <input id="poster-qr-url" type="hidden">
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div>
@@ -529,31 +616,20 @@
               </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div>
-                <label class="muted">背景类型</label>
-                <select id="poster-bg-type">
-                  <option value="theme">theme</option>
-                  <option value="auto_blur">auto_blur</option>
-                  <option value="solid">solid</option>
-                  <option value="gradient">gradient</option>
-                </select>
-              </div>
-              <div>
-                <label class="muted">启用</label>
-                <select id="poster-enabled">
-                  <option value="true">启用</option>
-                  <option value="false">停用</option>
-                </select>
-              </div>
+            <div>
+              <label class="muted">启用</label>
+              <select id="poster-enabled">
+                <option value="true">启用</option>
+                <option value="false">停用</option>
+              </select>
             </div>
 
-            <label class="muted">背景值（solid/gradient 可填）</label>
-            <input id="poster-bg-value" type="text" placeholder="#102018 或 linear-gradient(...)">
+            <input id="poster-bg-type" type="hidden" value="auto_blur">
+            <input id="poster-bg-value" type="hidden">
 
             <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
               <button onclick="resetPosterForm()">清空</button>
-              <button class="primary" onclick="savePosterItem()">保存动态内容</button>
+              <button class="primary" onclick="savePosterItem()">保存海报</button>
             </div>
           </div>
         </div>
@@ -562,16 +638,16 @@
           <div class="toolbar" style="border-bottom:1px solid var(--line)">
             <div>
               <h4 style="margin:0;font-size:13px;font-weight:900">当前播放列表</h4>
-              <div class="muted" style="margin-top:4px">数据来自 poster_items，右屏动态区域按排序轮播。</div>
+              <div class="muted" style="margin-top:4px">左侧两列海报区按排序轮播；秒数决定每张海报停留时间。</div>
             </div>
           </div>
           <div class="tableWrap">
             <table>
               <thead>
-                <tr><th>排序</th><th>类型</th><th>标题</th><th>酒头/图片</th><th>背景</th><th>秒数</th><th>状态</th><th>操作</th></tr>
+                <tr><th>排序</th><th>类型</th><th>标题</th><th>图片</th><th>背景</th><th>秒数</th><th>状态</th><th>操作</th></tr>
               </thead>
               <tbody id="poster-tbody">
-                <tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">点击刷新加载动态内容</td></tr>
+                <tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">点击刷新加载海报</td></tr>
               </tbody>
             </table>
           </div>
@@ -699,6 +775,9 @@
   const LOAD_URL  = "/api/load";
   const SAVE_URL  = "/api/save";
   const KEY_PREFIX = "F";
+  const DESIGN_PREVIEW =
+    location.protocol === "file:" ||
+    ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
 
   let ADMIN_PASS = "";
   let state = {};
@@ -732,8 +811,9 @@
   function setAuthUI(ok){
     const pill = document.getElementById("authPill");
     const txt  = document.getElementById("authText");
-    txt.textContent = ok ? "已登录" : "未登录";
-    pill.classList.toggle("ok", ok);
+    const preview = ok === "preview";
+    txt.textContent = preview ? "设计预览" : ok ? "已登录" : "未登录";
+    pill.classList.toggle("ok", !!ok);
     pill.classList.toggle("bad", !ok);
   }
 
@@ -1289,6 +1369,50 @@
 
   // ====== TV poster tab
   let posterItemsState = [];
+  const POSTER_PREVIEW_ITEMS = [
+    {
+      id: "preview-event",
+      type: "image",
+      title: "周末活动海报",
+      image_url: "preview://event-poster",
+      tap_no: null,
+      body: null,
+      qr_url: "",
+      bg_type: "auto_blur",
+      bg_value: "",
+      duration_sec: 12,
+      sort_order: 1,
+      enabled: true,
+    },
+    {
+      id: "preview-member",
+      type: "image",
+      title: "会员二维码",
+      image_url: "preview://member-poster",
+      tap_no: null,
+      body: null,
+      qr_url: "",
+      bg_type: "auto_blur",
+      bg_value: "",
+      duration_sec: 15,
+      sort_order: 2,
+      enabled: true,
+    },
+    {
+      id: "preview-wifi",
+      type: "image",
+      title: "Wi-Fi / 营业时间",
+      image_url: "preview://wifi-hours-poster",
+      tap_no: null,
+      body: null,
+      qr_url: "",
+      bg_type: "auto_blur",
+      bg_value: "",
+      duration_sec: 10,
+      sort_order: 3,
+      enabled: false,
+    },
+  ];
 
   function posterEscape(str) {
     return String(str || "")
@@ -1299,28 +1423,33 @@
       .replaceAll("'", "&#039;");
   }
 
+  function posterTypeLabel(type) {
+    if (type === "image") return "图片海报";
+    return type || "-";
+  }
+
   function syncPosterFormMode() {
-    const type = document.getElementById("poster-type").value;
-    document.getElementById("poster-tap-wrap").style.display = type === "beer_recommend" ? "" : "none";
-    document.getElementById("poster-image-wrap").style.display = type === "image" ? "" : "none";
-    document.getElementById("poster-body-wrap").style.display = type === "info_card" ? "" : "none";
-    if (!document.getElementById("poster-bg-type").dataset.touched) {
-      document.getElementById("poster-bg-type").value =
-        type === "beer_recommend" ? "theme" : type === "image" ? "auto_blur" : "gradient";
-    }
+    document.getElementById("poster-type").value = "image";
+    document.getElementById("poster-bg-type").value = "auto_blur";
+    const title = document.getElementById("poster-title");
+    if (!title.value.trim()) title.value = "活动海报";
   }
 
   function resetPosterForm() {
     document.getElementById("poster-id").value = "";
-    document.getElementById("poster-type").value = "beer_recommend";
-    document.getElementById("poster-title").value = "今日推荐";
-    document.getElementById("poster-tap-no").value = "1";
+    document.getElementById("poster-type").value = "image";
+    document.getElementById("poster-title").value = "活动海报";
+    document.getElementById("poster-tap-no").value = "";
+    document.getElementById("poster-image-file").value = "";
     document.getElementById("poster-image-url").value = "";
+    document.getElementById("poster-upload-status").textContent = "支持 JPG / PNG / WebP，单张不超过 3MB；保存时如已选择文件，会自动上传并保存图片地址。";
+    document.getElementById("poster-image-preview").style.display = "none";
+    document.getElementById("poster-image-preview").removeAttribute("src");
     document.getElementById("poster-body").value = "";
     document.getElementById("poster-qr-url").value = "";
     document.getElementById("poster-duration").value = "15";
     document.getElementById("poster-sort").value = "1";
-    document.getElementById("poster-bg-type").value = "theme";
+    document.getElementById("poster-bg-type").value = "auto_blur";
     document.getElementById("poster-bg-type").dataset.touched = "";
     document.getElementById("poster-bg-value").value = "";
     document.getElementById("poster-enabled").value = "true";
@@ -1331,22 +1460,128 @@
     const item = posterItemsState.find(x => x.id === id);
     if (!item) return;
     document.getElementById("poster-id").value = item.id || "";
-    document.getElementById("poster-type").value = item.type || "beer_recommend";
+    document.getElementById("poster-type").value = "image";
     document.getElementById("poster-title").value = item.title || "";
-    document.getElementById("poster-tap-no").value = item.tap_no || "";
+    document.getElementById("poster-tap-no").value = "";
+    document.getElementById("poster-image-file").value = "";
     document.getElementById("poster-image-url").value = item.image_url || "";
-    document.getElementById("poster-body").value = item.body ? JSON.stringify(item.body, null, 2) : "";
+    document.getElementById("poster-upload-status").textContent = item.image_url ? "已保存图片地址；如需更换，重新选择图片上传。" : "支持 JPG / PNG / WebP，单张不超过 3MB；保存时如已选择文件，会自动上传并保存图片地址。";
+    syncPosterImagePreviewFromUrl();
+    document.getElementById("poster-body").value = "";
     document.getElementById("poster-qr-url").value = item.qr_url || "";
     document.getElementById("poster-duration").value = item.duration_sec || 10;
     document.getElementById("poster-sort").value = item.sort_order || 0;
-    document.getElementById("poster-bg-type").value = item.bg_type || "auto_blur";
+    document.getElementById("poster-bg-type").value = "auto_blur";
     document.getElementById("poster-bg-type").dataset.touched = "1";
     document.getElementById("poster-bg-value").value = item.bg_value || "";
     document.getElementById("poster-enabled").value = item.enabled ? "true" : "false";
     syncPosterFormMode();
   }
 
+  function setPosterUploadStatus(message, ok = true) {
+    const el = document.getElementById("poster-upload-status");
+    el.textContent = message;
+    el.style.color = ok ? "rgba(234,240,255,.58)" : "var(--red)";
+  }
+
+  function previewPosterImageFile() {
+    const input = document.getElementById("poster-image-file");
+    const file = input.files && input.files[0];
+    const preview = document.getElementById("poster-image-preview");
+    if (!file) {
+      syncPosterImagePreviewFromUrl();
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setPosterUploadStatus("只支持 JPG / PNG / WebP 图片", false);
+      input.value = "";
+      return;
+    }
+    const maxSize = 3 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setPosterUploadStatus("图片不能超过 3MB。建议先压缩为 WebP/JPG 后再上传。", false);
+      input.value = "";
+      return;
+    }
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+    setPosterUploadStatus(`已选择：${file.name}，保存时会自动上传。`);
+  }
+
+  function syncPosterImagePreviewFromUrl() {
+    const url = document.getElementById("poster-image-url").value.trim();
+    const preview = document.getElementById("poster-image-preview");
+    if (!url) {
+      preview.style.display = "none";
+      preview.removeAttribute("src");
+      return;
+    }
+    preview.src = url;
+    preview.style.display = "block";
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("读取图片失败"));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadPosterImage() {
+    if (!ADMIN_PASS) { toast("未登录", false); return ""; }
+    const input = document.getElementById("poster-image-file");
+    const file = input.files && input.files[0];
+    if (!file) {
+      const existingUrl = document.getElementById("poster-image-url").value.trim();
+      if (!existingUrl) toast("请先选择图片", false);
+      return existingUrl;
+    }
+
+    try {
+      if (DESIGN_PREVIEW) {
+        const previewUrl = URL.createObjectURL(file);
+        document.getElementById("poster-image-url").value = previewUrl;
+        syncPosterImagePreviewFromUrl();
+        setPosterUploadStatus("设计预览：图片已模拟上传，不会保存到服务器。");
+        toast("设计预览：已模拟上传");
+        return previewUrl;
+      }
+
+      setPosterUploadStatus("正在上传图片…");
+      const dataUrl = await readFileAsDataUrl(file);
+      const res = await fetch('/api/admin?op=poster-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify({ fileName: file.name, mimeType: file.type, dataUrl }),
+      });
+      const json = await res.json();
+      if (json.code !== 0) {
+        setPosterUploadStatus(`上传失败：${json.message || res.status}`, false);
+        toast(`上传失败：${json.message || res.status}`, false);
+        return "";
+      }
+      document.getElementById("poster-image-url").value = json.data.url;
+      input.value = "";
+      syncPosterImagePreviewFromUrl();
+      setPosterUploadStatus("图片已上传，保存海报即可。");
+      toast("图片已上传");
+      return json.data.url;
+    } catch (err) {
+      setPosterUploadStatus(`上传失败：${err.message}`, false);
+      toast(`上传失败：${err.message}`, false);
+      return "";
+    }
+  }
+
   async function loadPosterItems() {
+    if (DESIGN_PREVIEW) {
+      posterItemsState = POSTER_PREVIEW_ITEMS;
+      renderPosterItemsTable();
+      toast("设计预览：已加载示例海报");
+      return;
+    }
     if (!ADMIN_PASS) { toast("未登录", false); return; }
     const tbody = document.getElementById("poster-tbody");
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">加载中…</td></tr>';
@@ -1358,62 +1593,79 @@
         return;
       }
       posterItemsState = json.data || [];
-      tbody.innerHTML = posterItemsState.length === 0
-        ? '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">暂无动态内容</td></tr>'
-        : posterItemsState.map(item => {
-          const ref = item.type === "beer_recommend"
-            ? `${item.tap_no || "-"}号酒头`
-            : item.type === "image"
-              ? (item.image_url ? "图片 URL" : "未填图片")
-              : (item.qr_url ? "含二维码" : "信息卡");
-          return `
-            <tr>
-              <td>${item.sort_order ?? 0}</td>
-              <td>${posterEscape(item.type)}</td>
-              <td>${posterEscape(item.title || "")}</td>
-              <td>${posterEscape(ref)}</td>
-              <td>${posterEscape(item.bg_type || "")}</td>
-              <td>${item.duration_sec || 10}s</td>
-              <td>${item.enabled ? "启用" : "停用"}</td>
-              <td><div class="rowActions">
-                <button class="mini" onclick="editPosterItem('${item.id}')">编辑</button>
-                <button class="mini danger" onclick="deletePosterItem('${item.id}')">删除</button>
-              </div></td>
-            </tr>`;
-        }).join("");
+      renderPosterItemsTable();
     } catch (err) {
       toast(`加载失败：${err.message}`, false);
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">加载失败</td></tr>';
     }
   }
 
+  function renderPosterItemsTable() {
+    const tbody = document.getElementById("poster-tbody");
+    tbody.innerHTML = posterItemsState.length === 0
+      ? '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">暂无海报</td></tr>'
+      : posterItemsState.map(item => {
+        const ref = item.image_url ? "已上传图片" : "未填图片";
+        return `
+          <tr>
+            <td>${item.sort_order ?? 0}</td>
+            <td><span class="poster-type-pill image">图片海报</span></td>
+            <td>${posterEscape(item.title || "")}</td>
+            <td>${posterEscape(ref)}</td>
+            <td>自动模糊</td>
+            <td>${item.duration_sec || 10}s</td>
+            <td><span class="status-dot ${item.enabled ? "on" : "off"}">${item.enabled ? "启用" : "停用"}</span></td>
+            <td><div class="rowActions">
+              <button class="mini" onclick="editPosterItem('${item.id}')">编辑</button>
+              <button class="mini danger" onclick="deletePosterItem('${item.id}')">删除</button>
+            </div></td>
+          </tr>`;
+      }).join("");
+  }
+
   async function savePosterItem() {
     if (!ADMIN_PASS) { toast("未登录", false); return; }
-    let body = null;
-    const bodyRaw = document.getElementById("poster-body").value.trim();
-    if (bodyRaw) {
-      try {
-        body = JSON.parse(bodyRaw);
-      } catch {
-        toast("信息卡 JSON 格式不正确", false);
-        return;
-      }
-    }
+    const uploadedUrl = await uploadPosterImage();
+    if (!uploadedUrl) return;
 
     const payload = {
       id: document.getElementById("poster-id").value || undefined,
-      type: document.getElementById("poster-type").value,
+      type: "image",
       title: document.getElementById("poster-title").value.trim(),
-      tapNo: document.getElementById("poster-tap-no").value,
+      tapNo: "",
       imageUrl: document.getElementById("poster-image-url").value.trim(),
-      body,
-      qrUrl: document.getElementById("poster-qr-url").value.trim(),
+      body: null,
+      qrUrl: "",
       durationSec: Number(document.getElementById("poster-duration").value) || 10,
       sortOrder: Number(document.getElementById("poster-sort").value) || 0,
-      bgType: document.getElementById("poster-bg-type").value,
-      bgValue: document.getElementById("poster-bg-value").value.trim(),
+      bgType: "auto_blur",
+      bgValue: "",
       enabled: document.getElementById("poster-enabled").value === "true",
     };
+
+    if (DESIGN_PREVIEW) {
+      const previewItem = {
+        id: payload.id || `preview-${Date.now()}`,
+        type: payload.type,
+        title: payload.title,
+        tap_no: payload.tapNo ? Number(payload.tapNo) : null,
+        image_url: payload.imageUrl,
+        body: payload.body,
+        qr_url: payload.qrUrl,
+        duration_sec: payload.durationSec,
+        sort_order: payload.sortOrder,
+        bg_type: payload.bgType,
+        bg_value: payload.bgValue,
+        enabled: payload.enabled,
+      };
+      const existingIndex = posterItemsState.findIndex(item => item.id === previewItem.id);
+      if (existingIndex >= 0) posterItemsState.splice(existingIndex, 1, previewItem);
+      else posterItemsState.push(previewItem);
+      posterItemsState.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      renderPosterItemsTable();
+      toast("设计预览：已模拟保存，不会写入数据库");
+      return;
+    }
 
     try {
       const res = await fetch('/api/admin?op=poster-upsert', {
@@ -1422,7 +1674,7 @@
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      toast(json.code === 0 ? "动态内容已保存" : `保存失败：${json.message}`, json.code === 0);
+      toast(json.code === 0 ? "海报已保存" : `保存失败：${json.message}`, json.code === 0);
       if (json.code === 0) {
         resetPosterForm();
         loadPosterItems();
@@ -1433,7 +1685,13 @@
   }
 
   async function deletePosterItem(id) {
-    if (!confirm("确认删除这条动态内容？")) return;
+    if (DESIGN_PREVIEW) {
+      posterItemsState = posterItemsState.filter(item => item.id !== id);
+      renderPosterItemsTable();
+      toast("设计预览：已模拟删除");
+      return;
+    }
+    if (!confirm("确认删除这张海报？")) return;
     try {
       const res = await fetch('/api/admin?op=poster-delete', {
         method: 'POST',
@@ -1789,7 +2047,14 @@
   document.getElementById("btnAdd").addEventListener("click", addTank);
 
   // 初始：显示未登录，等待登录蒙层操作
-  setAuthUI(false);
+  if (DESIGN_PREVIEW) {
+    ADMIN_PASS = "__design_preview__";
+    document.getElementById("loginMask").style.display = "none";
+    setAuthUI("preview");
+    document.querySelector('.tab-btn[data-tab="tv"]')?.click();
+  } else {
+    setAuthUI(false);
+  }
   renderMenu(); // 初始渲染空酒单表格
 </script>
 </body>

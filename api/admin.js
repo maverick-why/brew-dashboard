@@ -3,10 +3,18 @@ const { ok, error } = require('./_lib/response');
 const { getSupabase } = require('./_lib/supabase');
 const { verifyAdmin } = require('./_lib/admin-auth');
 const Redis = require('ioredis');
+const crypto = require('crypto');
 
 const MENU_KEY = 'brew_dash_menu_v1';
+const POSTER_BUCKET = process.env.POSTER_BUCKET || 'poster-assets';
 const POSTER_TYPES = ['image', 'beer_recommend', 'info_card'];
 const POSTER_BG_TYPES = ['auto_blur', 'solid', 'gradient', 'theme'];
+const POSTER_IMAGE_TYPES = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
+const POSTER_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
 
 let redis;
 function getRedis() {
@@ -19,6 +27,52 @@ function getRedis() {
     });
   }
   return redis;
+}
+
+async function ensurePosterBucket(supabase) {
+  const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+  if (listError) throw listError;
+  if ((buckets || []).some(bucket => bucket.name === POSTER_BUCKET)) return;
+
+  const { error: createError } = await supabase.storage.createBucket(POSTER_BUCKET, {
+    public: true,
+    allowedMimeTypes: Object.keys(POSTER_IMAGE_TYPES),
+    fileSizeLimit: POSTER_IMAGE_MAX_BYTES,
+  });
+  if (createError && !/already exists/i.test(createError.message || '')) throw createError;
+}
+
+function normalizePosterImageUpload(body) {
+  const mimeType = body.mimeType || body.mime_type || '';
+  const dataUrl = body.dataUrl || body.data_url || '';
+  if (!POSTER_IMAGE_TYPES[mimeType]) {
+    const err = new Error('只支持 JPG / PNG / WebP 图片');
+    err.status = 400;
+    throw err;
+  }
+
+  const prefix = `data:${mimeType};base64,`;
+  if (!dataUrl.startsWith(prefix)) {
+    const err = new Error('图片数据格式不正确');
+    err.status = 400;
+    throw err;
+  }
+
+  const buffer = Buffer.from(dataUrl.slice(prefix.length), 'base64');
+  if (!buffer.length || buffer.length > POSTER_IMAGE_MAX_BYTES) {
+    const err = new Error('图片不能超过 3MB');
+    err.status = 400;
+    throw err;
+  }
+
+  const ext = POSTER_IMAGE_TYPES[mimeType];
+  const id = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
+  const date = new Date().toISOString().slice(0, 10);
+  return {
+    buffer,
+    mimeType,
+    path: `poster-items/${date}/${Date.now()}-${id}.${ext}`,
+  };
 }
 
 function normalizePosterPayload(body) {
@@ -53,6 +107,18 @@ function normalizePosterPayload(body) {
 
   if (payload.tap_no !== null && (!Number.isInteger(payload.tap_no) || payload.tap_no < 1 || payload.tap_no > 64)) {
     const err = new Error('tap_no 必须是 1-64 的整数');
+    err.status = 400;
+    throw err;
+  }
+
+  if (type === 'image' && !payload.image_url) {
+    const err = new Error('图片海报必须填写图片 URL');
+    err.status = 400;
+    throw err;
+  }
+
+  if (type === 'beer_recommend' && payload.tap_no === null) {
+    const err = new Error('推荐酒款必须填写酒头编号');
     err.status = 400;
     throw err;
   }
@@ -195,6 +261,23 @@ module.exports = async function handler(req, res) {
           } catch { /* Redis failure is non-fatal */ }
         }
         return ok(res, { tapNo, active });
+      }
+
+      if (op === 'poster-upload') {
+        const upload = normalizePosterImageUpload(body);
+        await ensurePosterBucket(supabase);
+        const { error: uploadError } = await supabase.storage
+          .from(POSTER_BUCKET)
+          .upload(upload.path, upload.buffer, {
+            contentType: upload.mimeType,
+            cacheControl: '31536000',
+            upsert: false,
+          });
+        if (uploadError) throw uploadError;
+        const { data: publicData } = supabase.storage
+          .from(POSTER_BUCKET)
+          .getPublicUrl(upload.path);
+        return ok(res, { url: publicData.publicUrl, path: upload.path });
       }
 
       if (op === 'poster-upsert') {

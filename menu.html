@@ -35,29 +35,153 @@
 
     #posterZone { display: none; }
 
-    #root.dual-screen-left {
-      padding: var(--bezel) 0 var(--bezel) var(--dual-gap, var(--gap));
+    #root.dual-preview {
+      width: 3840px;
+      height: 1080px;
+      padding: var(--dual-gap, var(--gap));
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--dual-gap, var(--gap));
     }
 
-    #root.dual-screen-left .grid {
+    #root.dual-preview::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      background: rgba(255,255,255,.12);
+      transform: translateX(-2px);
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    #root.dual-preview #posterZone {
+      display: block;
+      grid-column: 1 / span 2;
+      grid-row: 1;
+    }
+
+    #root.dual-preview .grid {
+      grid-column: 3 / span 4;
+      grid-row: 1;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-screen-left {
+      padding: var(--dual-gap, var(--gap)) 0 var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap));
+      display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--dual-gap, var(--gap));
     }
 
-    #root.dual-screen-right {
-      padding: var(--bezel) var(--dual-gap, var(--gap)) var(--bezel) 0;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: var(--dual-gap, var(--gap));
+    #root.dual-screen-left #posterZone {
+      display: block;
+      grid-column: 1 / span 2;
+      grid-row: 1;
     }
 
-    #root.dual-screen-right .grid {
+    #root.dual-screen-left .grid {
+      grid-column: 3;
+      grid-row: 1;
       grid-template-columns: 1fr;
       gap: var(--dual-gap, var(--gap));
     }
 
-    #root.dual-screen-right #posterZone {
-      display: block;
+    #root.dual-screen-right {
+      padding: var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap)) 0;
+    }
+
+    #root.dual-screen-right .grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-menu .card-num {
+      width: calc(108px * var(--rs));
+    }
+    #root.dual-menu .num {
+      font-size: calc(78px * var(--rs));
+    }
+    #root.dual-menu .row-top {
+      padding: calc(16px * var(--rs)) calc(22px * var(--rs)) calc(8px * var(--rs)) calc(16px * var(--rs));
+      gap: calc(12px * var(--rs));
+      align-items: flex-start;
+    }
+    #root.dual-menu .brewery-tag {
+      font-size: calc(32px * var(--rs));
+      line-height: 1;
+    }
+    #root.dual-menu .beer-name-row {
+      align-items: center;
+      gap: calc(8px * var(--rs));
+      margin-top: calc(5px * var(--rs));
+      flex-wrap: wrap;
+    }
+    #root.dual-menu .beer-name {
+      max-width: 100%;
+      font-size: calc(52px * var(--rs));
+      letter-spacing: calc(1px * var(--rs));
+      line-height: 1.05;
+    }
+    #root.dual-menu .beer-tags {
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: calc(4px * var(--rs));
+    }
+    #root.dual-menu .beer-tag {
+      height: calc(28px * var(--rs));
+      max-width: calc(150px * var(--rs));
+      padding: 0 calc(8px * var(--rs));
+      font-size: calc(20px * var(--rs));
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #root.dual-menu .beer-style {
+      margin-top: calc(6px * var(--rs));
+      font-size: calc(25px * var(--rs));
+      line-height: 1.1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #root.dual-menu .price-block {
+      width: calc(220px * var(--rs));
+      flex: 0 0 calc(220px * var(--rs));
+      padding-top: calc(10px * var(--rs));
+    }
+    #root.dual-menu .price-line {
+      font-size: calc(42px * var(--rs));
+      line-height: 1.28;
+    }
+    #root.dual-menu .price-block.single .price-line {
+      font-size: calc(50px * var(--rs));
+      line-height: 1.15;
+    }
+    #root.dual-menu .divider {
+      margin: 0 calc(16px * var(--rs));
+    }
+    #root.dual-menu .row-bottom {
+      padding: calc(8px * var(--rs)) calc(22px * var(--rs)) calc(12px * var(--rs)) calc(16px * var(--rs));
+      align-items: flex-end;
+      gap: calc(10px * var(--rs));
+    }
+    #root.dual-menu .en-name,
+    #root.dual-menu .en-style {
+      font-size: calc(22px * var(--rs));
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #root.dual-menu .alc-info {
+      width: calc(220px * var(--rs));
+      flex: 0 0 calc(220px * var(--rs));
+      font-size: calc(38px * var(--rs));
+      line-height: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* TV 左屏：上下留 bezel，左外边留 gap（= 卡片间距），右贴边（拼缝） */
@@ -412,7 +536,7 @@
     /* 空卡片 */
     .card.empty .beer-name { color: #ddd; font-size: calc(28px * var(--rs)); font-weight: 400 }
 
-    /* ── 右屏动态区：1280×1080 逻辑画布，随电视端缩放 ── */
+    /* ── 活动动态区：双列 1280×1080 逻辑画布，随电视端缩放 ── */
     .poster-zone {
       width: 100%;
       height: 100%;
@@ -593,6 +717,7 @@ const TV_SCREEN = rawScreen === "left" || rawScreen === "right" ? rawScreen : ""
 const rawPage  = params.get("page");
 const IS_DUAL_SCREEN = !!TV_SCREEN;
 const IS_TV    = !!rawPage || IS_DUAL_SCREEN;
+const IS_DUAL_PREVIEW = !IS_TV;
 const TV_PAGE  = rawPage ? parseInt(rawPage, 10) : 1;
 
 let previewPage         = 1;
@@ -604,15 +729,57 @@ let posterIndex         = 0;
 let posterTimer         = null;
 let posterSignature     = "";
 
+const LOCAL_PREVIEW_ITEMS = [
+  ["时光酿造所","港岛妹妹","Hong Kong Sister","双倍浑浊IPA","Double Hazy IPA","来自香港的灵感","获奖配方升级","7.2","45","78","490ml","58","360ml"],
+  ["时光酿造所","决心","Golden Hour Ale","金色艾尔","Golden Ale","致敬坚持的决心","2025香港家酿","5.0","18","78","490ml","58","360ml"],
+  ["彼岸","阿达姆","Adam","古斯","Gose","芫荽柠檬","清爽易饮","4.0","35","66","490ml","59","360ml"],
+  ["蔓延酿造","辛香农舍","Farmhouse Soul","塞松","Sour Saison","辛香草本","明亮酸感","4.6","40","66","490ml","60","360ml"],
+  ["FEVER","谷仓铜琥","Amber Kellerbier","琥珀窖藏拉格","Amber Kellerbier","面包麦芽","德式骨架","5.0","35","64","400ml","",""],
+  ["山丘","空知王牌","Sorachi Ace Hop Lager","日式酒花拉格","Japanese Hop Lager","北海道酒花","","4.5","8","66","400ml","",""],
+  ["拾捌精酿","酒花逆流","Hops-upstream","双倍干投淡色艾尔","DDH Pale Ale","柑橘酒花","","5.5","35","66","490ml","58","360ml"],
+  ["勿慕","夏令甜酿苹果酒西打","Summer Sweet","苹果西打","Apple Cider","苹果清甜","夏日易饮","7.0","2","68","490ml","",""],
+  ["彼岸","夜曲波兰烟熏生啤","Nocturne","美式淡色艾尔","American Pale Ale","橡木烟熏","轻盈干爽","4.0","12","67","490ml","",""]
+].map((row, index) => ({
+  no: index + 1,
+  brewery: row[0],
+  name: row[1],
+  name_en: row[2],
+  style: row[3],
+  style_en: row[4],
+  tag1: row[5],
+  tag2: row[6],
+  abv: row[7],
+  ibu: row[8],
+  large_price: row[9],
+  large_size: row[10],
+  small_price: row[11],
+  small_size: row[12],
+  flag: "🇨🇳",
+  color: "dark",
+  sold_out: false,
+  special: false,
+  sponsor_name: "",
+}));
+
+function localPreviewData() {
+  const items = [];
+  for (let i = 0; i < 27; i++) {
+    items.push({ ...LOCAL_PREVIEW_ITEMS[i % LOCAL_PREVIEW_ITEMS.length], no: i + 1 });
+  }
+  return { ok: true, tapCount: 27, items };
+}
+
 // TV 模式：给 root 加边框 class（具体屏幕位置在 load() 里确认 screenCount 后再微调）
 if (IS_DUAL_SCREEN) {
-  document.getElementById("root").classList.add(`dual-screen-${TV_SCREEN}`);
+  document.getElementById("root").classList.add("dual-menu", `dual-screen-${TV_SCREEN}`);
+} else if (IS_DUAL_PREVIEW) {
+  document.getElementById("root").classList.add("dual-menu", "dual-preview");
 } else if (IS_TV) {
   document.getElementById("root").classList.add(`tv-page-${TV_PAGE}`);
 }
 
-// 预览模式显示翻页按钮
-if (!IS_TV) {
+// 旧分页预览才显示翻页按钮；默认无参数用于双屏总预览
+if (!IS_TV && !IS_DUAL_PREVIEW) {
   document.getElementById("previewNav").classList.add("show");
   document.getElementById("btnPrev").addEventListener("click", () => {
     if (previewPage > 1) { previewPage--; renderPreview(); }
@@ -774,7 +941,7 @@ function startPosterLoop(menuItems) {
 }
 
 async function loadPosterItems(menuItems) {
-  if (TV_SCREEN !== "right") return;
+  if (!(TV_SCREEN === "left" || IS_DUAL_PREVIEW)) return;
 
   try {
     const res = await fetch(POSTER_API, { cache: "no-store" });
@@ -793,7 +960,7 @@ async function loadPosterItems(menuItems) {
   }
 }
 
-function renderDualScreen(items, tapCount) {
+function renderDualLayout(items, tapCount) {
   const rows = Math.min(7, Math.max(3, Math.ceil(tapCount / 4)));
   const gap = rows >= 7 ? 4 : 40;
   const root = document.getElementById("root");
@@ -803,12 +970,17 @@ function renderDualScreen(items, tapCount) {
   root.style.setProperty("--rs", Math.min(1, 4.35 / rows));
   grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-  if (TV_SCREEN === "left") {
-    grid.innerHTML = renderSlice(items.slice(0, rows * 3));
+  if (IS_DUAL_PREVIEW) {
+    grid.innerHTML = renderSlice(items.slice(0, rows * 4));
     return;
   }
 
-  grid.innerHTML = renderSlice(items.slice(rows * 3, rows * 4));
+  if (TV_SCREEN === "left") {
+    grid.innerHTML = renderSlice(items.slice(0, rows));
+    return;
+  }
+
+  grid.innerHTML = renderSlice(items.slice(rows, rows * 4));
 }
 
 const SEAL_HTML = `
@@ -906,15 +1078,23 @@ function makeCard(item) {
 
 async function load() {
   try {
-    const res  = await fetch(API, { cache: "no-store" });
-    const data = await res.json();
+    let data;
+    if (location.protocol === "file:") {
+      data = localPreviewData();
+    } else {
+      const res  = await fetch(API, { cache: "no-store" });
+      data = await res.json();
+    }
     if (!data.ok) return;
     const tapCount = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
 
-    // 新双屏模式：左屏 3 列酒单，右屏 1 列酒单 + 动态区
-    if (IS_DUAL_SCREEN) {
-      allItems = data.items || [];
-      renderDualScreen(allItems, tapCount);
+    // 新双屏模式：
+    // 总画布 6 列：1-2 活动区，3-6 酒单
+    // left  屏：活动 2 列 + 酒单第 1 列
+    // right 屏：酒单第 2-4 列
+    if (IS_DUAL_SCREEN || IS_DUAL_PREVIEW) {
+      allItems = (data.items || []).filter(it => it.name || it.name_en);
+      renderDualLayout(allItems, tapCount);
       await loadPosterItems(allItems);
       return;
     }
@@ -949,16 +1129,31 @@ async function load() {
     }
   } catch(e) {
     console.warn("menu load error", e);
+    const data = localPreviewData();
+    const tapCount = data.tapCount;
+    allItems = data.items;
+    if (IS_DUAL_SCREEN || IS_DUAL_PREVIEW) {
+      renderDualLayout(allItems, tapCount);
+      if (TV_SCREEN === "left" || IS_DUAL_PREVIEW) renderPosterItem(null, allItems);
+      return;
+    }
+    screenCount = 2;
+    const rows = Math.min(5, Math.ceil(tapCount / 4));
+    currentItemsPerPage = rows * 2;
+    document.getElementById("grid").style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+    document.getElementById("root").style.setProperty("--rs", Math.min(1, 4 / rows));
+    renderPreview();
   }
 }
 
-// ── 缩放：将 1920×1080 的画布等比缩放铺满屏幕 ──
+// ── 缩放：将固定画布等比缩放铺满屏幕 ──
 function scaleToFit() {
   const root   = document.getElementById("root");
-  const scaleX = window.innerWidth  / 1920;
+  const canvasWidth = IS_DUAL_PREVIEW ? 3840 : 1920;
+  const scaleX = window.innerWidth  / canvasWidth;
   const scaleY = window.innerHeight / 1080;
   const scale  = Math.min(scaleX, scaleY);
-  const offsetX = (window.innerWidth  - 1920 * scale) / 2;
+  const offsetX = (window.innerWidth  - canvasWidth * scale) / 2;
   const offsetY = (window.innerHeight - 1080 * scale) / 2;
   root.style.transform = `scale(${scale})`;
   root.style.left = offsetX + "px";
