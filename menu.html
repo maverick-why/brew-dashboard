@@ -975,15 +975,12 @@ function renderDualLayout(items, tapCount) {
 
   root.style.setProperty("--dual-gap", `${gap}px`);
 
-  // 4:1 宽高比：卡宽由布局决定，高 = 宽 / 4，行高固定像素不拉伸
-  const rootW   = IS_DUAL_PREVIEW ? 3840 : 1920;
-  const cardW   = Math.round(rootW / 3 - gap);      // ≈600px (gap=40)
-  const availH  = 1080 - 2 * gap;
-  const targetH = Math.round(cardW / 4);             // 4:1 理想高 ≈150px
-  const maxH    = Math.floor((availH - (rows - 1) * gap) / rows);
-  const cardH   = Math.min(targetH, maxH);
+  // 高度平均填满屏幕，不强制 4:1；--rs 以 4 行时的卡高（220px）为基准缩放字体
+  const availH = 1080 - 2 * gap;
+  const cardH  = Math.floor((availH - (rows - 1) * gap) / rows);
+  const refH   = 220;  // 4 行 gap=40 时的卡高，此时 --rs=1 字体正好合适
 
-  root.style.setProperty("--rs", Math.min(1, cardH / targetH));
+  root.style.setProperty("--rs", Math.min(1, cardH / refH));
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
   grid.style.alignContent = "start";
 
