@@ -33,6 +33,33 @@
       padding: 0;
     }
 
+    #posterZone { display: none; }
+
+    #root.dual-screen-left {
+      padding: var(--bezel) 0 var(--bezel) var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-screen-left .grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-screen-right {
+      padding: var(--bezel) var(--dual-gap, var(--gap)) var(--bezel) 0;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-screen-right .grid {
+      grid-template-columns: 1fr;
+      gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-screen-right #posterZone {
+      display: block;
+    }
+
     /* TV 左屏：上下留 bezel，左外边留 gap（= 卡片间距），右贴边（拼缝） */
     #root.tv-page-1 { padding: var(--bezel) 0 var(--bezel) var(--gap); }
 
@@ -385,6 +412,117 @@
     /* 空卡片 */
     .card.empty .beer-name { color: #ddd; font-size: calc(28px * var(--rs)); font-weight: 400 }
 
+    /* ── 右屏动态区：1280×1080 逻辑画布，随电视端缩放 ── */
+    .poster-zone {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #101722;
+      color: #fff;
+      isolation: isolate;
+    }
+    .poster-bg-layer {
+      position: absolute;
+      inset: -30px;
+      background-image: var(--poster-image);
+      background-size: cover;
+      background-position: center;
+      filter: blur(40px);
+      opacity: .5;
+      transform: scale(1.04);
+      z-index: 0;
+    }
+    .poster-bg-layer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.28);
+    }
+    .poster-fg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .poster-fg-layer img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 32px rgba(0,0,0,.35));
+    }
+    .poster-generated {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 84px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--poster-bg, linear-gradient(135deg, #143b28, #68a35d));
+      overflow: hidden;
+    }
+    .poster-generated::before {
+      content: "";
+      position: absolute;
+      inset: 44px;
+      border: 1px solid rgba(255,255,255,.18);
+      pointer-events: none;
+    }
+    .poster-eyebrow {
+      position: relative;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px;
+      letter-spacing: 8px;
+      color: rgba(255,255,255,.68);
+      text-transform: uppercase;
+    }
+    .poster-title {
+      position: relative;
+      margin-top: 28px;
+      font-size: 92px;
+      line-height: 1.05;
+      letter-spacing: 8px;
+      font-weight: 900;
+      text-wrap: balance;
+    }
+    .poster-subtitle {
+      position: relative;
+      margin-top: 22px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 34px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,.76);
+    }
+    .poster-body {
+      position: relative;
+      margin-top: 42px;
+      max-width: 850px;
+      font-size: 42px;
+      line-height: 1.45;
+      color: rgba(255,255,255,.9);
+    }
+    .poster-qr {
+      position: relative;
+      margin-top: 42px;
+      width: 260px;
+      height: 260px;
+      object-fit: contain;
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .poster-default {
+      background:
+        radial-gradient(circle at 30% 24%, rgba(214,165,72,.25), transparent 32%),
+        linear-gradient(135deg, #101722, #173725 55%, #101722);
+    }
+
     /* ── 精选 special：只改底色和文字颜色，不显示徽章 ── */
     .card.special { background: #fdf8f0; }
     .card.special .beer-name  { color: #8a5f00; }
@@ -401,6 +539,7 @@
 
 <div id="root">
   <div class="grid" id="grid"></div>
+  <div class="poster-zone" id="posterZone"></div>
 </div>
 
 <div class="preview-nav" id="previewNav">
@@ -411,6 +550,7 @@
 
 <script>
 const API     = "/api/menu-public";
+const POSTER_API = "/api/poster-public";
 const REFRESH = 5000;
 
 const STYLE_COLORS = [
@@ -446,18 +586,28 @@ function getStyleColor(style, style_en) {
   return "#2B2B2B";
 }
 
-// ?page=1 → 左屏，?page=2 → 中屏（三屏时）或右屏（两屏时），?page=3 → 右屏（三屏时），无参数 → 预览翻页
-const rawPage  = new URLSearchParams(location.search).get("page");
-const IS_TV    = !!rawPage;
-const TV_PAGE  = IS_TV ? parseInt(rawPage, 10) : 1;
+// screen=left/right → 双屏电视物理屏幕；page=1/2/3 保留旧分页模式
+const params   = new URLSearchParams(location.search);
+const rawScreen = params.get("screen");
+const TV_SCREEN = rawScreen === "left" || rawScreen === "right" ? rawScreen : "";
+const rawPage  = params.get("page");
+const IS_DUAL_SCREEN = !!TV_SCREEN;
+const IS_TV    = !!rawPage || IS_DUAL_SCREEN;
+const TV_PAGE  = rawPage ? parseInt(rawPage, 10) : 1;
 
 let previewPage         = 1;
 let allItems            = [];
 let currentItemsPerPage = 8;
 let screenCount         = 2; // 由 load() 根据 tapCount 动态更新
+let posterItems         = [];
+let posterIndex         = 0;
+let posterTimer         = null;
+let posterSignature     = "";
 
 // TV 模式：给 root 加边框 class（具体屏幕位置在 load() 里确认 screenCount 后再微调）
-if (IS_TV) {
+if (IS_DUAL_SCREEN) {
+  document.getElementById("root").classList.add(`dual-screen-${TV_SCREEN}`);
+} else if (IS_TV) {
   document.getElementById("root").classList.add(`tv-page-${TV_PAGE}`);
 }
 
@@ -488,6 +638,177 @@ function esc(s) {
   return String(s || "")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;")
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function escAttr(s) {
+  return String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function safeCssValue(value) {
+  return String(value || "")
+    .replace(/[;{}<>]/g, "")
+    .trim();
+}
+
+function posterImageStyle(url) {
+  const safeUrl = String(url || "").replace(/["'()\\]/g, "");
+  return `--poster-image:url('${escAttr(safeUrl)}')`;
+}
+
+function gradientFromColor(color) {
+  const base = color && color !== "dark" ? color : "#173725";
+  return `linear-gradient(135deg, #101722 0%, ${base} 54%, #0b1118 100%)`;
+}
+
+function renderPosterFallback() {
+  return `
+    <div class="poster-generated poster-default">
+      <div class="poster-eyebrow">Chrono Brewery</div>
+      <div class="poster-title">时光酿造所</div>
+      <div class="poster-subtitle">Fresh Beer · Fresh Time</div>
+    </div>`;
+}
+
+function renderImagePoster(item) {
+  if (!item.imageUrl) return renderPosterFallback();
+  return `
+    <div class="poster-bg-layer" style="${posterImageStyle(item.imageUrl)}"></div>
+    <div class="poster-fg-layer">
+      <img src="${escAttr(item.imageUrl)}" alt="${escAttr(item.title || "动态海报")}"/>
+    </div>`;
+}
+
+function renderBeerRecommend(item, menuItems) {
+  const beer = menuItems.find(it => Number(it.no) === Number(item.tapNo)) || {};
+  const themeColor = item.bgValue || getStyleColor(beer.style, beer.style_en);
+  const bg = safeCssValue(item.bgValue || gradientFromColor(themeColor));
+  const title = item.title || beer.name || beer.name_en || "今日推荐";
+  const subtitle = [
+    beer.brewery || "",
+    beer.style || beer.style_en || "",
+  ].filter(Boolean).join(" · ");
+  const stats = [
+    beer.abv ? `ALC ${esc(beer.abv)}%` : "",
+    beer.ibu ? `IBU ${esc(beer.ibu)}` : "",
+    beer.large_price ? `¥${esc(beer.large_price)}` : "",
+  ].filter(Boolean).join(" · ");
+
+  return `
+    <div class="poster-generated" style="--poster-bg:${bg}">
+      <div class="poster-eyebrow">今日推荐</div>
+      <div class="poster-title">${esc(title)}</div>
+      <div class="poster-subtitle">${esc(subtitle)}</div>
+      <div class="poster-body">${stats || "Fresh On Tap"}</div>
+    </div>`;
+}
+
+function infoCardLines(body) {
+  if (!body || typeof body !== "object") return [];
+  if (body.wifi) {
+    return [
+      `Wi-Fi：${body.wifi.ssid || ""}`,
+      `密码：${body.wifi.pass || ""}`,
+    ].filter(line => line.trim() !== "Wi-Fi：" && line.trim() !== "密码：");
+  }
+  if (Array.isArray(body.hours)) return body.hours;
+  if (body.notice) return [body.notice];
+  if (Array.isArray(body.lines)) return body.lines;
+  return [];
+}
+
+function renderInfoCard(item) {
+  const bg = item.bgType === "solid" && item.bgValue
+    ? safeCssValue(item.bgValue)
+    : item.bgType === "gradient" && item.bgValue
+      ? safeCssValue(item.bgValue)
+      : "linear-gradient(135deg, #101722, #173725 58%, #0b1118)";
+  const lines = infoCardLines(item.body);
+
+  return `
+    <div class="poster-generated" style="--poster-bg:${bg}">
+      <div class="poster-eyebrow">Info</div>
+      <div class="poster-title">${esc(item.title || "店内信息")}</div>
+      <div class="poster-body">${lines.map(line => `<div>${esc(line)}</div>`).join("")}</div>
+      ${item.qrUrl ? `<img class="poster-qr" src="${escAttr(item.qrUrl)}" alt="二维码"/>` : ""}
+    </div>`;
+}
+
+function renderPosterItem(item, menuItems) {
+  if (!item) {
+    document.getElementById("posterZone").innerHTML = renderPosterFallback();
+    return;
+  }
+
+  if (item.type === "image") {
+    document.getElementById("posterZone").innerHTML = renderImagePoster(item);
+    return;
+  }
+
+  if (item.type === "beer_recommend") {
+    document.getElementById("posterZone").innerHTML = renderBeerRecommend(item, menuItems);
+    return;
+  }
+
+  document.getElementById("posterZone").innerHTML = renderInfoCard(item);
+}
+
+function startPosterLoop(menuItems) {
+  clearTimeout(posterTimer);
+  if (!posterItems.length) {
+    renderPosterItem(null, menuItems);
+    return;
+  }
+
+  const item = posterItems[posterIndex] || posterItems[0];
+  renderPosterItem(item, menuItems);
+
+  if (posterItems.length <= 1) return;
+  const delay = Math.max(3, Number(item.durationSec) || 10) * 1000;
+  posterTimer = setTimeout(() => {
+    posterIndex = (posterIndex + 1) % posterItems.length;
+    startPosterLoop(menuItems);
+  }, delay);
+}
+
+async function loadPosterItems(menuItems) {
+  if (TV_SCREEN !== "right") return;
+
+  try {
+    const res = await fetch(POSTER_API, { cache: "no-store" });
+    const data = await res.json();
+    const items = data.ok && Array.isArray(data.items) ? data.items : [];
+    const signature = JSON.stringify(items);
+    if (signature === posterSignature) return;
+    posterSignature = signature;
+    posterItems = items;
+    posterIndex = 0;
+    startPosterLoop(menuItems);
+  } catch {
+    posterItems = [];
+    posterSignature = "";
+    startPosterLoop(menuItems);
+  }
+}
+
+function renderDualScreen(items, tapCount) {
+  const rows = Math.min(7, Math.max(3, Math.ceil(tapCount / 4)));
+  const gap = rows >= 7 ? 4 : 40;
+  const root = document.getElementById("root");
+  const grid = document.getElementById("grid");
+
+  root.style.setProperty("--dual-gap", `${gap}px`);
+  root.style.setProperty("--rs", Math.min(1, 4.35 / rows));
+  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+  if (TV_SCREEN === "left") {
+    grid.innerHTML = renderSlice(items.slice(0, rows * 3));
+    return;
+  }
+
+  grid.innerHTML = renderSlice(items.slice(rows * 3, rows * 4));
 }
 
 const SEAL_HTML = `
@@ -588,9 +909,17 @@ async function load() {
     const res  = await fetch(API, { cache: "no-store" });
     const data = await res.json();
     if (!data.ok) return;
+    const tapCount = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
 
-    // 根据酒头数决定屏幕数：>20 启用第三屏，否则两屏
-    const tapCount      = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
+    // 新双屏模式：左屏 3 列酒单，右屏 1 列酒单 + 动态区
+    if (IS_DUAL_SCREEN) {
+      allItems = data.items || [];
+      renderDualScreen(allItems, tapCount);
+      await loadPosterItems(allItems);
+      return;
+    }
+
+    // 旧 page 模式：根据酒头数决定屏幕数，>20 启用第三屏，否则两屏
     screenCount         = tapCount > 20 ? 3 : 2;
     const totalCols     = screenCount * 2;           // 每页2列
     const rows          = Math.min(5, Math.ceil(tapCount / totalCols));
