@@ -596,7 +596,7 @@
                 <button type="button" class="blue" onclick="uploadPosterImage()">上传</button>
               </div>
               <img id="poster-image-preview" class="poster-image-preview" alt="图片预览">
-              <div class="poster-upload-status" id="poster-upload-status">支持 JPG / PNG / WebP，单张不超过 3MB；保存时如已选择文件，会自动上传并保存图片地址。</div>
+              <div class="poster-upload-status" id="poster-upload-status">支持 JPG / PNG / WebP，单张不超过 5MB；保存时如已选择文件，会自动上传并保存图片地址。</div>
               <label class="muted">图片 URL（系统自动生成，可手动备用）</label>
               <input id="poster-image-url" type="text" placeholder="上传后自动生成，或粘贴外部图片 URL" oninput="syncPosterImagePreviewFromUrl()">
               <div class="field-hint">管理员正常只需要选择图片；URL 是数据库内部保存值，也是外部图片的备用入口。</div>
@@ -1442,7 +1442,7 @@
     document.getElementById("poster-tap-no").value = "";
     document.getElementById("poster-image-file").value = "";
     document.getElementById("poster-image-url").value = "";
-    document.getElementById("poster-upload-status").textContent = "支持 JPG / PNG / WebP，单张不超过 3MB；保存时如已选择文件，会自动上传并保存图片地址。";
+    document.getElementById("poster-upload-status").textContent = "支持 JPG / PNG / WebP，单张不超过 5MB；保存时如已选择文件，会自动上传并保存图片地址。";
     document.getElementById("poster-image-preview").style.display = "none";
     document.getElementById("poster-image-preview").removeAttribute("src");
     document.getElementById("poster-body").value = "";
@@ -1465,7 +1465,7 @@
     document.getElementById("poster-tap-no").value = "";
     document.getElementById("poster-image-file").value = "";
     document.getElementById("poster-image-url").value = item.image_url || "";
-    document.getElementById("poster-upload-status").textContent = item.image_url ? "已保存图片地址；如需更换，重新选择图片上传。" : "支持 JPG / PNG / WebP，单张不超过 3MB；保存时如已选择文件，会自动上传并保存图片地址。";
+    document.getElementById("poster-upload-status").textContent = item.image_url ? "已保存图片地址；如需更换，重新选择图片上传。" : "支持 JPG / PNG / WebP，单张不超过 5MB；保存时如已选择文件，会自动上传并保存图片地址。";
     syncPosterImagePreviewFromUrl();
     document.getElementById("poster-body").value = "";
     document.getElementById("poster-qr-url").value = item.qr_url || "";
@@ -1497,9 +1497,9 @@
       input.value = "";
       return;
     }
-    const maxSize = 3 * 1024 * 1024;
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setPosterUploadStatus("图片不能超过 3MB。建议先压缩为 WebP/JPG 后再上传。", false);
+      setPosterUploadStatus("图片不能超过 5MB。建议先压缩为 WebP/JPG 后再上传。", false);
       input.value = "";
       return;
     }

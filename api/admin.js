@@ -14,7 +14,7 @@ const POSTER_IMAGE_TYPES = {
   'image/png': 'png',
   'image/webp': 'webp',
 };
-const POSTER_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
+const POSTER_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
 let redis;
 function getRedis() {
@@ -60,7 +60,7 @@ function normalizePosterImageUpload(body) {
 
   const buffer = Buffer.from(dataUrl.slice(prefix.length), 'base64');
   if (!buffer.length || buffer.length > POSTER_IMAGE_MAX_BYTES) {
-    const err = new Error('图片不能超过 3MB');
+    const err = new Error('图片不能超过 5MB');
     err.status = 400;
     throw err;
   }
