@@ -5,6 +5,8 @@ const { verifyAdmin } = require('./_lib/admin-auth');
 const Redis = require('ioredis');
 
 const MENU_KEY = 'brew_dash_menu_v1';
+const POSTER_TYPES = ['image', 'beer_recommend', 'info_card'];
+const POSTER_BG_TYPES = ['auto_blur', 'solid', 'gradient', 'theme'];
 
 let redis;
 function getRedis() {
@@ -19,6 +21,45 @@ function getRedis() {
   return redis;
 }
 
+function normalizePosterPayload(body) {
+  const type = body.type || 'image';
+  const bgType = body.bgType || body.bg_type || (type === 'beer_recommend' ? 'theme' : 'auto_blur');
+  if (!POSTER_TYPES.includes(type)) {
+    const err = new Error('无效的动态内容类型');
+    err.status = 400;
+    throw err;
+  }
+  if (!POSTER_BG_TYPES.includes(bgType)) {
+    const err = new Error('无效的背景类型');
+    err.status = 400;
+    throw err;
+  }
+
+  const payload = {
+    type,
+    title: body.title || null,
+    image_url: body.imageUrl || body.image_url || null,
+    tap_no: body.tapNo === '' || body.tapNo === undefined || body.tapNo === null ? null : Number(body.tapNo),
+    body: body.body || null,
+    qr_url: body.qrUrl || body.qr_url || null,
+    enabled: body.enabled !== false,
+    sort_order: Number(body.sortOrder ?? body.sort_order ?? 0) || 0,
+    duration_sec: Math.max(3, Number(body.durationSec ?? body.duration_sec ?? 10) || 10),
+    starts_at: body.startsAt || body.starts_at || null,
+    ends_at: body.endsAt || body.ends_at || null,
+    bg_type: bgType,
+    bg_value: body.bgValue || body.bg_value || null,
+  };
+
+  if (payload.tap_no !== null && (!Number.isInteger(payload.tap_no) || payload.tap_no < 1 || payload.tap_no > 64)) {
+    const err = new Error('tap_no 必须是 1-64 的整数');
+    err.status = 400;
+    throw err;
+  }
+
+  return payload;
+}
+
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
 
@@ -27,7 +68,17 @@ module.exports = async function handler(req, res) {
     const supabase = getSupabase();
 
     if (req.method === 'GET') {
-      const { status } = getQuery(req);
+      const { status, op } = getQuery(req);
+      if (op === 'poster-list') {
+        const { data, error: dbError } = await supabase
+          .from('poster_items')
+          .select('*')
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true });
+        if (dbError) throw dbError;
+        return ok(res, data || []);
+      }
+
       const VALID_STATUSES = ['pending', 'live', 'rejected', 'expired'];
       if (status && !VALID_STATUSES.includes(status)) return error(res, 400, '无效的 status 参数');
       let query = supabase.from('sponsor_records').select('*').order('created_at', { ascending: false });
@@ -144,6 +195,39 @@ module.exports = async function handler(req, res) {
           } catch { /* Redis failure is non-fatal */ }
         }
         return ok(res, { tapNo, active });
+      }
+
+      if (op === 'poster-upsert') {
+        const payload = normalizePosterPayload(body);
+        let query;
+        if (body.id) {
+          query = supabase
+            .from('poster_items')
+            .update(payload)
+            .eq('id', body.id)
+            .select('*')
+            .single();
+        } else {
+          query = supabase
+            .from('poster_items')
+            .insert(payload)
+            .select('*')
+            .single();
+        }
+        const { data, error: dbError } = await query;
+        if (dbError) throw dbError;
+        return ok(res, data);
+      }
+
+      if (op === 'poster-delete') {
+        const { id } = body;
+        if (!id) return error(res, 400, '缺少 id');
+        const { error: dbError } = await supabase
+          .from('poster_items')
+          .delete()
+          .eq('id', id);
+        if (dbError) throw dbError;
+        return ok(res, { deleted: true });
       }
 
       return error(res, 400, '缺少 op 参数');

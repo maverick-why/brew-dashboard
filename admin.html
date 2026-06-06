@@ -366,6 +366,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="fermenter">发酵罐</button>
       <button class="tab-btn" data-tab="menu">酒单管理</button>
+      <button class="tab-btn" data-tab="tv">电视展示</button>
       <button class="tab-btn" data-tab="sponsor-review">冠名审核</button>
       <button class="tab-btn" data-tab="sponsor-manage">冠名管理</button>
       <button class="tab-btn" data-tab="cups">开业酒杯</button>
@@ -467,6 +468,114 @@
           </thead>
           <tbody id="menuTbody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Tab: 电视展示 -->
+    <div class="tab-pane" id="tab-tv">
+      <div class="toolbar">
+        <div class="btns">
+          <h3 style="margin:0;font-size:14px;font-weight:900">电视展示 · 右屏动态区域</h3>
+          <button onclick="loadPosterItems()">刷新</button>
+          <button class="blue" onclick="window.open('/menu.html?screen=left','_blank')">左电视 ↗</button>
+          <button class="blue" onclick="window.open('/menu.html?screen=right','_blank')">右电视 ↗</button>
+        </div>
+        <div class="muted" style="line-height:1.7">
+          左电视显示酒单第 1-3 栏；右电视显示第 4 栏 + 动态区域。图片海报会完整显示，不裁切，背景自动模糊填充。
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(340px,440px) minmax(520px,1fr);gap:12px;padding:12px">
+        <div class="panel" style="box-shadow:none">
+          <div class="toolbar" style="border-bottom:1px solid var(--line)">
+            <h4 style="margin:0;font-size:13px;font-weight:900">编辑动态内容</h4>
+          </div>
+          <div style="padding:12px;display:grid;gap:10px">
+            <input type="hidden" id="poster-id">
+            <label class="muted">内容类型</label>
+            <select id="poster-type" onchange="syncPosterFormMode()">
+              <option value="beer_recommend">推荐酒款</option>
+              <option value="image">图片海报</option>
+              <option value="info_card">固定信息卡</option>
+            </select>
+
+            <label class="muted">标题</label>
+            <input id="poster-title" type="text" placeholder="例如：今日推荐">
+
+            <div id="poster-tap-wrap">
+              <label class="muted">推荐酒头编号</label>
+              <input id="poster-tap-no" type="number" min="1" max="64" placeholder="1">
+            </div>
+
+            <div id="poster-image-wrap" style="display:none">
+              <label class="muted">图片 URL</label>
+              <input id="poster-image-url" type="text" placeholder="https://...">
+            </div>
+
+            <div id="poster-body-wrap" style="display:none">
+              <label class="muted">信息卡 JSON</label>
+              <textarea id="poster-body" rows="5" placeholder='{"notice":"本周五 8PM 精酿之夜"}'></textarea>
+              <label class="muted">二维码 URL（可选）</label>
+              <input id="poster-qr-url" type="text" placeholder="https://...">
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div>
+                <label class="muted">停留秒数</label>
+                <input id="poster-duration" type="number" min="3" value="15">
+              </div>
+              <div>
+                <label class="muted">排序</label>
+                <input id="poster-sort" type="number" value="1">
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div>
+                <label class="muted">背景类型</label>
+                <select id="poster-bg-type">
+                  <option value="theme">theme</option>
+                  <option value="auto_blur">auto_blur</option>
+                  <option value="solid">solid</option>
+                  <option value="gradient">gradient</option>
+                </select>
+              </div>
+              <div>
+                <label class="muted">启用</label>
+                <select id="poster-enabled">
+                  <option value="true">启用</option>
+                  <option value="false">停用</option>
+                </select>
+              </div>
+            </div>
+
+            <label class="muted">背景值（solid/gradient 可填）</label>
+            <input id="poster-bg-value" type="text" placeholder="#102018 或 linear-gradient(...)">
+
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+              <button onclick="resetPosterForm()">清空</button>
+              <button class="primary" onclick="savePosterItem()">保存动态内容</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="box-shadow:none">
+          <div class="toolbar" style="border-bottom:1px solid var(--line)">
+            <div>
+              <h4 style="margin:0;font-size:13px;font-weight:900">当前播放列表</h4>
+              <div class="muted" style="margin-top:4px">数据来自 poster_items，右屏动态区域按排序轮播。</div>
+            </div>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr><th>排序</th><th>类型</th><th>标题</th><th>酒头/图片</th><th>背景</th><th>秒数</th><th>状态</th><th>操作</th></tr>
+              </thead>
+              <tbody id="poster-tbody">
+                <tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">点击刷新加载动态内容</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1178,6 +1287,172 @@
     }
   });
 
+  // ====== TV poster tab
+  let posterItemsState = [];
+
+  function posterEscape(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function syncPosterFormMode() {
+    const type = document.getElementById("poster-type").value;
+    document.getElementById("poster-tap-wrap").style.display = type === "beer_recommend" ? "" : "none";
+    document.getElementById("poster-image-wrap").style.display = type === "image" ? "" : "none";
+    document.getElementById("poster-body-wrap").style.display = type === "info_card" ? "" : "none";
+    if (!document.getElementById("poster-bg-type").dataset.touched) {
+      document.getElementById("poster-bg-type").value =
+        type === "beer_recommend" ? "theme" : type === "image" ? "auto_blur" : "gradient";
+    }
+  }
+
+  function resetPosterForm() {
+    document.getElementById("poster-id").value = "";
+    document.getElementById("poster-type").value = "beer_recommend";
+    document.getElementById("poster-title").value = "今日推荐";
+    document.getElementById("poster-tap-no").value = "1";
+    document.getElementById("poster-image-url").value = "";
+    document.getElementById("poster-body").value = "";
+    document.getElementById("poster-qr-url").value = "";
+    document.getElementById("poster-duration").value = "15";
+    document.getElementById("poster-sort").value = "1";
+    document.getElementById("poster-bg-type").value = "theme";
+    document.getElementById("poster-bg-type").dataset.touched = "";
+    document.getElementById("poster-bg-value").value = "";
+    document.getElementById("poster-enabled").value = "true";
+    syncPosterFormMode();
+  }
+
+  function editPosterItem(id) {
+    const item = posterItemsState.find(x => x.id === id);
+    if (!item) return;
+    document.getElementById("poster-id").value = item.id || "";
+    document.getElementById("poster-type").value = item.type || "beer_recommend";
+    document.getElementById("poster-title").value = item.title || "";
+    document.getElementById("poster-tap-no").value = item.tap_no || "";
+    document.getElementById("poster-image-url").value = item.image_url || "";
+    document.getElementById("poster-body").value = item.body ? JSON.stringify(item.body, null, 2) : "";
+    document.getElementById("poster-qr-url").value = item.qr_url || "";
+    document.getElementById("poster-duration").value = item.duration_sec || 10;
+    document.getElementById("poster-sort").value = item.sort_order || 0;
+    document.getElementById("poster-bg-type").value = item.bg_type || "auto_blur";
+    document.getElementById("poster-bg-type").dataset.touched = "1";
+    document.getElementById("poster-bg-value").value = item.bg_value || "";
+    document.getElementById("poster-enabled").value = item.enabled ? "true" : "false";
+    syncPosterFormMode();
+  }
+
+  async function loadPosterItems() {
+    if (!ADMIN_PASS) { toast("未登录", false); return; }
+    const tbody = document.getElementById("poster-tbody");
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">加载中…</td></tr>';
+    try {
+      const res = await fetch('/api/admin?op=poster-list', { headers: { 'x-admin-pass': ADMIN_PASS } });
+      const json = await res.json();
+      if (json.code !== 0) {
+        toast(`加载失败：${json.message || res.status}`, false);
+        return;
+      }
+      posterItemsState = json.data || [];
+      tbody.innerHTML = posterItemsState.length === 0
+        ? '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">暂无动态内容</td></tr>'
+        : posterItemsState.map(item => {
+          const ref = item.type === "beer_recommend"
+            ? `${item.tap_no || "-"}号酒头`
+            : item.type === "image"
+              ? (item.image_url ? "图片 URL" : "未填图片")
+              : (item.qr_url ? "含二维码" : "信息卡");
+          return `
+            <tr>
+              <td>${item.sort_order ?? 0}</td>
+              <td>${posterEscape(item.type)}</td>
+              <td>${posterEscape(item.title || "")}</td>
+              <td>${posterEscape(ref)}</td>
+              <td>${posterEscape(item.bg_type || "")}</td>
+              <td>${item.duration_sec || 10}s</td>
+              <td>${item.enabled ? "启用" : "停用"}</td>
+              <td><div class="rowActions">
+                <button class="mini" onclick="editPosterItem('${item.id}')">编辑</button>
+                <button class="mini danger" onclick="deletePosterItem('${item.id}')">删除</button>
+              </div></td>
+            </tr>`;
+        }).join("");
+    } catch (err) {
+      toast(`加载失败：${err.message}`, false);
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">加载失败</td></tr>';
+    }
+  }
+
+  async function savePosterItem() {
+    if (!ADMIN_PASS) { toast("未登录", false); return; }
+    let body = null;
+    const bodyRaw = document.getElementById("poster-body").value.trim();
+    if (bodyRaw) {
+      try {
+        body = JSON.parse(bodyRaw);
+      } catch {
+        toast("信息卡 JSON 格式不正确", false);
+        return;
+      }
+    }
+
+    const payload = {
+      id: document.getElementById("poster-id").value || undefined,
+      type: document.getElementById("poster-type").value,
+      title: document.getElementById("poster-title").value.trim(),
+      tapNo: document.getElementById("poster-tap-no").value,
+      imageUrl: document.getElementById("poster-image-url").value.trim(),
+      body,
+      qrUrl: document.getElementById("poster-qr-url").value.trim(),
+      durationSec: Number(document.getElementById("poster-duration").value) || 10,
+      sortOrder: Number(document.getElementById("poster-sort").value) || 0,
+      bgType: document.getElementById("poster-bg-type").value,
+      bgValue: document.getElementById("poster-bg-value").value.trim(),
+      enabled: document.getElementById("poster-enabled").value === "true",
+    };
+
+    try {
+      const res = await fetch('/api/admin?op=poster-upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      toast(json.code === 0 ? "动态内容已保存" : `保存失败：${json.message}`, json.code === 0);
+      if (json.code === 0) {
+        resetPosterForm();
+        loadPosterItems();
+      }
+    } catch (err) {
+      toast(`保存失败：${err.message}`, false);
+    }
+  }
+
+  async function deletePosterItem(id) {
+    if (!confirm("确认删除这条动态内容？")) return;
+    try {
+      const res = await fetch('/api/admin?op=poster-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify({ id }),
+      });
+      const json = await res.json();
+      toast(json.code === 0 ? "已删除" : `删除失败：${json.message}`, json.code === 0);
+      if (json.code === 0) loadPosterItems();
+    } catch (err) {
+      toast(`删除失败：${err.message}`, false);
+    }
+  }
+
+  document.getElementById("poster-bg-type").addEventListener("change", () => {
+    document.getElementById("poster-bg-type").dataset.touched = "1";
+  });
+  resetPosterForm();
+
   // ====== Sponsor Review Tab
   async function loadPendingSponsors() {
     const res = await fetch('/api/admin?status=pending', {
@@ -1456,6 +1731,7 @@
   // Auto-load cups when switching to cups tab
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
+      if (btn.dataset.tab === 'tv') loadPosterItems();
       if (btn.dataset.tab === 'cups') loadCupAdmin();
       if (btn.dataset.tab === 'sponsor-manage') { loadAllSponsors(); loadTapToggles(); }
     });
