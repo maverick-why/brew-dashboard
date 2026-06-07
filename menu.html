@@ -106,7 +106,7 @@
       font-size: calc(60px * var(--rs));
     }
     #root.dual-menu .row-top {
-      padding: calc(12px * var(--rs)) calc(22px * var(--rs)) calc(8px * var(--rs)) calc(16px * var(--rs));
+      padding: calc(12px * var(--rs)) calc(24px * var(--rs)) calc(8px * var(--rs)) calc(18px * var(--rs));
       gap: calc(10px * var(--rs));
       align-items: flex-start;
     }
@@ -115,8 +115,9 @@
       justify-content: flex-start;
     }
     #root.dual-menu .brewery-tag {
-      font-size: calc(22px * var(--rs));
-      line-height: 1;
+      font-size: calc(23px * var(--rs));
+      line-height: 1.02;
+      color: #8d8d8d;
     }
     #root.dual-menu .beer-name-row {
       align-items: center;
@@ -130,9 +131,9 @@
       max-width: 100%;
       min-width: 0;
       flex: 1 1 auto;
-      font-size: calc(32px * var(--rs));
-      letter-spacing: calc(0.5px * var(--rs));
-      line-height: 1.04;
+      font-size: calc(33px * var(--rs));
+      letter-spacing: 0;
+      line-height: 1.05;
       white-space: nowrap;
       display: block;
     }
@@ -144,7 +145,7 @@
     }
     #root.dual-menu .beer-tag {
       height: calc(21px * var(--rs));
-      max-width: calc(96px * var(--rs));
+      max-width: calc(120px * var(--rs));
       padding: 0 calc(8px * var(--rs));
       font-size: calc(13px * var(--rs));
       overflow: hidden;
@@ -156,27 +157,28 @@
       line-height: 1.08;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #9a9a9a;
     }
     #root.dual-menu .price-block {
-      width: calc(142px * var(--rs));
-      flex: 0 0 calc(142px * var(--rs));
-      padding-top: calc(6px * var(--rs));
-      padding-right: calc(10px * var(--rs));
-      margin-left: calc(4px * var(--rs));
+      width: calc(156px * var(--rs));
+      flex: 0 0 calc(156px * var(--rs));
+      padding-top: calc(2px * var(--rs));
+      padding-right: calc(16px * var(--rs));
+      margin-left: calc(8px * var(--rs));
     }
     #root.dual-menu .price-line {
-      font-size: calc(28px * var(--rs));
-      line-height: 1.12;
+      font-size: calc(29px * var(--rs));
+      line-height: 1.18;
     }
     #root.dual-menu .price-block.single .price-line {
-      font-size: calc(34px * var(--rs));
+      font-size: calc(35px * var(--rs));
       line-height: 1.04;
     }
     #root.dual-menu .divider {
       margin: 0 calc(16px * var(--rs));
     }
     #root.dual-menu .row-bottom {
-      padding: calc(8px * var(--rs)) calc(22px * var(--rs)) calc(10px * var(--rs)) calc(16px * var(--rs));
+      padding: calc(8px * var(--rs)) calc(24px * var(--rs)) calc(10px * var(--rs)) calc(18px * var(--rs));
       align-items: flex-end;
       gap: calc(4px * var(--rs));
     }
@@ -189,13 +191,56 @@
       text-overflow: ellipsis;
     }
     #root.dual-menu .alc-info {
-      width: calc(142px * var(--rs));
-      flex: 0 0 calc(142px * var(--rs));
+      width: calc(156px * var(--rs));
+      flex: 0 0 calc(156px * var(--rs));
       font-size: calc(23px * var(--rs));
       line-height: 1;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding-right: calc(10px * var(--rs));
+      padding-right: calc(16px * var(--rs));
+      color: #b8b8b8;
+    }
+    #root.dual-menu .sold-out-stamp {
+      inset: auto;
+      top: 50%;
+      left: 56%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      height: auto;
+      background: transparent;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    #root.dual-menu .stamp-inner {
+      border-width: calc(4px * var(--rs));
+      border-radius: calc(6px * var(--rs));
+      padding: calc(7px * var(--rs)) calc(18px * var(--rs));
+      transform: rotate(-17deg);
+      opacity: .86;
+      background: rgba(255,255,255,.08);
+    }
+    #root.dual-menu .stamp-cn {
+      font-size: calc(44px * var(--rs));
+      letter-spacing: calc(5px * var(--rs));
+      line-height: 1;
+    }
+    #root.dual-menu .stamp-en {
+      font-size: calc(20px * var(--rs));
+      letter-spacing: calc(3px * var(--rs));
+    }
+    #root.dual-menu .card.sold-out .brewery-tag,
+    #root.dual-menu .card.sold-out .beer-name,
+    #root.dual-menu .card.sold-out .beer-style,
+    #root.dual-menu .card.sold-out .en-name,
+    #root.dual-menu .card.sold-out .en-style,
+    #root.dual-menu .card.sold-out .price-line,
+    #root.dual-menu .card.sold-out .alc-info {
+      color: #8a8a8a;
+    }
+    #root.dual-menu .card.sold-out .beer-tag.ingredient {
+      background: #eef6ee;
+      border-color: #c9ddca;
+      color: #8db18f;
     }
 
     /* TV 左屏：上下留 bezel，左外边留 gap（= 卡片间距），右贴边（拼缝） */
@@ -1065,7 +1110,7 @@ function makeCard(item) {
     : "";
 
   return `
-<div class="card${item.special ? " special" : ""}">
+<div class="card${item.special ? " special" : ""}${item.sold_out ? " sold-out" : ""}">
   ${item.sold_out ? `<div class="sold-out-stamp"><div class="stamp-inner"><div class="stamp-cn">售罄</div><div class="stamp-en">SOLD OUT</div></div></div>` : ""}
   <div class="card-num${sponsored ? " sponsored" : ""}" style="background:${blockColor}">
     ${badge}
