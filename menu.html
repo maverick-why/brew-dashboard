@@ -969,20 +969,21 @@ async function loadPosterItems(menuItems) {
 
 function renderDualLayout(items, tapCount) {
   const rows = Math.min(7, Math.max(3, Math.ceil(tapCount / 4)));
-  const gap = rows >= 7 ? 4 : 40;
   const root = document.getElementById("root");
   const grid = document.getElementById("grid");
 
-  root.style.setProperty("--dual-gap", `${gap}px`);
+  // 固定卡片尺寸：以7行满员为基准，行数减少时尺寸不变，额外空间留深色背景、居中显示
+  const screenPad = 40;                                        // 屏幕上下边距（对应电视边框）
+  const cardGap   = 8;                                         // 卡片间距（固定）
+  const availH    = 1080 - 2 * screenPad;                     // = 1000px
+  const cardH     = Math.floor((availH - 6 * cardGap) / 7);   // 7行基准 ≈ 136px
+  const refH      = 260;                                       // --rs 基准高度
 
-  // 高度平均填满屏幕，不强制 4:1；--rs 以 4 行时的卡高（220px）为基准缩放字体
-  const availH = 1080 - 2 * gap;
-  const cardH  = Math.floor((availH - (rows - 1) * gap) / rows);
-  const refH   = 300;  // --rs 基准：超过此卡高时 --rs=1，低于时按比例缩小字体
-
-  root.style.setProperty("--rs", Math.min(1, cardH / refH));
+  root.style.setProperty("--dual-gap", `${screenPad}px`);
+  root.style.setProperty("--rs", Math.min(1, cardH / refH));  // ≈ 0.52，固定值
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
-  grid.style.alignContent = "start";
+  grid.style.gap              = `${cardGap}px`;
+  grid.style.alignContent     = "center";   // 行数少于7时垂直居中，多余空间留黑
 
   if (IS_DUAL_PREVIEW) {
     grid.innerHTML = renderSlice(items.slice(0, rows * 4));
