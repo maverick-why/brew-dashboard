@@ -274,6 +274,41 @@
       vertical-align:middle;
     }
     .menu-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+    .menu-table tbody tr.dragging td{
+      opacity:.55;
+      background:rgba(59,130,246,.10);
+    }
+    .menu-table tbody tr.drop-before td{
+      box-shadow: inset 0 2px 0 #60a5fa;
+    }
+    .menu-table tbody tr.drop-after td{
+      box-shadow: inset 0 -2px 0 #60a5fa;
+    }
+    .drag-cell{
+      width:34px;
+      text-align:center;
+      user-select:none;
+      color:rgba(234,240,255,.55);
+    }
+    .drag-handle{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:20px;
+      height:28px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      cursor:grab;
+      font-size:14px;
+      font-weight:900;
+      line-height:1;
+    }
+    .drag-handle:active{cursor:grabbing}
+    .menu-table tbody tr:hover .drag-handle{
+      background:rgba(255,255,255,.06);
+      color:#cfe6ff;
+    }
     .no-cell{
       font-weight:900; font-size:13px;
       text-align:center; color:#9fd1ff; width:36px;
@@ -306,10 +341,19 @@
       position: sticky; left: 0; z-index: 7;
       background: rgba(10,16,28,.96);
     }
-    .menu-table td.no-cell {
-      position: sticky; left: 0; z-index: 2;
+    .menu-table td.drag-cell{
+      position: sticky; left: 0; z-index: 3;
       background: var(--card);
     }
+    .menu-table th:nth-child(2){
+      position: sticky; left: 34px; z-index: 7;
+      background: rgba(10,16,28,.96);
+    }
+    .menu-table td.no-cell {
+      position: sticky; left: 34px; z-index: 2;
+      background: var(--card);
+    }
+    .menu-table tr:hover td.drag-cell,
     .menu-table tr:hover td.no-cell { background: rgba(15,23,38,.98); }
 
     /* 标签 emoji 图例 */
@@ -500,7 +544,7 @@
               style="width:62px;text-align:center;padding:6px 4px"/>
           </label>
         </div>
-        <div class="muted">编号动态（取决于总酒头数），留空的格子在前台显示「待上新」。Ctrl+S 快捷保存。</div>
+        <div class="muted">编号动态（取决于总酒头数），支持拖动整行调整顺序并自动重排编号；留空的格子在前台显示「待上新」。Ctrl+S 快捷保存。</div>
         <div class="muted" style="margin-top:6px;line-height:1.7">
           💡 <b>操作说明：</b>① 先点「加载酒单」读取现有数据 → ② 修改内容 → ③ 点「保存酒单」推送到前台（约5秒生效）。<br/>
           ⚠️ 未加载直接保存会覆盖现有数据，请先加载再改。
@@ -518,6 +562,7 @@
         <table class="menu-table">
           <thead>
             <tr>
+              <th style="width:34px">拖</th>
               <th style="width:36px">#</th>
               <th style="width:72px">颜色</th>
               <th class="w-brewery">酒厂</th>
@@ -1153,6 +1198,8 @@
   const MENU_LOAD_URL = "/api/menu-edit";
   const MENU_SAVE_URL = "/api/menu-edit";
   let menuState = {}; // { "1": {...}, ... }
+  let draggedMenuNo = null;
+  let dragHoverState = null;
 
   const MENU_FIELDS = [
     { k: "brewery",     cls: "w-brewery", ph: "时光酿造所" },
@@ -1217,6 +1264,91 @@
       data-menu-no="${i}" data-menu-k="${f.k}" value="${val}"/></td>`;
   }
 
+  function clearMenuDropIndicators() {
+    document.querySelectorAll("#menuTbody tr.drop-before, #menuTbody tr.drop-after").forEach(tr => {
+      tr.classList.remove("drop-before", "drop-after");
+    });
+    dragHoverState = null;
+  }
+
+  function renumberMenuStateFromOrder(order) {
+    const tapCount = Math.max(4, Math.min(64, Number(menuState._tapCount) || order.length || 16));
+    const nextState = { _tapCount: tapCount };
+    for (let i = 1; i <= tapCount; i++) {
+      const sourceNo = String(order[i - 1] || i);
+      const row = menuState[sourceNo] || {};
+      nextState[String(i)] = { ...row };
+    }
+    menuState = nextState;
+  }
+
+  function reorderMenuRows(fromNo, toNo, placement = "before") {
+    const tapCount = Math.max(4, Math.min(64, Number(menuState._tapCount) || 16));
+    const order = Array.from({ length: tapCount }, (_, index) => String(index + 1));
+    const fromIndex = order.indexOf(String(fromNo));
+    const toIndex = order.indexOf(String(toNo));
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const [moved] = order.splice(fromIndex, 1);
+    let insertIndex = toIndex;
+    if (placement === "after") insertIndex = toIndex + (fromIndex < toIndex ? 0 : 1);
+    else if (fromIndex < toIndex) insertIndex = toIndex - 1;
+    order.splice(insertIndex, 0, moved);
+
+    if (order.every((no, index) => no === String(index + 1))) return;
+    renumberMenuStateFromOrder(order);
+    renderMenu();
+    markDirty();
+  }
+
+  function bindMenuDragEvents(tr, no) {
+    const handle = tr.querySelector(".drag-handle");
+    if (handle) {
+      handle.addEventListener("mousedown", () => {
+        tr.draggable = true;
+      });
+      handle.addEventListener("mouseup", () => {
+        if (!draggedMenuNo) tr.draggable = false;
+      });
+      handle.addEventListener("mouseleave", () => {
+        if (!draggedMenuNo) tr.draggable = false;
+      });
+    }
+
+    tr.addEventListener("dragstart", event => {
+      draggedMenuNo = String(no);
+      tr.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(no));
+    });
+
+    tr.addEventListener("dragend", () => {
+      draggedMenuNo = null;
+      tr.draggable = false;
+      tr.classList.remove("dragging");
+      clearMenuDropIndicators();
+    });
+
+    tr.addEventListener("dragover", event => {
+      if (!draggedMenuNo || draggedMenuNo === String(no)) return;
+      event.preventDefault();
+      const rect = tr.getBoundingClientRect();
+      const placement = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+      clearMenuDropIndicators();
+      tr.classList.add(placement === "before" ? "drop-before" : "drop-after");
+      dragHoverState = { targetNo: String(no), placement };
+      event.dataTransfer.dropEffect = "move";
+    });
+
+    tr.addEventListener("drop", event => {
+      if (!draggedMenuNo || draggedMenuNo === String(no)) return;
+      event.preventDefault();
+      const placement = dragHoverState?.targetNo === String(no) ? dragHoverState.placement : "before";
+      clearMenuDropIndicators();
+      reorderMenuRows(draggedMenuNo, String(no), placement);
+    });
+  }
+
   function renderMenu() {
     const tapCount = Math.max(4, Math.min(64, Number(menuState._tapCount) || 16));
     // 同步输入框
@@ -1234,12 +1366,16 @@
       ).join("");
 
       const tr = document.createElement("tr");
+      tr.draggable = false;
+      tr.dataset.rowNo = String(i);
       tr.innerHTML =
+        `<td class="drag-cell"><span class="drag-handle" title="拖动调整编号">⋮⋮</span></td>` +
         `<td class="no-cell">${String(i).padStart(2,"0")}</td>` +
         `<td><select class="color-sel" data-menu-no="${i}" data-menu-k="color">${colorOpts}</select></td>` +
         MENU_FIELDS.map(f => renderFieldCell(f, i, row)).join("") +
         `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="sold_out" ${row.sold_out ? "checked" : ""}/></td>` +
         `<td style="text-align:center"><input type="checkbox" data-menu-no="${i}" data-menu-k="special" ${row.special ? "checked" : ""}/></td>`;
+      bindMenuDragEvents(tr, i);
       tbody.appendChild(tr);
     }
   }
