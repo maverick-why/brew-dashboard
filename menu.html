@@ -99,35 +99,29 @@
       gap: var(--dual-gap, var(--gap));
     }
 
-    #root.dual-preview .card-num,
-    #root.dual-screen-right .card-num {
+    #root.dual-preview .card-num {
       width: calc(84px * var(--rs));
     }
-    #root.dual-preview .num,
-    #root.dual-screen-right .num {
+    #root.dual-preview .num {
       font-size: calc(60px * var(--rs));
     }
-    #root.dual-preview .row-top,
-    #root.dual-screen-right .row-top {
+    #root.dual-preview .row-top {
       flex: 1;
       padding: calc(12px * var(--rs)) calc(24px * var(--rs)) calc(8px * var(--rs)) calc(18px * var(--rs));
       gap: calc(10px * var(--rs));
       align-items: flex-start;
     }
-    #root.dual-preview .info-left,
-    #root.dual-screen-right .info-left {
+    #root.dual-preview .info-left {
       align-self: stretch;
       justify-content: center;
       gap: calc(5px * var(--rs));
     }
-    #root.dual-preview .brewery-tag,
-    #root.dual-screen-right .brewery-tag {
+    #root.dual-preview .brewery-tag {
       font-size: calc(23px * var(--rs));
       line-height: 1.02;
       color: #8d8d8d;
     }
-    #root.dual-preview .beer-name-row,
-    #root.dual-screen-right .beer-name-row {
+    #root.dual-preview .beer-name-row {
       align-items: center;
       justify-content: flex-start;
       gap: calc(7px * var(--rs));
@@ -137,8 +131,7 @@
       flex-wrap: nowrap;
       width: 100%;
     }
-    #root.dual-preview .beer-name,
-    #root.dual-screen-right .beer-name {
+    #root.dual-preview .beer-name {
       max-width: 100%;
       min-width: 0;
       flex: 0 1 auto;
@@ -148,15 +141,13 @@
       white-space: nowrap;
       display: block;
     }
-    #root.dual-preview .beer-tags,
-    #root.dual-screen-right .beer-tags {
+    #root.dual-preview .beer-tags {
       max-width: 100%;
       flex: 0 0 auto;
       flex-wrap: nowrap;
       gap: calc(4px * var(--rs));
     }
-    #root.dual-preview .beer-tag,
-    #root.dual-screen-right .beer-tag {
+    #root.dual-preview .beer-tag {
       height: calc(21px * var(--rs));
       max-width: calc(108px * var(--rs));
       padding: 0 calc(7px * var(--rs));
@@ -164,8 +155,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    #root.dual-preview .beer-style,
-    #root.dual-screen-right .beer-style {
+    #root.dual-preview .beer-style {
       margin-top: 0;
       font-size: calc(17px * var(--rs));
       line-height: 1.08;
@@ -173,46 +163,38 @@
       text-overflow: ellipsis;
       color: #9a9a9a;
     }
-    #root.dual-preview .price-block,
-    #root.dual-screen-right .price-block {
+    #root.dual-preview .price-block {
       width: calc(156px * var(--rs));
       flex: 0 0 calc(156px * var(--rs));
       padding-top: calc(2px * var(--rs));
       padding-right: calc(16px * var(--rs));
       margin-left: calc(8px * var(--rs));
     }
-    #root.dual-preview .price-line,
-    #root.dual-screen-right .price-line {
+    #root.dual-preview .price-line {
       font-size: calc(29px * var(--rs));
       line-height: 1.18;
     }
-    #root.dual-preview .price-block.single .price-line,
-    #root.dual-screen-right .price-block.single .price-line {
+    #root.dual-preview .price-block.single .price-line {
       font-size: calc(35px * var(--rs));
       line-height: 1.04;
     }
-    #root.dual-preview .divider,
-    #root.dual-screen-right .divider {
+    #root.dual-preview .divider {
       margin: calc(2px * var(--rs)) calc(18px * var(--rs)) 0;
     }
-    #root.dual-preview .row-bottom,
-    #root.dual-screen-right .row-bottom {
+    #root.dual-preview .row-bottom {
       padding: calc(7px * var(--rs)) calc(18px * var(--rs)) calc(9px * var(--rs)) calc(18px * var(--rs));
       align-items: flex-end;
       gap: calc(4px * var(--rs));
     }
     #root.dual-preview .en-name,
-    #root.dual-preview .en-style,
-    #root.dual-screen-right .en-name,
-    #root.dual-screen-right .en-style {
+    #root.dual-preview .en-style {
       font-size: calc(15px * var(--rs));
       line-height: 1.05;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    #root.dual-preview .alc-info,
-    #root.dual-screen-right .alc-info {
+    #root.dual-preview .alc-info {
       width: calc(172px * var(--rs));
       flex: 0 0 calc(172px * var(--rs));
       font-size: calc(21px * var(--rs));
@@ -224,8 +206,7 @@
       letter-spacing: 0;
       text-align: right;
     }
-    #root.dual-preview .sold-out-stamp,
-    #root.dual-screen-right .sold-out-stamp {
+    #root.dual-preview .sold-out-stamp {
       inset: auto;
       top: 50%;
       left: 56%;
@@ -236,8 +217,7 @@
       justify-content: flex-start;
       align-items: flex-start;
     }
-    #root.dual-preview .stamp-inner,
-    #root.dual-screen-right .stamp-inner {
+    #root.dual-preview .stamp-inner {
       border-width: calc(4px * var(--rs));
       border-radius: calc(6px * var(--rs));
       padding: calc(7px * var(--rs)) calc(18px * var(--rs));
@@ -245,14 +225,12 @@
       opacity: .86;
       background: rgba(255,255,255,.08);
     }
-    #root.dual-preview .stamp-cn,
-    #root.dual-screen-right .stamp-cn {
+    #root.dual-preview .stamp-cn {
       font-size: calc(44px * var(--rs));
       letter-spacing: calc(5px * var(--rs));
       line-height: 1;
     }
-    #root.dual-preview .stamp-en,
-    #root.dual-screen-right .stamp-en {
+    #root.dual-preview .stamp-en {
       font-size: calc(20px * var(--rs));
       letter-spacing: calc(3px * var(--rs));
     }
@@ -262,18 +240,10 @@
     #root.dual-preview .card.sold-out .en-name,
     #root.dual-preview .card.sold-out .en-style,
     #root.dual-preview .card.sold-out .price-line,
-    #root.dual-preview .card.sold-out .alc-info,
-    #root.dual-screen-right .card.sold-out .brewery-tag,
-    #root.dual-screen-right .card.sold-out .beer-name,
-    #root.dual-screen-right .card.sold-out .beer-style,
-    #root.dual-screen-right .card.sold-out .en-name,
-    #root.dual-screen-right .card.sold-out .en-style,
-    #root.dual-screen-right .card.sold-out .price-line,
-    #root.dual-screen-right .card.sold-out .alc-info {
+    #root.dual-preview .card.sold-out .alc-info {
       color: #8a8a8a;
     }
-    #root.dual-preview .card.sold-out .beer-tag.ingredient,
-    #root.dual-screen-right .card.sold-out .beer-tag.ingredient {
+    #root.dual-preview .card.sold-out .beer-tag.ingredient {
       background: #eef6ee;
       border-color: #c9ddca;
       color: #8db18f;
