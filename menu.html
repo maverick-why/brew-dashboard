@@ -20,12 +20,13 @@
       --bezel: 20px;  /* 电视边框宽度（像素），到货后量好改这一个值 */
       --gap: calc(var(--bezel) * 2); /* 卡片间距 = 2×bezel，与拼接缝视觉等宽 */
       --rs: 1;        /* row-scale：JS 根据行数动态设置，4行=1，5行=0.8，以此类推 */
+      --tv-base-width: 1947px; /* 1226mm × 680mm 面板的 1080p 等比例基准宽度 */
     }
 
     #root {
       position: fixed;
       top: 0; left: 0;
-      width: 1920px;
+      width: var(--tv-base-width);
       height: 1080px;
       transform-origin: top left;
       background: #1c1c1c;
@@ -46,7 +47,7 @@
     #posterZone { display: none; }
 
     #root.dual-preview {
-      width: 3840px;
+      width: calc(var(--tv-base-width) * 2);
       height: 1080px;
       padding: var(--dual-gap, var(--gap));
       display: grid;
@@ -795,6 +796,11 @@ const IS_DUAL_SCREEN = !!TV_SCREEN;
 const IS_TV    = !!rawPage || IS_DUAL_SCREEN;
 const IS_DUAL_PREVIEW = !IS_TV;
 const TV_PAGE  = rawPage ? parseInt(rawPage, 10) : 1;
+const TV_VISIBLE_WIDTH_MM = 1226 - 2 * 1.1;
+const TV_VISIBLE_HEIGHT_MM = 680 - 2 * 1.1;
+const TV_ASPECT = TV_VISIBLE_WIDTH_MM / TV_VISIBLE_HEIGHT_MM;
+const TV_BASE_WIDTH = Math.round(1080 * TV_ASPECT);
+document.documentElement.style.setProperty("--tv-base-width", `${TV_BASE_WIDTH}px`);
 
 let previewPage         = 1;
 let allItems            = [];
@@ -1041,17 +1047,20 @@ function renderDualLayout(items, tapCount) {
   const root = document.getElementById("root");
   const grid = document.getElementById("grid");
 
-  // 电视实机：按真实视口计算；总预览：继续用 3840×1080 固定逻辑画布
-  const layoutHeight = IS_DUAL_SCREEN ? Math.max(720, window.innerHeight || 1080) : 1080;
-  const uiScale = layoutHeight / 1080;
-  const screenPad = Math.round(40 * uiScale);
-  const cardGap   = Math.max(4, Math.round(8 * uiScale));
+  // TV 实机：按真实视口高度排版，4K 屏会自动把卡片和字号放大到整屏
+  // 总预览仍保留固定画布逻辑，不影响本地设计查看
+  const layoutHeight = IS_DUAL_PREVIEW
+    ? 1080
+    : Math.max(1080, Math.floor(window.innerHeight || 1080));
+  const layoutScale  = layoutHeight / 1080;
+  const screenPad    = Math.max(40, Math.round(40 * layoutScale));
+  const cardGap      = Math.max(8, Math.round(8 * layoutScale));
   const availH    = layoutHeight - 2 * screenPad;
   const cardH     = Math.floor((availH - 6 * cardGap) / 7);
   const refH      = 260;                                       // --rs 基准高度
 
   root.style.setProperty("--dual-gap", `${screenPad}px`);
-  root.style.setProperty("--rs", Math.max(0.5, cardH / refH));
+  root.style.setProperty("--rs", Math.max(0.52, cardH / refH));
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
   grid.style.gap              = `${cardGap}px`;
   grid.style.alignContent     = "center";   // 行数少于7时垂直居中，多余空间留黑
@@ -1241,7 +1250,7 @@ function scaleToFit() {
     root.style.top  = "0px";
     return;
   }
-  const canvasWidth = IS_DUAL_PREVIEW ? 3840 : 1920;
+  const canvasWidth = IS_DUAL_PREVIEW ? TV_BASE_WIDTH * 2 : TV_BASE_WIDTH;
   const scaleX = window.innerWidth  / canvasWidth;
   const scaleY = window.innerHeight / 1080;
   const scale  = Math.min(scaleX, scaleY);
