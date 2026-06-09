@@ -146,31 +146,33 @@
     #root.dual-preview .beer-name-row,
     #root.dual-screen-left .beer-name-row,
     #root.dual-screen-right .beer-name-row {
-      align-items: center;
+      align-items: flex-start;
       justify-content: flex-start;
-      gap: calc(7px * var(--rs));
-      row-gap: calc(4px * var(--rs));
+      gap: calc(4px * var(--rs));
+      row-gap: calc(3px * var(--rs));
       margin-top: 0;
       flex-direction: row;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;   /* 标签不够位置时换到酒名下方 */
       width: 100%;
     }
     #root.dual-preview .beer-name,
     #root.dual-screen-left .beer-name,
     #root.dual-screen-right .beer-name {
-      max-width: 100%;
+      width: 100%;       /* 酒名独占一行，标签强制换到下行 */
       min-width: 0;
-      flex: 0 1 auto;
+      flex: 1 0 100%;
       font-size: calc(33px * var(--rs));
-      letter-spacing: calc(8px * var(--rs));
+      letter-spacing: calc(5px * var(--rs));
       line-height: 1.05;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       display: block;
     }
     #root.dual-preview .beer-tags,
     #root.dual-screen-left .beer-tags,
     #root.dual-screen-right .beer-tags {
-      max-width: 100%;
+      width: 100%;
       flex: 0 0 auto;
       flex-wrap: nowrap;
       gap: calc(4px * var(--rs));
@@ -1114,9 +1116,11 @@ function renderDualLayout(items, tapCount) {
   const grid = document.getElementById("grid");
 
   // TV 实机：按真实视口高度排版；预览保留固定 1080px 画布
+  // 不做 Math.max(1080,…)：浏览器窗口有工具栏时 innerHeight 小于1080，
+  // 强制1080会导致卡片总高溢出、alignContent:center把溢出均分到上下，顶部被截断
   const layoutHeight = IS_DUAL_PREVIEW
     ? 1080
-    : Math.max(1080, Math.floor(window.innerHeight || 1080));
+    : Math.floor(window.innerHeight || 1080);
   const layoutScale  = layoutHeight / 1080;
   // 实机：1.1mm bezel ≈ 2px（1226mm/1920px ≈ 0.639mm/px）；预览留 40px 设计留白
   const screenPad = IS_DUAL_PREVIEW ? 40 : 2;
