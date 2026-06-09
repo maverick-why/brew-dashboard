@@ -146,19 +146,19 @@
     #root.dual-preview .beer-name-row,
     #root.dual-screen-left .beer-name-row,
     #root.dual-screen-right .beer-name-row {
-      align-items: flex-start;
+      align-items: center;
       justify-content: flex-start;
-      gap: calc(3px * var(--rs));
+      gap: calc(6px * var(--rs));
       margin-top: 0;
-      flex-direction: column; /* 酒名与标签垂直堆叠，避免标签横向占位导致酒名截断 */
+      flex-direction: row;   /* 标签在酒名右侧横排 */
+      flex-wrap: nowrap;
       width: 100%;
     }
     #root.dual-preview .beer-name,
     #root.dual-screen-left .beer-name,
     #root.dual-screen-right .beer-name {
-      width: 100%;
       min-width: 0;
-      flex: 0 0 auto;
+      flex: 1 1 auto;        /* 可收缩，给标签让位但不会压缩到0 */
       font-size: calc(33px * var(--rs));
       letter-spacing: calc(5px * var(--rs));
       line-height: 1.05;
@@ -170,7 +170,7 @@
     #root.dual-preview .beer-tags,
     #root.dual-screen-left .beer-tags,
     #root.dual-screen-right .beer-tags {
-      flex: 0 0 auto;
+      flex: 0 0 auto;        /* 标签不收缩，酒名收缩让位 */
       flex-wrap: nowrap;
       gap: calc(4px * var(--rs));
     }
@@ -197,11 +197,11 @@
     #root.dual-preview .price-block,
     #root.dual-screen-left .price-block,
     #root.dual-screen-right .price-block {
-      width: calc(156px * var(--rs));
-      flex: 0 0 calc(156px * var(--rs));
-      padding-top: calc(2px * var(--rs));
+      width: calc(190px * var(--rs));   /* 156→190：单杯型"¥98/360ml"不再截断 */
+      flex: 0 0 calc(190px * var(--rs));
       padding-right: calc(16px * var(--rs));
       margin-left: calc(8px * var(--rs));
+      align-self: center;              /* 价格在上半区垂直居中 */
     }
     #root.dual-preview .price-line,
     #root.dual-screen-left .price-line,
