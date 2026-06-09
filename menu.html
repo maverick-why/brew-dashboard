@@ -33,6 +33,16 @@
       padding: 0;
     }
 
+    #root.dual-screen-left,
+    #root.dual-screen-right,
+    #root.tv-page-1,
+    #root.tv-page-2,
+    #root.tv-page-2-mid,
+    #root.tv-page-3 {
+      width: 100vw;
+      height: 100vh;
+    }
+
     #posterZone { display: none; }
 
     #root.dual-preview {
@@ -1031,15 +1041,17 @@ function renderDualLayout(items, tapCount) {
   const root = document.getElementById("root");
   const grid = document.getElementById("grid");
 
-  // 固定卡片尺寸：以7行满员为基准，行数减少时尺寸不变，额外空间留深色背景、居中显示
-  const screenPad = 40;                                        // 屏幕上下边距（对应电视边框）
-  const cardGap   = 8;                                         // 卡片间距（固定）
-  const availH    = 1080 - 2 * screenPad;                     // = 1000px
-  const cardH     = Math.floor((availH - 6 * cardGap) / 7);   // 7行基准 ≈ 136px
+  // 电视实机：按真实视口计算；总预览：继续用 3840×1080 固定逻辑画布
+  const layoutHeight = IS_DUAL_SCREEN ? Math.max(720, window.innerHeight || 1080) : 1080;
+  const uiScale = layoutHeight / 1080;
+  const screenPad = Math.round(40 * uiScale);
+  const cardGap   = Math.max(4, Math.round(8 * uiScale));
+  const availH    = layoutHeight - 2 * screenPad;
+  const cardH     = Math.floor((availH - 6 * cardGap) / 7);
   const refH      = 260;                                       // --rs 基准高度
 
   root.style.setProperty("--dual-gap", `${screenPad}px`);
-  root.style.setProperty("--rs", Math.min(1, cardH / refH));  // ≈ 0.52，固定值
+  root.style.setProperty("--rs", Math.max(0.5, cardH / refH));
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
   grid.style.gap              = `${cardGap}px`;
   grid.style.alignContent     = "center";   // 行数少于7时垂直居中，多余空间留黑
@@ -1223,6 +1235,12 @@ async function load() {
 // ── 缩放：将固定画布等比缩放铺满屏幕 ──
 function scaleToFit() {
   const root   = document.getElementById("root");
+  if (IS_DUAL_SCREEN || IS_TV) {
+    root.style.transform = "none";
+    root.style.left = "0px";
+    root.style.top  = "0px";
+    return;
+  }
   const canvasWidth = IS_DUAL_PREVIEW ? 3840 : 1920;
   const scaleX = window.innerWidth  / canvasWidth;
   const scaleY = window.innerHeight / 1080;
