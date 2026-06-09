@@ -1120,13 +1120,14 @@ function renderDualLayout(items, tapCount) {
   const layoutScale  = layoutHeight / 1080;
   // 实机：1.1mm bezel ≈ 2px（1226mm/1920px ≈ 0.639mm/px）；预览留 40px 设计留白
   const screenPad = IS_DUAL_PREVIEW ? 40 : 2;
-  const cardGap   = IS_DUAL_PREVIEW ? Math.max(8, Math.round(8 * layoutScale)) : 4;
+  const cardGap   = IS_DUAL_PREVIEW ? Math.max(8, Math.round(8 * layoutScale)) : 8;
   const availH    = layoutHeight - 2 * screenPad;
   const cardH     = Math.floor((availH - (rows - 1) * cardGap) / rows);
-  const refH      = 260;  // --rs 基准高度（260px ≈ 满格单屏卡片高度）
+  // refH=190 使 6 行（≈172px）时 rs≈0.9，字号清晰；上限 1.1 防行数极少时溢出
+  const refH      = 190;
 
   root.style.setProperty("--dual-gap", `${screenPad}px`);
-  root.style.setProperty("--rs", Math.max(0.52, cardH / refH));
+  root.style.setProperty("--rs", Math.min(1.1, Math.max(0.52, cardH / refH)));
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
   grid.style.gap              = `${cardGap}px`;
   grid.style.alignContent     = "center";  // 行数不足时垂直居中，余量留黑
