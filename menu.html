@@ -148,19 +148,17 @@
     #root.dual-screen-right .beer-name-row {
       align-items: flex-start;
       justify-content: flex-start;
-      gap: calc(4px * var(--rs));
-      row-gap: calc(3px * var(--rs));
+      gap: calc(3px * var(--rs));
       margin-top: 0;
-      flex-direction: row;
-      flex-wrap: wrap;   /* 标签不够位置时换到酒名下方 */
+      flex-direction: column; /* 酒名与标签垂直堆叠，避免标签横向占位导致酒名截断 */
       width: 100%;
     }
     #root.dual-preview .beer-name,
     #root.dual-screen-left .beer-name,
     #root.dual-screen-right .beer-name {
-      width: 100%;       /* 酒名独占一行，标签强制换到下行 */
+      width: 100%;
       min-width: 0;
-      flex: 1 0 100%;
+      flex: 0 0 auto;
       font-size: calc(33px * var(--rs));
       letter-spacing: calc(5px * var(--rs));
       line-height: 1.05;
@@ -172,7 +170,6 @@
     #root.dual-preview .beer-tags,
     #root.dual-screen-left .beer-tags,
     #root.dual-screen-right .beer-tags {
-      width: 100%;
       flex: 0 0 auto;
       flex-wrap: nowrap;
       gap: calc(4px * var(--rs));
