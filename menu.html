@@ -127,7 +127,7 @@
     #root.dual-screen-left .row-top,
     #root.dual-screen-right .row-top {
       flex: 1;
-      padding: calc(12px * var(--rs)) calc(24px * var(--rs)) calc(8px * var(--rs)) calc(18px * var(--rs));
+      padding: calc(8px * var(--rs)) calc(24px * var(--rs)) calc(12px * var(--rs)) calc(18px * var(--rs));
       gap: calc(10px * var(--rs));
       align-items: flex-start;
     }
@@ -135,8 +135,8 @@
     #root.dual-screen-left .info-left,
     #root.dual-screen-right .info-left {
       align-self: stretch;
-      justify-content: center;
-      gap: calc(5px * var(--rs));
+      justify-content: space-between;  /* 三行均匀分布，靠近分割线 */
+      padding-bottom: calc(4px * var(--rs));
     }
     #root.dual-preview .brewery-tag,
     #root.dual-screen-left .brewery-tag,
