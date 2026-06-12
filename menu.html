@@ -148,11 +148,11 @@
     #root.dual-preview .beer-name-row,
     #root.dual-screen-left .beer-name-row,
     #root.dual-screen-right .beer-name-row {
-      align-items: center;
+      align-items: flex-start; /* 酒名与第一个标签顶部对齐 */
       justify-content: flex-start;
       gap: calc(6px * var(--rs));
       margin-top: 0;
-      flex-direction: row;   /* 标签在酒名右侧横排 */
+      flex-direction: row;   /* 标签列在酒名右侧 */
       flex-wrap: nowrap;
       width: 100%;
     }
@@ -173,18 +173,29 @@
     #root.dual-screen-left .beer-tags,
     #root.dual-screen-right .beer-tags {
       flex: 0 0 auto;        /* 标签不收缩，酒名收缩让位 */
-      flex-wrap: nowrap;
+      flex-direction: column; /* 上下排列 */
+      align-items: flex-start;
       gap: calc(4px * var(--rs));
     }
     #root.dual-preview .beer-tag,
     #root.dual-screen-left .beer-tag,
     #root.dual-screen-right .beer-tag {
-      height: calc(21px * var(--rs));
-      max-width: calc(108px * var(--rs));
-      padding: 0 calc(7px * var(--rs));
-      font-size: calc(12px * var(--rs));
+      height: calc(24px * var(--rs));
+      max-width: calc(130px * var(--rs));
+      padding: 0 calc(9px * var(--rs));
+      font-size: calc(14px * var(--rs));
+      letter-spacing: 0;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    /* 单标签时字号更大 */
+    #root.dual-preview .beer-tag:only-child,
+    #root.dual-screen-left .beer-tag:only-child,
+    #root.dual-screen-right .beer-tag:only-child {
+      height: calc(28px * var(--rs));
+      font-size: calc(17px * var(--rs));
+      max-width: calc(140px * var(--rs));
+      padding: 0 calc(10px * var(--rs));
     }
     #root.dual-preview .beer-style,
     #root.dual-screen-left .beer-style,
