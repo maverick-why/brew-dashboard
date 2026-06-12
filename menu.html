@@ -148,19 +148,12 @@
     #root.dual-preview .beer-name-row,
     #root.dual-screen-left .beer-name-row,
     #root.dual-screen-right .beer-name-row {
-      align-items: flex-start; /* 酒名与第一个标签顶部对齐 */
-      justify-content: flex-start;
-      gap: calc(6px * var(--rs));
       margin-top: 0;
-      flex-direction: row;   /* 标签列在酒名右侧 */
-      flex-wrap: nowrap;
       width: 100%;
     }
     #root.dual-preview .beer-name,
     #root.dual-screen-left .beer-name,
     #root.dual-screen-right .beer-name {
-      min-width: 0;
-      flex: 1 1 auto;        /* 可收缩，给标签让位但不会压缩到0 */
       font-size: calc(33px * var(--rs));
       letter-spacing: calc(5px * var(--rs));
       line-height: 1.05;
@@ -169,10 +162,12 @@
       text-overflow: ellipsis;
       display: block;
     }
+    /* 标签列：独立放在 row-top 的 info-left 与 price-block 之间 */
     #root.dual-preview .beer-tags,
     #root.dual-screen-left .beer-tags,
     #root.dual-screen-right .beer-tags {
-      flex: 0 0 auto;        /* 标签不收缩，酒名收缩让位 */
+      flex: 0 0 auto;
+      align-self: center;     /* 在 row-top 里垂直居中 */
       flex-direction: column; /* 上下排列 */
       align-items: flex-start;
       gap: calc(4px * var(--rs));
@@ -1236,10 +1231,10 @@ function makeCard(item) {
         <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
         <div class="beer-name-row">
           <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
-          ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
         </div>
         <div class="beer-style">${esc(item.style)}</div>
       </div>
+      ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
       <div class="price-block${singlePrice ? " single" : ""}">${priceL}${priceS}</div>
     </div>
     <div class="divider"></div>
