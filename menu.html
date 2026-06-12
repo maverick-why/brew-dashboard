@@ -52,6 +52,7 @@
       padding: var(--dual-gap, var(--gap));
       display: grid;
       grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: 1fr;   /* 同上：保证 poster-zone height:100% 正确解析 */
       gap: var(--dual-gap, var(--gap));
     }
 
@@ -85,6 +86,7 @@
       padding: var(--dual-gap, var(--gap)) 0 var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap));
       display: grid;
       grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr;   /* 让唯一行撑满全高，poster-zone height:100% 才能正确解析 */
       gap: var(--dual-gap, var(--gap));
     }
 
