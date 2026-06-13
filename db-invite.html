@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Weekend in Shenzhen — Chrono Brewery</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0f0e0c;
+    --paper:     #f7f4ef;
+    --amber:     #c8860a;
+    --amber-lt:  #f0c96b;
+    --warm-mid:  #e8dfc8;
+    --warm-dk:   #b8a98a;
+    --white:     #ffffff;
+    --gap:       clamp(2rem, 5vw, 4rem);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: "Inter", sans-serif;
+    font-size: clamp(15px, 1.6vw, 17px);
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: clamp(2rem, 6vw, 5rem);
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-template-rows: 3fr 2fr;
+    gap: 3px;
+  }
+  .hero-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-bg .main { grid-row: 1 / 3; }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(15,14,12,0.98) 0%,
+      rgba(15,14,12,0.65) 45%,
+      rgba(15,14,12,0.25) 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 760px;
+  }
+
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: clamp(0.62rem, 1.1vw, 0.75rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber-lt);
+    margin-bottom: 1.2rem;
+  }
+
+  .hero-title {
+    font-family: "DM Serif Display", Georgia, serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 1.0;
+    color: var(--white);
+    margin-bottom: 1.4rem;
+  }
+  .hero-title em { font-style: italic; color: var(--amber-lt); }
+
+  .hero-sub {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: var(--warm-mid);
+    max-width: 500px;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--amber);
+    color: var(--ink);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.85rem 1.8rem;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .cta-btn:hover { background: var(--amber-lt); transform: translateY(-2px); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem; right: clamp(2rem,6vw,5rem);
+    z-index: 2;
+    writing-mode: vertical-rl;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--warm-dk);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .scroll-hint::before {
+    content: "";
+    display: block; width: 1px; height: 40px;
+    background: var(--warm-dk);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+  /* LAYOUT */
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--gap) clamp(1.5rem, 6vw, 5rem);
+  }
+
+  .section-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-family: "DM Serif Display", serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+  h2 em { font-style: italic; color: var(--amber-lt); }
+
+  .lead {
+    font-size: clamp(1rem,1.5vw,1.1rem);
+    color: var(--warm-mid);
+    max-width: 620px;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+  }
+
+  .rule { width:100%; height:1px; background:rgba(200,180,140,0.12); border:none; }
+
+  /* ABOUT GRID */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 3px;
+    margin-top: 1.5rem;
+  }
+  .about-photo { overflow: hidden; }
+  .about-photo img {
+    width:100%; height:100%; object-fit:cover; display:block;
+    transition: transform 0.6s;
+  }
+  .about-photo:hover img { transform: scale(1.04); }
+  .about-photo.tall { grid-row: span 2; min-height: 420px; }
+  .about-stats {
+    padding: 2.5rem;
+    background: rgba(255,255,255,0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  .stat-num {
+    font-family: "DM Serif Display", serif;
+    font-size: 3.5rem;
+    color: var(--amber-lt);
+    line-height: 1;
+  }
+  .stat-label { font-size: 0.82rem; color: var(--warm-dk); }
+
+  /* TRANSPORT */
+  .transport-box {
+    border: 1px solid rgba(200,180,140,0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .transport-head {
+    background: var(--amber);
+    color: var(--ink);
+    padding: 0.9rem 1.8rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.73rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .steps { padding: 2rem 1.8rem; display: flex; flex-direction: column; }
+  .step { display: grid; grid-template-columns: 2.2rem 1fr; gap: 0 1.2rem; }
+  .dot-col { display: flex; flex-direction: column; align-items: center; }
+  .dot {
+    width: 0.9rem; height: 0.9rem; border-radius: 50%;
+    background: var(--amber); flex-shrink: 0; margin-top: 0.25rem; z-index:1;
+  }
+  .dot.end { background: var(--amber-lt); box-shadow: 0 0 0 3px rgba(240,201,107,0.25); }
+  .line { flex:1; width:1px; background:rgba(200,134,10,0.3); min-height: 1.6rem; }
+  .step-body { padding-bottom: 1.8rem; }
+  .step-title { font-size: 1rem; font-weight: 600; color: var(--white); margin-bottom: 0.2rem; }
+  .step-meta { font-size: 0.84rem; color: var(--warm-dk); line-height: 1.65; }
+  .badge {
+    display: inline-block;
+    background: rgba(200,134,10,0.15);
+    border: 1px solid rgba(200,134,10,0.4);
+    color: var(--amber-lt);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    margin-top: 0.4rem;
+    margin-right: 0.3rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* BUS GRID */
+  .bus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-top: 2.5rem;
+  }
+  .bus-card {
+    border: 1px solid rgba(200,180,140,0.13);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bus-head {
+    padding: 0.85rem 1.2rem;
+    background: rgba(200,134,10,0.08);
+    border-bottom: 1px solid rgba(200,180,140,0.12);
+  }
+  .bus-name { font-size: 1rem; font-weight: 600; color: var(--white); }
+  .bus-info { font-size: 0.75rem; color: var(--warm-dk); margin-top: 0.1rem; }
+  .bus-times { padding: 1rem 1.2rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .chip {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    padding: 0.22rem 0.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,180,140,0.12);
+    border-radius: 2px;
+    color: var(--warm-mid);
+  }
+  .chip.rec {
+    background: rgba(200,134,10,0.18);
+    border-color: rgba(200,134,10,0.45);
+    color: var(--amber-lt);
+  }
+
+  /* ITINERARY */
+  .itin { display: flex; flex-direction: column; margin-top: 2rem; }
+  .itin-row {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 0 2rem;
+  }
+  .itin-time {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    color: var(--amber);
+    text-align: right;
+    padding-top: 0.2rem;
+    line-height: 1.5;
+  }
+  .itin-body {
+    padding-bottom: 2.5rem;
+    border-left: 1px solid rgba(200,134,10,0.22);
+    padding-left: 1.8rem;
+    position: relative;
+  }
+  .itin-body::before {
+    content: "";
+    position: absolute;
+    left: -5px; top: 0.3rem;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--ink);
+  }
+  .itin-row.star .itin-body::before {
+    background: var(--amber-lt);
+    width: 13px; height: 13px;
+    left: -7px;
+    box-shadow: 0 0 0 4px rgba(240,201,107,0.18);
+  }
+  .itin-tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.3rem;
+  }
+  .itin-title {
+    font-family: "DM Serif Display", serif;
+    font-size: 1.3rem;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+  .itin-desc { font-size: 0.88rem; color: var(--warm-mid); line-height: 1.72; max-width: 540px; }
+  .itin-photo { margin-top: 1rem; border-radius: 3px; overflow: hidden; max-width: 460px; }
+  .itin-photo img { width:100%; display:block; object-fit:cover; max-height:240px; transition:transform 0.5s; }
+  .itin-photo:hover img { transform: scale(1.03); }
+
+  /* NEARBY */
+  .nearby-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .nearby-card {
+    border: 1px solid rgba(200,180,140,0.12);
+    border-radius: 3px;
+    padding: 1.4rem;
+    background: rgba(255,255,255,0.02);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .nearby-card:hover {
+    border-color: rgba(200,134,10,0.38);
+    background: rgba(200,134,10,0.04);
+  }
+  .nearby-icon { font-size: 1.5rem; margin-bottom: 0.7rem; display: block; }
+  .nearby-name { font-weight: 600; color: var(--white); font-size: 0.98rem; margin-bottom: 0.12rem; }
+  .nearby-sub {
+    font-size: 0.7rem; color: var(--amber);
+    font-family: "JetBrains Mono", monospace;
+    margin-bottom: 0.5rem; letter-spacing: 0.04em;
+  }
+  .nearby-desc { font-size: 0.82rem; color: var(--warm-dk); line-height: 1.6; }
+
+  /* PHOTO STRIP */
+  .photo-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    margin-top: 3rem;
+  }
+  .photo-strip img {
+    width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+    transition: transform 0.5s;
+  }
+  .photo-strip img:hover { transform: scale(1.03); }
+  .photo-strip .wide { grid-column: span 2; aspect-ratio: 16/9; }
+
+  /* FOOTER */
+  .footer {
+    max-width: 1100px; margin: 0 auto;
+    padding: var(--gap) clamp(1.5rem,6vw,5rem);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: end;
+  }
+  .footer-brand {
+    font-family: "DM Serif Display", serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    color: var(--white);
+    line-height: 1.1;
+  }
+  .footer-brand span {
+    display: block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    color: var(--warm-dk);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+    font-style: normal;
+  }
+  .footer-details { font-size: 0.84rem; color: var(--warm-dk); line-height: 2; margin-top: 1rem; }
+  .footer-right { text-align: right; }
+  .wa-btn {
+    display: inline-flex;
+    align-items: center; gap: 0.6rem;
+    background: #25D366; color: #fff;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.76rem; font-weight: 500;
+    letter-spacing: 0.08em;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-bottom: 0.8rem;
+  }
+  .wa-btn:hover { opacity: 0.88; transform: translateY(-2px); }
+  .footer-hours {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem; color: var(--warm-dk);
+    letter-spacing: 0.08em; line-height: 1.9;
+  }
+  .footer-bottom {
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(200,180,140,0.1);
+    padding: 1.2rem clamp(1.5rem,6vw,5rem);
+    display: flex; justify-content: space-between;
+    font-size: 0.7rem; color: var(--warm-dk);
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 700px) {
+    .about-grid, .bus-grid, .footer { grid-template-columns: 1fr; }
+    .about-photo.tall { grid-row: auto; min-height: 280px; }
+    .footer-right { text-align: left; }
+    .itin-row { grid-template-columns: 4rem 1fr; gap: 0 1rem; }
+    .itin-body { padding-left: 1.2rem; }
+    .photo-strip { grid-template-columns: 1fr 1fr; }
+    .photo-strip .wide { grid-column: span 2; }
+    .hero-bg { grid-template-columns: 1fr; }
+    .hero-bg img:not(.main) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg">
+    <img class="main" src="/db-invite-hero-1.webp" alt="Chrono Brewery exterior at night">
+    <img src="/db-invite-hero-2.webp" alt="時光釀造所 sign">
+    <img src="/db-invite-hero-3.webp" alt="Beer glass at taps">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="eyebrow">Discovery Bay → Shenzhen &nbsp;·&nbsp; A Weekend Worth Crossing For</p>
+    <h1 class="hero-title">Brew Your<br><em>Weekend.</em></h1>
+    <p class="hero-sub">
+      A craft brewery with its own fermentation tanks, 24 taps, and a beer brewed on-site — just over the border. We've mapped out the whole day so you don't have to think.
+    </p>
+    <a href="#transport" class="cta-btn">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Plan My Visit
+    </a>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</div>
+
+<!-- ABOUT -->
+<div class="wrap">
+  <p class="section-label">Who We Are</p>
+  <h2>Craft beer,<br><em>brewed here.</em></h2>
+  <p class="lead">
+    時光釀造所 · Chrono Brewery opened in Nanshan, Shenzhen in June 2026. We brew our own beer on the premises — watch the fermentation tanks through the glass wall — and pour 24 taps of carefully curated craft beer from across China and beyond.
+  </p>
+  <div class="about-grid">
+    <div class="about-photo tall">
+      <img src="/db-invite-about-1.webp" alt="Interior bar with taps and brewing equipment">
+    </div>
+    <div class="about-stats">
+      <div>
+        <div class="stat-num">24</div>
+        <div class="stat-label">Taps on rotation</div>
+      </div>
+      <div>
+        <div class="stat-num" style="font-size:2.2rem">17:00<br>—&nbsp;00:30</div>
+        <div class="stat-label">Open daily</div>
+      </div>
+    </div>
+    <div class="about-photo">
+      <img src="/db-invite-about-2.webp" alt="Branded beer glass at taps">
+    </div>
+  </div>
+</div>
+
+<div class="wrap" style="padding-top:0; padding-bottom:0;"><hr class="rule"></div>
+
+<!-- TRANSPORT -->
+<div class="wrap" id="transport">
+  <p class="section-label">Getting Here</p>
+  <h2>Door to tap<br><em>in under 2 hours.</em></h2>
+  <p class="lead">
+    No car needed, no complicated transfers. A cross-border coach from Tung Chung drops you at Shenzhen Bay Port, and a short taxi ride brings you here.
+  </p>
+
+  <div class="transport-box">
+    <div class="transport-head">Discovery Bay → 時光釀造所 · Step by Step</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="dot-col"><div class="dot"></div><div class="line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Discovery Bay → Tung Chung (東涌)</div>
+          <div class="step-meta">Take the DB Ferry or DB Bus to Tung Chung. Head to <strong style="color:#fff">Citygate (東薈城)</strong>, North Gate P3 bus terminus.</div>
+          <span class="badge">~20 min</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="dot-col"><div class="dot"></div><div class="line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Tung Chung → Shenzhen Bay Port (深圳灣口岸)</div>
+          <div class="step-meta">Board a cross-border coach. Two operators run this route daily — buy tickets in advance on the app. The coach crosses Shenzhen Bay Bridge directly, no stops.</div>
+          <span class="badge">~45–60 min</span>
+          <span class="badge">¥40–45 / person</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="dot-col"><div class="dot"></div><div class="line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Clear Immigration · Shenzhen Bay Port</div>
+          <div class="step-meta">Have your Home Return Permit (回鄉證) or passport ready. Shenzhen Bay is generally smooth and fast. Once through, you're in Shenzhen.</div>
+          <span class="badge">~15–30 min</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="dot-col"><div class="dot end"></div></div>
+        <div class="step-body">
+          <div class="step-title">Taxi to Chrono Brewery · 時光釀造所</div>
+          <div class="step-meta">Take a taxi or Didi from the port exit. Show the driver: <strong style="color:#fff">南山智谷产业园 F座 1楼 107</strong></div>
+          <span class="badge">~15 min</span>
+          <span class="badge">~¥20–30</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bus-grid">
+    <div class="bus-card">
+      <div class="bus-head">
+        <div class="bus-name">環島中港通</div>
+        <div class="bus-info">East Citygate (cable car stn) → Shenzhen Bay · ¥40</div>
+      </div>
+      <div class="bus-times">
+        <span class="chip">07:45</span><span class="chip">08:45</span>
+        <span class="chip rec">09:45 ★</span><span class="chip rec">10:45 ★</span>
+        <span class="chip">11:45</span><span class="chip">12:45</span>
+        <span class="chip">13:45</span><span class="chip">14:45</span>
+        <span class="chip">15:45</span><span class="chip">16:45</span>
+        <span class="chip">17:45</span><span class="chip">18:15</span>
+        <span class="chip">19:15</span><span class="chip">19:45</span>
+        <span class="chip">20:15</span><span class="chip">20:45</span>
+        <span class="chip">21:15</span>
+      </div>
+    </div>
+    <div class="bus-card">
+      <div class="bus-head">
+        <div class="bus-name">永東巴士</div>
+        <div class="bus-info">Citygate North Gate P3 → Shenzhen Bay · ¥45</div>
+      </div>
+      <div class="bus-times">
+        <span class="chip">08:00</span><span class="chip">09:00</span>
+        <span class="chip rec">10:00 ★</span><span class="chip rec">10:30 ★</span>
+        <span class="chip">11:00</span><span class="chip">12:00</span>
+        <span class="chip">13:00</span><span class="chip">14:00</span>
+        <span class="chip">15:00</span><span class="chip">15:15</span>
+        <span class="chip">16:15</span><span class="chip">17:15</span>
+        <span class="chip">18:15</span><span class="chip">19:15</span>
+        <span class="chip">20:00</span><span class="chip">20:15</span>
+        <span class="chip">21:00</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.72rem;color:var(--warm-dk);margin-top:0.7rem;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;">
+    ★ Recommended departure for a full day · Verify schedules before travel
+  </p>
+</div>
+
+<div class="wrap" style="padding-top:0; padding-bottom:0;"><hr class="rule"></div>
+
+<!-- ITINERARY -->
+<div class="wrap" id="itinerary">
+  <p class="section-label">Suggested Weekend Itinerary</p>
+  <h2>A day well<br><em>spent.</em></h2>
+  <p class="lead">Leave DB after breakfast, explore Nanshan in the afternoon, and end the evening exactly where you should — at the bar.</p>
+
+  <div class="itin">
+
+    <div class="itin-row">
+      <div class="itin-time">09:30</div>
+      <div class="itin-body">
+        <div class="itin-tag">Departure · Tung Chung</div>
+        <div class="itin-title">Board the Cross-Border Coach</div>
+        <p class="itin-desc">Catch the 09:45 (環島) or 10:00 (永東) from Tung Chung Citygate. Buy the night before to skip the queue. The Shenzhen Bay Bridge crossing is scenic — 36km over the Pearl River estuary.</p>
+      </div>
+    </div>
+
+    <div class="itin-row">
+      <div class="itin-time">11:00</div>
+      <div class="itin-body">
+        <div class="itin-tag">Nanshan · History</div>
+        <div class="itin-title">南頭古城 Nantou Ancient City</div>
+        <p class="itin-desc">One of the oldest walled settlements in the Pearl River Delta, now a lively neighbourhood of restaurants, galleries, and local shops. Great for a wander and an early lunch — try the clay pot rice in the inner lanes.</p>
+      </div>
+    </div>
+
+    <div class="itin-row">
+      <div class="itin-time">13:30</div>
+      <div class="itin-body">
+        <div class="itin-tag">Nanshan · Culture</div>
+        <div class="itin-title">華僑城 OCT Creative Park</div>
+        <p class="itin-desc">Shenzhen's original creative district — sculpture gardens, independent bookshops, art galleries, and some of the city's best coffee. A slow afternoon walk before the brewery opens.</p>
+      </div>
+    </div>
+
+    <div class="itin-row">
+      <div class="itin-time">15:30</div>
+      <div class="itin-body">
+        <div class="itin-tag">Nanshan · Shopping</div>
+        <div class="itin-title">萬象城 MixC Nanshan</div>
+        <p class="itin-desc">Drop in for a coffee or a browse. The scale of Shenzhen malls is genuinely something — MixC alone is the size of several Hong Kong shopping centres. Good for picking up a few things before the evening.</p>
+      </div>
+    </div>
+
+    <div class="itin-row star">
+      <div class="itin-time">17:00</div>
+      <div class="itin-body">
+        <div class="itin-tag">★ Main Event · 南山智谷</div>
+        <div class="itin-title">時光釀造所 · Chrono Brewery</div>
+        <p class="itin-desc">We open at 5pm. Start with something from the tap wall — 24 options means there's always something new. Our house IPA <em>決心 (Resolve)</em> is brewed right here in the back. You can see the fermentation tanks through the glass.</p>
+        <div class="itin-photo">
+          <img src="/db-invite-itinerary.webp" alt="Beer glass in front of fermentation tanks">
+        </div>
+      </div>
+    </div>
+
+    <div class="itin-row">
+      <div class="itin-time">22:00</div>
+      <div class="itin-body">
+        <div class="itin-tag">Return</div>
+        <div class="itin-title">Head Back to the Border</div>
+        <p class="itin-desc">Shenzhen Bay Port closes at midnight — give yourself time. A Didi from the brewery to the border is about 15 minutes. The coach back to Tung Chung departs from the Hong Kong side.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="wrap" style="padding-top:0; padding-bottom:0;"><hr class="rule"></div>
+
+<!-- PHOTO STRIP -->
+<div class="wrap" style="padding-bottom:0;">
+  <div class="photo-strip">
+    <img src="/db-invite-strip-1.webp" alt="24 taps and menu screen" class="wide">
+    <img src="/db-invite-strip-2.webp" alt="Brewer at work">
+    <img src="/db-invite-strip-3.webp" alt="Fermentation tanks close-up">
+    <img src="/db-invite-strip-4.webp" alt="Chrono Brewery sign at night">
+  </div>
+</div>
+
+<div class="wrap" style="padding-top:0; padding-bottom:0; margin-top: 3rem;"><hr class="rule"></div>
+
+<!-- NEARBY -->
+<div class="wrap" id="nearby">
+  <p class="section-label">While You're in Nanshan</p>
+  <h2>Worth the<br><em>detour.</em></h2>
+  <p class="lead">Nanshan is one of Shenzhen's most walkable and varied districts. Here's what's around us.</p>
+  <div class="nearby-grid">
+    <div class="nearby-card">
+      <span class="nearby-icon">🏯</span>
+      <div class="nearby-name">南頭古城</div>
+      <div class="nearby-sub">Nantou Ancient City · ~10 min taxi</div>
+      <p class="nearby-desc">A 1,700-year-old walled city turned creative village. Lunch spots, local snacks, and architecture you won't find anywhere else in the city.</p>
+    </div>
+    <div class="nearby-card">
+      <span class="nearby-icon">🎨</span>
+      <div class="nearby-name">華僑城創意文化園</div>
+      <div class="nearby-sub">OCT Creative Park · ~12 min taxi</div>
+      <p class="nearby-desc">Old factories converted into galleries, studios, and cafés. One of Shenzhen's best neighbourhoods for an aimless afternoon wander.</p>
+    </div>
+    <div class="nearby-card">
+      <span class="nearby-icon">🌏</span>
+      <div class="nearby-name">世界之窗 / 錦繡中華</div>
+      <div class="nearby-sub">Window of the World · ~15 min</div>
+      <p class="nearby-desc">Miniature world landmarks side by side — more fun than it sounds, especially with kids. A uniquely Shenzhen experience.</p>
+    </div>
+    <div class="nearby-card">
+      <span class="nearby-icon">🛍️</span>
+      <div class="nearby-name">萬象城 MixC</div>
+      <div class="nearby-sub">Nanshan · ~8 min taxi</div>
+      <p class="nearby-desc">Shenzhen's flagship mall. Luxury brands, a solid food hall, and enough space to get genuinely lost. Good air con on a hot day.</p>
+    </div>
+    <div class="nearby-card">
+      <span class="nearby-icon">🏙️</span>
+      <div class="nearby-name">萬科雲城</div>
+      <div class="nearby-sub">Vanke Cloud City · ~5 min taxi</div>
+      <p class="nearby-desc">A newer tech and lifestyle development with good coffee and a more local, less touristy atmosphere than the big malls.</p>
+    </div>
+    <div class="nearby-card">
+      <span class="nearby-icon">🚢</span>
+      <div class="nearby-name">蛇口漁人碼頭</div>
+      <div class="nearby-sub">Shekou Waterfront · ~25 min</div>
+      <p class="nearby-desc">Restaurants and bars along the waterfront near Shekou Ferry Terminal. A nice evening walk if you have time before heading to the brewery.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" style="padding-top: 3rem; padding-bottom: 0;"><hr class="rule"></div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>
+    <div class="footer-brand">
+      Chrono Brewery
+      <span>時光釀造所</span>
+    </div>
+    <div class="footer-details">
+      <div>📍 南山智谷产业园 F座 1楼 107，深圳</div>
+      <div style="font-size:.78rem; margin-top:.2rem;">Nanshan Zhigu Industrial Park, Building F, Unit 107, Shenzhen</div>
+      <div style="margin-top:.8rem;">🍺 House beer: <strong style="color:var(--amber-lt)">決心 (Resolve)</strong> — Clean IPA, brewed on-site</div>
+    </div>
+  </div>
+  <div class="footer-right">
+    <a href="https://wa.me/85254801597" class="wa-btn" target="_blank" rel="noopener">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.073.527 4.023 1.455 5.727L0 24l6.407-1.435A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.877 9.877 0 01-5.042-1.378l-.361-.214-3.741.982 1.001-3.648-.235-.374A9.855 9.855 0 012.106 12C2.106 6.533 6.533 2.106 12 2.106c5.467 0 9.894 4.427 9.894 9.894 0 5.467-4.427 9.894-9.894 9.894z"/></svg>
+      WhatsApp Us
+    </a>
+    <div class="footer-hours">
+      Open Daily<br>
+      17:00 — 00:30<br>
+      <span style="color:var(--amber-lt); display:block; margin-top:.2rem;">852 5480 1597</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer-bottom">
+  <span>© 2026 Chrono Brewery · 時光釀造所</span>
+  <span>Brew Your Life</span>
+</div>
+
+</body>
+</html>
