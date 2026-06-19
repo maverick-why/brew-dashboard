@@ -1137,6 +1137,9 @@ function renderDualLayout(items, tapCount) {
 
   root.style.setProperty("--dual-gap", `${screenPad}px`);
   root.style.setProperty("--rs", Math.min(1.1, Math.max(0.52, cardH / refH)));
+  // TV 浏览器 height:100% 不能从 grid 1fr 行继承，显式设置 posterZone 高度
+  const posterZone = document.getElementById("posterZone");
+  if (posterZone) posterZone.style.height = `${availH}px`;
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
   grid.style.gap              = `${cardGap}px`;
   grid.style.alignContent     = "center";  // 行数不足时垂直居中，余量留黑
