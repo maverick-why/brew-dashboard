@@ -264,7 +264,7 @@
     #root.dual-preview .sold-out-stamp,
     #root.dual-screen-left .sold-out-stamp,
     #root.dual-screen-right .sold-out-stamp {
-      inset: auto;
+      top: auto; right: auto; bottom: auto; left: auto;
       top: 50%;
       left: 56%;
       transform: translate(-50%, -50%);
@@ -645,7 +645,7 @@
     /* 售罄印章 */
     .sold-out-stamp {
       position: absolute;
-      inset: 0;
+      top: 0; right: 0; bottom: 0; left: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -693,7 +693,7 @@
     }
     .poster-bg-layer {
       position: absolute;
-      inset: -30px;
+      top: -30px; right: -30px; bottom: -30px; left: -30px;
       background-image: var(--poster-image);
       background-size: cover;
       background-position: center;
@@ -705,12 +705,12 @@
     .poster-bg-layer::after {
       content: "";
       position: absolute;
-      inset: 0;
+      top: 0; right: 0; bottom: 0; left: 0;
       background: rgba(0,0,0,.28);
     }
     .poster-fg-layer {
       position: absolute;
-      inset: 0;
+      top: 0; right: 0; bottom: 0; left: 0;
       z-index: 1;
       display: flex;
       align-items: center;
@@ -739,7 +739,7 @@
     .poster-generated::before {
       content: "";
       position: absolute;
-      inset: 44px;
+      top: 44px; right: 44px; bottom: 44px; left: 44px;
       border: 1px solid rgba(255,255,255,.18);
       pointer-events: none;
     }
