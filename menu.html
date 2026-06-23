@@ -710,16 +710,19 @@
     }
     .poster-fg-layer {
       position: absolute;
-      top: 0; right: 0; bottom: 0; left: 0;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
+      overflow: hidden;
     }
     .poster-fg-layer img {
-      max-width: 100%;
-      max-height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: calc(100% - 80px);
+      max-height: calc(100% - 80px);
       object-fit: contain;
       filter: drop-shadow(0 18px 32px rgba(0,0,0,.35));
     }
