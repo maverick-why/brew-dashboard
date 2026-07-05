@@ -121,14 +121,14 @@
     #root.dual-preview .num,
     #root.dual-screen-left .num,
     #root.dual-screen-right .num {
-      font-size: calc(60px * var(--rs));
+      font-size: calc(var(--num-size, 60px) * var(--rs));
     }
     #root.dual-preview .row-top,
     #root.dual-screen-left .row-top,
     #root.dual-screen-right .row-top {
       flex: 1;
-      padding: calc(12px * var(--rs)) calc(24px * var(--rs)) calc(8px * var(--rs)) calc(18px * var(--rs));
-      gap: calc(10px * var(--rs));
+      padding: calc(var(--row-top-pad-scale, 1) * 12px * var(--rs)) calc(24px * var(--rs)) calc(var(--row-top-pad-scale, 1) * 8px * var(--rs)) calc(18px * var(--rs));
+      gap: calc(var(--row-top-gap, 10px) * var(--rs));
       align-items: flex-start;
     }
     #root.dual-preview .info-left,
@@ -136,13 +136,13 @@
     #root.dual-screen-right .info-left {
       align-self: stretch;
       justify-content: flex-start;  /* 酒厂名顶部固定不动 */
-      gap: calc(14px * var(--rs));  /* 酒厂名↔酒名↔风格 间距 */
+      gap: calc(var(--info-left-gap, 14px) * var(--rs));  /* 酒厂名↔酒名↔风格 间距 */
     }
     #root.dual-preview .brewery-tag,
     #root.dual-screen-left .brewery-tag,
     #root.dual-screen-right .brewery-tag {
-      font-size: calc(23px * var(--rs));
-      line-height: 1.02;
+      font-size: calc(var(--brewery-size, 23px) * var(--rs));
+      line-height: var(--brewery-lh, 1.02);
       color: #8d8d8d;
     }
     #root.dual-preview .beer-name-row,
@@ -154,9 +154,9 @@
     #root.dual-preview .beer-name,
     #root.dual-screen-left .beer-name,
     #root.dual-screen-right .beer-name {
-      font-size: calc(33px * var(--rs));
-      letter-spacing: calc(5px * var(--rs));
-      line-height: 1.05;
+      font-size: calc(var(--name-size, 33px) * var(--rs));
+      letter-spacing: calc(var(--name-tracking, 5px) * var(--rs));
+      line-height: var(--name-lh, 1.05);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -170,34 +170,34 @@
       align-self: center;     /* 在 row-top 里垂直居中 */
       flex-direction: column; /* 上下排列 */
       align-items: flex-start;
-      gap: calc(4px * var(--rs));
+      gap: calc(var(--tag-gap, 4px) * var(--rs));
     }
     #root.dual-preview .beer-tag,
     #root.dual-screen-left .beer-tag,
     #root.dual-screen-right .beer-tag {
-      height: calc(35px * var(--rs));
-      max-width: calc(220px * var(--rs));
-      padding: 0 calc(10px * var(--rs));
-      font-size: calc(24px * var(--rs));
+      height: calc(var(--tag-size, 24px) * 1.45833 * var(--rs));
+      max-width: calc(var(--tag-size, 24px) * 9.16667 * var(--rs));
+      padding: 0 calc(var(--tag-size, 24px) * 0.41667 * var(--rs));
+      font-size: calc(var(--tag-size, 24px) * var(--rs));
       letter-spacing: 0;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    /* 单标签时字号更大 */
+    /* 单标签时字号更大（比例固定为基础标签字号的 1.25 倍，与设计稿一致） */
     #root.dual-preview .beer-tag:only-child,
     #root.dual-screen-left .beer-tag:only-child,
     #root.dual-screen-right .beer-tag:only-child {
-      height: calc(40px * var(--rs));
-      font-size: calc(30px * var(--rs));
-      max-width: calc(260px * var(--rs));
-      padding: 0 calc(12px * var(--rs));
+      height: calc(var(--tag-size, 24px) * 1.25 * 1.33333 * var(--rs));
+      font-size: calc(var(--tag-size, 24px) * 1.25 * var(--rs));
+      max-width: calc(var(--tag-size, 24px) * 1.25 * 8.66667 * var(--rs));
+      padding: 0 calc(var(--tag-size, 24px) * 1.25 * 0.4 * var(--rs));
     }
     #root.dual-preview .beer-style,
     #root.dual-screen-left .beer-style,
     #root.dual-screen-right .beer-style {
       margin-top: 0;
-      font-size: calc(17px * var(--rs));
-      line-height: 1.08;
+      font-size: calc(var(--style-size, 17px) * var(--rs));
+      line-height: var(--style-lh, 1.08);
       overflow: hidden;
       text-overflow: ellipsis;
       color: #9a9a9a;
@@ -214,13 +214,13 @@
     #root.dual-preview .price-line,
     #root.dual-screen-left .price-line,
     #root.dual-screen-right .price-line {
-      font-size: calc(29px * var(--rs));
+      font-size: calc(var(--price-size, 29px) * var(--rs));
       line-height: 1.18;
     }
     #root.dual-preview .price-block.single .price-line,
     #root.dual-screen-left .price-block.single .price-line,
     #root.dual-screen-right .price-block.single .price-line {
-      font-size: calc(35px * var(--rs));
+      font-size: calc(var(--price-size, 29px) * 1.2069 * var(--rs));
       line-height: 1.04;
     }
     #root.dual-preview .divider,
@@ -257,7 +257,7 @@
       overflow: visible;
       text-overflow: clip;
       padding-right: calc(8px * var(--rs));
-      color: #b8b8b8;
+      color: #7a7a7a;
       letter-spacing: 0;
       text-align: right;
     }
@@ -389,7 +389,7 @@
 
     /* ── 卡片 ── */
     .card {
-      background: #e3e3e3;
+      background: #1c1c1c;
       display: flex;
       flex-direction: row;
       overflow: hidden;
@@ -470,7 +470,7 @@
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 500;
       font-size: calc(30px * var(--rs));
-      color: #666;
+      color: #9a9a9a;
       letter-spacing: 1px;
       text-transform: uppercase;
       white-space: nowrap;
@@ -481,7 +481,7 @@
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 900;
       font-size: calc(46px * var(--rs));
-      color: #111;
+      color: #f2f2f2;
       letter-spacing: 8px;
       line-height: 1.05;
       white-space: nowrap;
@@ -493,7 +493,7 @@
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 400;
       font-size: calc(20px * var(--rs));
-      color: #888;
+      color: #7d7d7d;
       letter-spacing: 0.5px;
       white-space: nowrap;
       margin-top: calc(8px * var(--rs));
@@ -578,7 +578,7 @@
       font-family: 'Barlow', sans-serif;
       font-weight: 700;
       font-size: calc(41px * var(--rs));
-      color: #222;
+      color: #f2f2f2;
       line-height: 1.6;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
@@ -589,7 +589,7 @@
     }
 
     /* 分隔线 */
-    .divider { height: 1px; background: #cacaca; margin: 0 16px }
+    .divider { height: 1px; background: #444; margin: 0 16px }
 
     /* 下半 */
     .row-bottom {
@@ -599,6 +599,7 @@
       padding: max(8px, calc(8px * var(--rs))) 20px calc(12px * var(--rs)) 16px;
       gap: calc(10px * var(--rs));
     }
+    .en-name, .en-style { color: #8a8a8a; }
     .comment-tags {
       flex-shrink: 0;
       display: flex;
@@ -616,7 +617,7 @@
       flex-shrink: 0;
       align-self: center;
       font-size: calc(39px * var(--rs));
-      color: #aaa;
+      color: #777;
       text-align: right;
       white-space: nowrap;
       letter-spacing: 0.5px;
@@ -634,11 +635,11 @@
       line-height: 1;
     }
     .sponsor-inline .sp-prefix {
-      color: #bbb;
+      color: #666;
       font-weight: 400;
     }
     .sponsor-inline .sp-name {
-      color: #666;
+      color: #e0e0e0;
       font-weight: 500;
     }
 
@@ -679,7 +680,7 @@
     }
 
     /* 空卡片 */
-    .card.empty .beer-name { color: #c4c4c4; font-size: calc(28px * var(--rs)); font-weight: 400 }
+    .card.empty .beer-name { color: #525252; font-size: calc(28px * var(--rs)); font-weight: 400 }
 
     /* ── 活动动态区：双列 1280×1080 逻辑画布，随电视端缩放 ── */
     .poster-zone {
@@ -881,6 +882,46 @@ let posterItems         = [];
 let posterIndex         = 0;
 let posterTimer         = null;
 let posterSignature     = "";
+let styleConfig         = {}; // 后台"排版"面板保存的可调样式参数，见 applyStyleConfig()
+
+// styleConfig 里的 key → 应用到 #root 上的 CSS 自定义属性；unit 为空字符串表示无单位（如行高）
+const STYLE_CONFIG_VARS = {
+  nameSize:        ["--name-size", "px"],
+  nameTracking:    ["--name-tracking", "px"],
+  nameLh:          ["--name-lh", ""],
+  brewerySize:     ["--brewery-size", "px"],
+  breweryLh:       ["--brewery-lh", ""],
+  styleSize:       ["--style-size", "px"],
+  styleLh:         ["--style-lh", ""],
+  tagSize:         ["--tag-size", "px"],
+  tagGap:          ["--tag-gap", "px"],
+  priceSize:       ["--price-size", "px"],
+  numSize:         ["--num-size", "px"],
+  infoLeftGap:     ["--info-left-gap", "px"],
+  rowTopPadScale:  ["--row-top-pad-scale", ""],
+  rowTopGap:       ["--row-top-gap", "px"],
+};
+
+let livePreviewActive = false; // true 之后，本页面的自动轮询不再覆盖排版参数（供 admin.html 的实时预览 iframe 使用）
+
+function applyStyleConfig(cfg) {
+  styleConfig = cfg && typeof cfg === "object" ? cfg : {};
+  const root = document.getElementById("root");
+  for (const [key, [cssVar, unit]] of Object.entries(STYLE_CONFIG_VARS)) {
+    const value = styleConfig[key];
+    if (value === undefined || value === null || value === "") {
+      root.style.removeProperty(cssVar);
+    } else {
+      root.style.setProperty(cssVar, `${value}${unit}`);
+    }
+  }
+}
+
+// 供 admin.html「排版」编辑面板的预览 iframe 调用：拖动滑块时实时生效，且不再被 5 秒轮询覆盖
+window.setLivePreviewStyle = function (cfg) {
+  livePreviewActive = true;
+  applyStyleConfig(cfg);
+};
 
 const LOCAL_PREVIEW_ITEMS = [
   ["时光酿造所","港岛妹妹","Hong Kong Sister","双倍浑浊IPA","Double Hazy IPA","来自香港的灵感","获奖配方升级","7.2","45","78","490ml","58","360ml"],
@@ -1132,7 +1173,8 @@ function renderDualLayout(items, tapCount) {
   const layoutScale  = layoutHeight / 1080;
   // 实机：1.1mm bezel ≈ 2px（1226mm/1920px ≈ 0.639mm/px）；预览留 40px 设计留白
   const screenPad = IS_DUAL_PREVIEW ? 40 : 2;
-  const cardGap   = IS_DUAL_PREVIEW ? Math.max(8, Math.round(8 * layoutScale)) : 8;
+  const baseCardGap = Number(styleConfig.cardGap) || 8;
+  const cardGap   = IS_DUAL_PREVIEW ? Math.max(baseCardGap, Math.round(baseCardGap * layoutScale)) : baseCardGap;
   const availH    = layoutHeight - 2 * screenPad;
   const cardH     = Math.floor((availH - (rows - 1) * cardGap) / rows);
   // refH=190 使 6 行（≈172px）时 rs≈0.9，字号清晰；上限 1.1 防行数极少时溢出
@@ -1267,6 +1309,7 @@ async function load() {
       data = await res.json();
     }
     if (!data.ok) return;
+    if (!livePreviewActive) applyStyleConfig(data.styleConfig);
     const tapCount = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
 
     // 新双屏模式：

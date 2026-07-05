@@ -445,6 +445,20 @@
       .tv-note{grid-template-columns:1fr}
     }
 
+    /* ── 排版（样式）编辑面板 ── */
+    .style-group{margin-bottom:18px}
+    .style-group-title{
+      font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
+      color:var(--sub);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--line);
+    }
+    .style-row{margin-bottom:10px}
+    .style-row label{
+      display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:4px;
+    }
+    .style-row label b{color:var(--green);font-weight:900;font-variant-numeric:tabular-nums}
+    .style-row input[type=range]{width:100%;accent-color:var(--green);cursor:pointer}
+    #styleTvPreview{width:100%;height:640px;border:0;background:#000;border-radius:8px}
+
     @media (max-width: 560px){
       header{padding:8px 12px}
       .pill{padding:4px 8px; font-size:11px}
@@ -484,6 +498,7 @@
       <button class="tab-btn active" data-tab="fermenter">发酵罐</button>
       <button class="tab-btn" data-tab="menu">酒单管理</button>
       <button class="tab-btn" data-tab="tv">电视展示</button>
+      <button class="tab-btn" data-tab="style">排版</button>
       <button class="tab-btn" data-tab="sponsor-review">冠名审核</button>
       <button class="tab-btn" data-tab="sponsor-manage">冠名管理</button>
       <button class="tab-btn" data-tab="cups">开业酒杯</button>
@@ -700,6 +715,78 @@
       </div>
     </div>
   </div>
+
+    <!-- Tab: 排版 -->
+    <div class="tab-pane" id="tab-style">
+      <div class="toolbar">
+        <div class="btns">
+          <button id="btnStyleLoad">加载酒单</button>
+          <button class="primary" id="btnStyleSave">保存酒单</button>
+          <button id="btnStyleReset">重置为默认</button>
+        </div>
+        <div class="muted" style="line-height:1.7">
+          调整电视酒单的字号、行高、间距、标签样式。跟"酒单管理"共用同一份数据，保存前请先加载。右侧是电视酒单的实时预览（总览模式），滑块拖动即时生效；点「保存酒单」才会推送到真实电视端（约5秒生效）。
+        </div>
+      </div>
+      <div class="tv-layout">
+        <div class="panel" style="box-shadow:none;padding:14px;overflow-y:auto;max-height:720px">
+
+          <div class="style-group">
+            <div class="style-group-title">酒名</div>
+            <div class="style-row"><label>字号 <b id="v-style-nameSize">33px</b></label>
+              <input type="range" id="style-nameSize" min="20" max="50" value="33"></div>
+            <div class="style-row"><label>字间距 <b id="v-style-nameTracking">5px</b></label>
+              <input type="range" id="style-nameTracking" min="0" max="12" value="5"></div>
+            <div class="style-row"><label>行高 <b id="v-style-nameLh">1.05</b></label>
+              <input type="range" id="style-nameLh" min="0.8" max="1.8" step="0.05" value="1.05"></div>
+          </div>
+
+          <div class="style-group">
+            <div class="style-group-title">酒厂 / 风格</div>
+            <div class="style-row"><label>酒厂字号 <b id="v-style-brewerySize">23px</b></label>
+              <input type="range" id="style-brewerySize" min="12" max="36" value="23"></div>
+            <div class="style-row"><label>酒厂行高 <b id="v-style-breweryLh">1.02</b></label>
+              <input type="range" id="style-breweryLh" min="0.8" max="1.8" step="0.05" value="1.02"></div>
+            <div class="style-row"><label>风格字号 <b id="v-style-styleSize">17px</b></label>
+              <input type="range" id="style-styleSize" min="10" max="26" value="17"></div>
+            <div class="style-row"><label>风格行高 <b id="v-style-styleLh">1.08</b></label>
+              <input type="range" id="style-styleLh" min="0.8" max="1.8" step="0.05" value="1.08"></div>
+          </div>
+
+          <div class="style-group">
+            <div class="style-group-title">标签（奖项 / 原料 / 评语，上下堆叠最多两条）</div>
+            <div class="style-row"><label>标签字号（两条时） <b id="v-style-tagSize">24px</b></label>
+              <input type="range" id="style-tagSize" min="14" max="34" value="24"></div>
+            <div class="style-row"><label>标签之间的间距 <b id="v-style-tagGap">4px</b></label>
+              <input type="range" id="style-tagGap" min="0" max="16" value="4"></div>
+          </div>
+
+          <div class="style-group">
+            <div class="style-group-title">价格 / 编号</div>
+            <div class="style-row"><label>价格字号 <b id="v-style-priceSize">29px</b></label>
+              <input type="range" id="style-priceSize" min="16" max="46" value="29"></div>
+            <div class="style-row"><label>编号字号 <b id="v-style-numSize">60px</b></label>
+              <input type="range" id="style-numSize" min="30" max="90" value="60"></div>
+          </div>
+
+          <div class="style-group">
+            <div class="style-group-title">间距</div>
+            <div class="style-row"><label>酒厂↔酒名↔风格 间距 <b id="v-style-infoLeftGap">14px</b></label>
+              <input type="range" id="style-infoLeftGap" min="0" max="30" value="14"></div>
+            <div class="style-row"><label>卡片内边距(上下) <b id="v-style-rowTopPadScale">1.0×</b></label>
+              <input type="range" id="style-rowTopPadScale" min="0.3" max="2.5" step="0.05" value="1"></div>
+            <div class="style-row"><label>信息区↔价格区 间距 <b id="v-style-rowTopGap">10px</b></label>
+              <input type="range" id="style-rowTopGap" min="0" max="30" value="10"></div>
+            <div class="style-row"><label>卡片之间的间距 <b id="v-style-cardGap">8px</b></label>
+              <input type="range" id="style-cardGap" min="0" max="24" value="8"></div>
+          </div>
+
+        </div>
+        <div class="panel" style="box-shadow:none;padding:10px">
+          <iframe id="styleTvPreview" src="/menu.html"></iframe>
+        </div>
+      </div>
+    </div>
 
     <!-- Tab: 冠名审核 -->
     <div class="tab-pane" id="tab-sponsor-review">
@@ -1493,12 +1580,78 @@
     markDirty();
   });
 
+  // ====== 排版（样式）编辑面板 —— 跟"酒单管理"共用同一份 menuState，只是多存一个 _styleConfig 字段
+  const STYLE_SLIDER_KEYS = [
+    "nameSize", "nameTracking", "nameLh",
+    "brewerySize", "breweryLh", "styleSize", "styleLh",
+    "tagSize", "tagGap",
+    "priceSize", "numSize",
+    "infoLeftGap", "rowTopPadScale", "rowTopGap", "cardGap",
+  ];
+
+  function styleUnit(key) {
+    if (key === "nameLh" || key === "breweryLh" || key === "styleLh") return "";
+    if (key === "rowTopPadScale") return "×";
+    return "px";
+  }
+
+  function styleConfigFromState() {
+    return (menuState._styleConfig && typeof menuState._styleConfig === "object") ? menuState._styleConfig : {};
+  }
+
+  function syncStyleTabFromState() {
+    const cfg = styleConfigFromState();
+    STYLE_SLIDER_KEYS.forEach(key => {
+      const input = document.getElementById("style-" + key);
+      const label = document.getElementById("v-style-" + key);
+      if (!input || !label) return;
+      input.value = (cfg[key] !== undefined && cfg[key] !== null && cfg[key] !== "") ? cfg[key] : input.defaultValue;
+      label.textContent = input.value + styleUnit(key);
+    });
+  }
+
+  function pushStyleConfigToPreview() {
+    const frame = document.getElementById("styleTvPreview");
+    const win = frame && frame.contentWindow;
+    if (win && typeof win.setLivePreviewStyle === "function") {
+      win.setLivePreviewStyle(styleConfigFromState());
+    }
+  }
+
+  STYLE_SLIDER_KEYS.forEach(key => {
+    const input = document.getElementById("style-" + key);
+    const label = document.getElementById("v-style-" + key);
+    if (!input || !label) return;
+    input.addEventListener("input", () => {
+      if (!menuState._styleConfig) menuState._styleConfig = {};
+      menuState._styleConfig[key] = input.value;
+      label.textContent = input.value + styleUnit(key);
+      markDirty();
+      pushStyleConfigToPreview();
+    });
+  });
+
+  document.getElementById("btnStyleLoad").addEventListener("click", async () => {
+    await menuLoad();
+    syncStyleTabFromState();
+    pushStyleConfigToPreview();
+  });
+  document.getElementById("btnStyleSave").addEventListener("click", menuSave);
+  document.getElementById("btnStyleReset").addEventListener("click", () => {
+    menuState._styleConfig = {};
+    syncStyleTabFromState();
+    markDirty();
+    pushStyleConfigToPreview();
+    toast("已重置为默认排版（点「保存酒单」后生效）");
+  });
+  document.getElementById("styleTvPreview").addEventListener("load", pushStyleConfigToPreview);
+
   // Ctrl+S 同时覆盖酒单保存
   document.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       const activeTab = document.querySelector(".tab-btn.active")?.dataset?.tab;
-      if (activeTab === "menu") menuSave();
+      if (activeTab === "menu" || activeTab === "style") menuSave();
       else apiSave();
     }
   });
