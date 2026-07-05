@@ -131,9 +131,7 @@ module.exports = async (req, res) => {
       // Supabase 不可用时不影响主菜单数据
     }
 
-    const styleConfig = raw._styleConfig && typeof raw._styleConfig === "object" ? raw._styleConfig : null;
-
-    return res.status(200).end(JSON.stringify({ ok: true, tapCount, items, styleConfig }));
+    return res.status(200).end(JSON.stringify({ ok: true, tapCount, items }));
   } catch (e) {
     return res.status(500).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
   }
