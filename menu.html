@@ -136,7 +136,7 @@
     #root.dual-screen-right .info-left {
       align-self: stretch;
       justify-content: flex-start;  /* 酒厂名顶部固定不动 */
-      gap: calc(14px * var(--rs));  /* 酒厂名↔酒名↔风格 间距 */
+      /* 酒厂↔酒名↔风格 的间距改用各自的 margin-top 单独控制，见 .beer-name-row / .beer-style */
     }
     #root.dual-preview .brewery-tag,
     #root.dual-screen-left .brewery-tag,
@@ -148,7 +148,7 @@
     #root.dual-preview .beer-name-row,
     #root.dual-screen-left .beer-name-row,
     #root.dual-screen-right .beer-name-row {
-      margin-top: 0;
+      margin-top: calc(6px * var(--rs));  /* 酒厂↔酒名 间距，比酒名↔风格小，抵消大字号的视觉膨胀 */
       width: 100%;
     }
     #root.dual-preview .beer-name,
@@ -195,7 +195,7 @@
     #root.dual-preview .beer-style,
     #root.dual-screen-left .beer-style,
     #root.dual-screen-right .beer-style {
-      margin-top: 0;
+      margin-top: calc(12px * var(--rs));  /* 酒名↔风格 间距 */
       font-size: calc(17px * var(--rs));
       line-height: 1.08;
       overflow: hidden;
