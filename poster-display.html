@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>时光酿造所 · 海报播放</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; background:#101722; overflow:hidden; }
+  #posterZone {
+    width:100vw;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:#101722;
+    color:#fff;
+    isolation:isolate;
+  }
+  .poster-bg-layer {
+    position:absolute;
+    top:-30px; right:-30px; bottom:-30px; left:-30px;
+    background-image: var(--poster-image);
+    background-size:cover;
+    background-position:center;
+    filter:blur(40px);
+    opacity:.5;
+    transform:scale(1.04);
+    z-index:0;
+  }
+  .poster-bg-layer::after {
+    content:"";
+    position:absolute;
+    top:0; right:0; bottom:0; left:0;
+    background:rgba(0,0,0,.28);
+  }
+  .poster-fg-layer {
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:1;
+    overflow:hidden;
+  }
+  .poster-fg-layer img {
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    max-width:calc(100% - 80px);
+    max-height:calc(100% - 80px);
+    object-fit:contain;
+    filter:drop-shadow(0 18px 32px rgba(0,0,0,.35));
+  }
+  .poster-generated {
+    position:relative;
+    width:100%; height:100%;
+    padding:84px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    overflow:hidden;
+  }
+  .poster-default {
+    background:
+      radial-gradient(circle at 30% 24%, rgba(214,165,72,.25), transparent 32%),
+      linear-gradient(135deg, #101722, #173725 55%, #101722);
+  }
+  .poster-eyebrow {
+    position:relative;
+    font-family:'Barlow Condensed', sans-serif;
+    font-size:32px;
+    letter-spacing:8px;
+    color:rgba(255,255,255,.68);
+    text-transform:uppercase;
+  }
+  .poster-title {
+    position:relative;
+    margin-top:28px;
+    font-size:92px;
+    line-height:1.05;
+    letter-spacing:8px;
+    font-weight:900;
+  }
+  .poster-subtitle {
+    position:relative;
+    margin-top:22px;
+    font-family:'Barlow Condensed', sans-serif;
+    font-size:34px;
+    letter-spacing:2px;
+    color:rgba(255,255,255,.76);
+  }
+</style>
+</head>
+<body>
+<div id="posterZone"></div>
+<script>
+const POSTER_API = "/api/menu-public?poster=1";
+const REFRESH = 5000;
+
+let posterItems = [];
+let posterIndex = 0;
+let posterTimer = null;
+let posterSignature = "";
+
+function escAttr(s) {
+  return String(s || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function posterImageStyle(url) {
+  const safeUrl = String(url || "").replace(/["'()\\]/g, "");
+  return `--poster-image:url('${escAttr(safeUrl)}')`;
+}
+
+function renderPosterFallback() {
+  return `
+    <div class="poster-generated poster-default">
+      <div class="poster-eyebrow">Chrono Brewery</div>
+      <div class="poster-title">时光酿造所</div>
+      <div class="poster-subtitle">Fresh Beer · Fresh Time</div>
+    </div>`;
+}
+
+function renderImagePoster(item) {
+  if (!item.imageUrl) return renderPosterFallback();
+  return `
+    <div class="poster-bg-layer" style="${posterImageStyle(item.imageUrl)}"></div>
+    <div class="poster-fg-layer">
+      <img src="${escAttr(item.imageUrl)}" alt="${escAttr(item.title || '')}">
+    </div>`;
+}
+
+function renderPosterItem(item) {
+  const zone = document.getElementById("posterZone");
+  if (!item || item.type !== "image") {
+    zone.innerHTML = renderPosterFallback();
+    return;
+  }
+  zone.innerHTML = renderImagePoster(item);
+}
+
+function startPosterLoop() {
+  clearTimeout(posterTimer);
+  if (!posterItems.length) {
+    renderPosterItem(null);
+    return;
+  }
+  const item = posterItems[posterIndex] || posterItems[0];
+  renderPosterItem(item);
+  if (posterItems.length <= 1) return;
+  const delay = Math.max(3, Number(item.durationSec) || 10) * 1000;
+  posterTimer = setTimeout(() => {
+    posterIndex = (posterIndex + 1) % posterItems.length;
+    startPosterLoop();
+  }, delay);
+}
+
+async function loadPosterItems() {
+  try {
+    const res = await fetch(POSTER_API, { cache: "no-store" });
+    const data = await res.json();
+    const items = data.ok && Array.isArray(data.items) ? data.items : [];
+    const signature = JSON.stringify(items);
+    if (signature === posterSignature) return;
+    posterSignature = signature;
+    posterItems = items;
+    posterIndex = 0;
+    startPosterLoop();
+  } catch {
+    posterItems = [];
+    posterSignature = "";
+    startPosterLoop();
+  }
+}
+
+loadPosterItems();
+setInterval(loadPosterItems, REFRESH);
+</script>
+</body>
+</html>
