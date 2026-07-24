@@ -279,14 +279,29 @@
     #root.dual-screen-right .alc-info {
       width: calc(172px * var(--rs));
       flex: 0 0 calc(172px * var(--rs));
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: calc(2px * var(--rs));
+      padding-right: calc(8px * var(--rs));
+      text-align: right;
+    }
+    #root.dual-preview .alc-line,
+    #root.dual-screen-left .alc-line,
+    #root.dual-screen-right .alc-line {
       font-size: calc(21px * var(--rs));
       line-height: 1;
-      overflow: visible;
-      text-overflow: clip;
-      padding-right: calc(8px * var(--rs));
       color: #000;
       letter-spacing: 0;
-      text-align: right;
+      white-space: nowrap;
+    }
+    #root.dual-preview .alc-tapday,
+    #root.dual-screen-left .alc-tapday,
+    #root.dual-screen-right .alc-tapday {
+      font-size: calc(15px * var(--rs));
+      line-height: 1.1;
+      color: #8a5f00;
+      white-space: nowrap;
     }
     #root.dual-preview .sold-out-stamp,
     #root.dual-screen-left .sold-out-stamp,
@@ -331,7 +346,8 @@
     #root.dual-preview .card.sold-out .en-name,
     #root.dual-preview .card.sold-out .en-style,
     #root.dual-preview .card.sold-out .price-line,
-    #root.dual-preview .card.sold-out .alc-info,
+    #root.dual-preview .card.sold-out .alc-line,
+    #root.dual-preview .card.sold-out .alc-tapday,
     #root.dual-screen-left .card.sold-out .brewery-tag,
     #root.dual-screen-left .card.sold-out .beer-name,
     #root.dual-screen-left .card.sold-out .beer-style,
@@ -339,7 +355,8 @@
     #root.dual-screen-left .card.sold-out .en-name,
     #root.dual-screen-left .card.sold-out .en-style,
     #root.dual-screen-left .card.sold-out .price-line,
-    #root.dual-screen-left .card.sold-out .alc-info,
+    #root.dual-screen-left .card.sold-out .alc-line,
+    #root.dual-screen-left .card.sold-out .alc-tapday,
     #root.dual-screen-right .card.sold-out .brewery-tag,
     #root.dual-screen-right .card.sold-out .beer-name,
     #root.dual-screen-right .card.sold-out .beer-style,
@@ -347,7 +364,8 @@
     #root.dual-screen-right .card.sold-out .en-name,
     #root.dual-screen-right .card.sold-out .en-style,
     #root.dual-screen-right .card.sold-out .price-line,
-    #root.dual-screen-right .card.sold-out .alc-info {
+    #root.dual-screen-right .card.sold-out .alc-line,
+    #root.dual-screen-right .card.sold-out .alc-tapday {
       color: #8a8a8a;
     }
     #root.dual-preview .card.sold-out .beer-tag.ingredient,
@@ -652,15 +670,30 @@
     .row-bottom.has-sponsor { justify-content: space-between; align-items: center; }
     .row-bottom.has-sponsor .info-en { flex: 0 0 auto; }
     .alc-info {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 400;
       flex-shrink: 0;
       align-self: center;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: calc(2px * var(--rs));
+    }
+    .alc-line {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 400;
       font-size: calc(39px * var(--rs));
       color: #aaa;
-      text-align: right;
       white-space: nowrap;
       letter-spacing: 0.5px;
+      line-height: 1.05;
+    }
+    .alc-tapday {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 400;
+      font-size: calc(22px * var(--rs));
+      color: #b07d00;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
       line-height: 1.05;
     }
     /* 冠名信息：居中列 */
@@ -905,10 +938,10 @@
     }
     .ff-item-caption {
       flex: 0 0 auto;
-      max-width: 35%;
-      font-size: 12px;
-      line-height: 1.3;
-      color: rgba(255,255,255,.35);
+      max-width: 45%;
+      font-size: 36px;
+      line-height: 1.25;
+      color: rgba(255,255,255,.55);
       text-align: right;
     }
     .ff-legend {
@@ -1391,9 +1424,9 @@ function makeCard(item) {
 
   const abvIbu = [
     item.abv ? `ALC ${esc(item.abv)}%` : "",
-    item.ibu ? `IBU ${esc(item.ibu)}` : "",
-    (item.tapDay !== null && item.tapDay !== undefined) ? `On Tap Day ${item.tapDay}` : ""
+    item.ibu ? `IBU ${esc(item.ibu)}` : ""
   ].filter(Boolean).join("  ·  ");
+  const tapDayEn = (item.tapDay !== null && item.tapDay !== undefined) ? `On Tap Day ${item.tapDay}` : "";
 
   // 标签分流：💬 评语 → 下栏换行展示；其余 → 酒名右侧
   function getTagClass(text) {
@@ -1453,7 +1486,10 @@ function makeCard(item) {
       </div>
       ${commentTagsHtml ? `<div class="comment-tags">${commentTagsHtml}</div>` : ""}
       ${sponsorInlineHtml}
-      <div class="alc-info">${abvIbu}</div>
+      <div class="alc-info">
+        ${abvIbu ? `<div class="alc-line">${abvIbu}</div>` : ""}
+        ${tapDayEn ? `<div class="alc-tapday">${tapDayEn}</div>` : ""}
+      </div>
     </div>
   </div>
 </div>`;
