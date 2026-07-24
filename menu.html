@@ -912,14 +912,19 @@
     }
     .ff-header {
       flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 24px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 40px;
+      letter-spacing: 8px;
       color: #efe6d8;
-      text-align: center;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
+    .ff-header-leaf { flex: 0 0 auto; opacity: .85; }
+    .ff-header-leaf.right { transform: scaleX(-1); }
     .ff-list {
       flex: 1;
       min-height: 0;
@@ -1330,6 +1335,16 @@ let funFactSignature = "";
 
 const FUN_FACT_ZONE_MAX = 7;
 
+const FF_LEAF_SVG = `<svg class="ff-header-leaf __SIDE__" width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M17 45 Q7 34 10 20 Q12 8 20 3" stroke="#efe6d8" stroke-width="2" fill="none"/>
+  <ellipse cx="12" cy="37" rx="5" ry="2.6" fill="#efe6d8" transform="rotate(-30 12 37)"/>
+  <ellipse cx="9" cy="27" rx="5" ry="2.6" fill="#efe6d8" transform="rotate(-55 9 27)"/>
+  <ellipse cx="11" cy="17" rx="5" ry="2.6" fill="#efe6d8" transform="rotate(-80 11 17)"/>
+  <ellipse cx="17" cy="8" rx="5" ry="2.6" fill="#efe6d8" transform="rotate(-105 17 8)"/>
+  <ellipse cx="24" cy="4" rx="4.2" ry="2.2" fill="#efe6d8" transform="rotate(-125 24 4)"/>
+</svg>`;
+const FF_HEADER_HTML = `<div class="ff-header">${FF_LEAF_SVG.replace("__SIDE__", "left")}<span>排行榜</span>${FF_LEAF_SVG.replace("__SIDE__", "right")}</div>`;
+
 function renderFunFactZone(rawItems) {
   const zone = document.getElementById("funFactZone");
   if (!zone) return;
@@ -1337,7 +1352,7 @@ function renderFunFactZone(rawItems) {
   const items = rawItems.slice(0, FUN_FACT_ZONE_MAX);
 
   if (!items.length) {
-    zone.innerHTML = `<div class="ff-header">本店趣味数据榜</div><div class="ff-empty">敬请期待</div>`;
+    zone.innerHTML = `${FF_HEADER_HTML}<div class="ff-empty">敬请期待</div>`;
     return;
   }
 
@@ -1355,7 +1370,7 @@ function renderFunFactZone(rawItems) {
     .join("");
 
   zone.innerHTML = `
-    <div class="ff-header">本店趣味数据榜</div>
+    ${FF_HEADER_HTML}
     <div class="ff-list">${list}</div>
     <div class="ff-legend">${legend}</div>`;
 }
