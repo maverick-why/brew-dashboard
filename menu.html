@@ -913,6 +913,18 @@
     .ff-header {
       flex: 0 0 auto;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .ff-header-logo {
+      height: 56px;
+      width: auto;
+      opacity: .92;
+    }
+    .ff-header-title {
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
@@ -921,7 +933,6 @@
       font-size: 40px;
       letter-spacing: 8px;
       color: #efe6d8;
-      margin-bottom: 20px;
     }
     .ff-header-leaf { flex: 0 0 auto; opacity: .85; }
     .ff-header-leaf.right { transform: scaleX(-1); }
@@ -1343,7 +1354,10 @@ const FF_LEAF_SVG = `<svg class="ff-header-leaf __SIDE__" width="34" height="48"
   <ellipse cx="17" cy="8" rx="5" ry="2.6" fill="#efe6d8" transform="rotate(-105 17 8)"/>
   <ellipse cx="24" cy="4" rx="4.2" ry="2.2" fill="#efe6d8" transform="rotate(-125 24 4)"/>
 </svg>`;
-const FF_HEADER_HTML = `<div class="ff-header">${FF_LEAF_SVG.replace("__SIDE__", "left")}<span>排行榜</span>${FF_LEAF_SVG.replace("__SIDE__", "right")}</div>`;
+const FF_HEADER_HTML = `<div class="ff-header">
+  <img class="ff-header-logo" src="/logo.png" alt="时光酿造所"/>
+  <div class="ff-header-title">${FF_LEAF_SVG.replace("__SIDE__", "left")}<span>排行榜</span>${FF_LEAF_SVG.replace("__SIDE__", "right")}</div>
+</div>`;
 
 function renderFunFactZone(rawItems) {
   const zone = document.getElementById("funFactZone");
