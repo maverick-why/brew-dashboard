@@ -898,6 +898,7 @@
     }
 
     /* ── 本店趣味数据榜：右屏最右侧，镜像左屏海报区，不轮播 ── */
+    /* 便签墙风格：刻意跟酒单的深色表格感区分开，避免客人误认成菜单的一部分 */
     .fun-fact-zone {
       width: 100%;
       height: 100%;
@@ -906,8 +907,8 @@
       padding: 32px 28px;
       display: flex;
       flex-direction: column;
-      background: linear-gradient(135deg, #101722 0%, #173725 58%, #0b1118 100%);
-      color: #fff;
+      background: #2b2620;
+      color: #efe6d8;
     }
     .ff-header {
       flex: 0 0 auto;
@@ -915,8 +916,9 @@
       font-size: 24px;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: rgba(255,255,255,.55);
-      margin-bottom: 16px;
+      color: #efe6d8;
+      text-align: center;
+      margin-bottom: 18px;
     }
     .ff-list {
       flex: 1;
@@ -924,33 +926,37 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 20px;
     }
     .ff-item {
       flex: 1;
       display: flex;
-      background: rgba(255,255,255,.05);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .ff-item-bar { width: 6px; flex: 0 0 auto; }
-    .cat-sales  { background: #5DCAA5; }
-    .cat-member { background: #D4537E; }
-    .cat-keg    { background: #EF9F27; }
-    .cat-staff  { background: #7F77DD; }
-    .ff-item-body {
-      flex: 1;
-      min-width: 0;
-      padding: 10px 18px;
-      display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 4px;
+      padding: 12px 20px;
+      border-radius: 4px;
+      box-shadow: 3px 4px 0 rgba(0,0,0,.25);
     }
+    .ff-list .ff-item:nth-child(4n+1) { transform: rotate(-2deg); }
+    .ff-list .ff-item:nth-child(4n+2) { transform: rotate(1.5deg); }
+    .ff-list .ff-item:nth-child(4n+3) { transform: rotate(-1deg); }
+    .ff-list .ff-item:nth-child(4n+4) { transform: rotate(2deg); }
+    .cat-sales  { background: #F4D35E; }
+    .cat-member { background: #F4A6C6; }
+    .cat-keg    { background: #8ECBFF; }
+    .cat-staff  { background: #7FD8BE; }
+    .ff-item.cat-sales  .ff-item-title, .ff-item.cat-sales  .ff-item-caption { color: #6b5410; }
+    .ff-item.cat-member .ff-item-title, .ff-item.cat-member .ff-item-caption { color: #7a2f4c; }
+    .ff-item.cat-keg    .ff-item-title, .ff-item.cat-keg    .ff-item-caption { color: #134a73; }
+    .ff-item.cat-staff  .ff-item-title, .ff-item.cat-staff  .ff-item-caption { color: #0f5943; }
+    .ff-item.cat-sales  .ff-item-value { color: #2b2210; }
+    .ff-item.cat-member .ff-item-value { color: #3d1526; }
+    .ff-item.cat-keg    .ff-item-value { color: #0d2e47; }
+    .ff-item.cat-staff  .ff-item-value { color: #0a3d2f; }
     .ff-item-title {
       font-family: 'Noto Sans SC', sans-serif;
-      font-size: 24px;
-      color: rgba(255,255,255,.65);
+      font-size: 22px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -958,7 +964,7 @@
     .ff-item-value {
       font-family: 'Noto Sans SC', sans-serif;
       font-weight: 500;
-      font-size: 52px;
+      font-size: 48px;
       line-height: 1.05;
       white-space: nowrap;
       overflow: hidden;
@@ -966,9 +972,9 @@
     }
     .ff-item-caption {
       font-family: 'Noto Sans SC', sans-serif;
-      font-size: 22px;
+      font-size: 20px;
       line-height: 1.3;
-      color: rgba(255,255,255,.5);
+      opacity: .75;
     }
     .ff-legend {
       flex: 0 0 auto;
@@ -976,10 +982,10 @@
       gap: 20px;
       flex-wrap: wrap;
       font-size: 18px;
-      color: rgba(255,255,255,.4);
-      border-top: 1px solid rgba(255,255,255,.1);
+      color: rgba(239,230,216,.55);
+      border-top: 1px solid rgba(239,230,216,.15);
       padding-top: 10px;
-      margin-top: 12px;
+      margin-top: 16px;
     }
     .ff-legend-dot {
       display: inline-block;
@@ -993,7 +999,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(255,255,255,.4);
+      color: rgba(239,230,216,.5);
       font-size: 24px;
       text-align: center;
     }
@@ -1337,13 +1343,10 @@ function renderFunFactZone(rawItems) {
 
   const usedCategories = new Set(items.map(it => it.category));
   const list = items.map(it => `
-    <div class="ff-item">
-      <div class="ff-item-bar cat-${esc(it.category)}"></div>
-      <div class="ff-item-body">
-        <div class="ff-item-title">${esc(it.title)}</div>
-        <div class="ff-item-value">${esc(it.value)}</div>
-        ${it.caption ? `<div class="ff-item-caption">${esc(it.caption)}</div>` : ""}
-      </div>
+    <div class="ff-item cat-${esc(it.category)}">
+      <div class="ff-item-title">${esc(it.title)}</div>
+      <div class="ff-item-value">${esc(it.value)}</div>
+      ${it.caption ? `<div class="ff-item-caption">${esc(it.caption)}</div>` : ""}
     </div>`).join("");
 
   const legend = Object.keys(FUN_FACT_CATEGORY_LABELS)
