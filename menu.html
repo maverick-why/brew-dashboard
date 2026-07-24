@@ -1293,9 +1293,13 @@ async function loadPosterItems(menuItems) {
 const FUN_FACT_CATEGORY_LABELS = { sales: "销售数据", member: "会员数据", keg: "清桶记录", staff: "店员观察" };
 let funFactSignature = "";
 
-function renderFunFactZone(items) {
+const FUN_FACT_ZONE_MAX = 7;
+
+function renderFunFactZone(rawItems) {
   const zone = document.getElementById("funFactZone");
   if (!zone) return;
+
+  const items = rawItems.slice(0, FUN_FACT_ZONE_MAX);
 
   if (!items.length) {
     zone.innerHTML = `<div class="ff-header">本店趣味数据榜</div><div class="ff-empty">敬请期待</div>`;
