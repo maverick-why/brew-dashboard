@@ -335,6 +335,8 @@
     .w-abv{min-width:40px}
     .w-sponsor{min-width:96px; max-width:120px}
     .w-flag{min-width:52px}
+    .w-city{min-width:70px}
+    .w-tapdate{min-width:120px}
 
     /* # 列横向固定，横向滚动时始终可见 */
     .menu-table th:first-child {
@@ -566,7 +568,8 @@
               <th style="width:36px">#</th>
               <th style="width:72px">颜色</th>
               <th class="w-brewery">酒厂</th>
-              <th class="w-flag">国旗</th>
+              <th class="w-flag">产地</th>
+              <th class="w-city">城市</th>
               <th class="w-name">酒名（中）</th>
               <th class="w-name">酒名（英）</th>
               <th class="w-style">风格（中）</th>
@@ -575,6 +578,8 @@
               <th class="w-tag">特色标签2</th>
               <th class="w-abv">酒精度</th>
               <th class="w-abv">苦度</th>
+              <th style="width:56px">上枪天数</th>
+              <th class="w-tapdate">上枪日期</th>
               <th class="w-price">大杯价</th>
               <th class="w-size">大杯容量</th>
               <th class="w-price">小杯价</th>
@@ -694,6 +699,87 @@
               </thead>
               <tbody id="poster-tbody">
                 <tr><td colspan="8" style="text-align:center;color:var(--sub);padding:20px">点击刷新加载海报</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top:24px">
+        <div class="btns">
+          <h3 style="margin:0;font-size:14px;font-weight:900">右电视最右侧 · 本店趣味数据榜</h3>
+          <button onclick="loadFunFacts()">刷新</button>
+        </div>
+        <div class="muted" style="line-height:1.7">
+          镜像左电视的海报区，固定展示一份清单，不轮播。最多同时启用 12 条，超出会提示精简。内容全部手动填写，系统不做实时统计。
+        </div>
+      </div>
+      <div class="tv-layout">
+        <div class="panel" style="box-shadow:none">
+          <div class="toolbar" style="border-bottom:1px solid var(--line)">
+            <div>
+              <h4 style="margin:0;font-size:13px;font-weight:900">编辑条目</h4>
+              <div class="muted" style="margin-top:4px">保存后进入右侧两列旁边的趣味数据榜。</div>
+            </div>
+          </div>
+          <div style="padding:12px;display:grid;gap:10px">
+            <input type="hidden" id="ff-id">
+
+            <label class="muted">类别（决定卡片左侧色条颜色，及底部图例分组）</label>
+            <select id="ff-category">
+              <option value="sales">销售数据</option>
+              <option value="member">会员数据</option>
+              <option value="keg">清桶记录</option>
+              <option value="staff">店员观察</option>
+            </select>
+
+            <label class="muted">展示标题</label>
+            <input id="ff-title" type="text" placeholder="例如：女性会员人气王">
+
+            <label class="muted">结果</label>
+            <input id="ff-value" type="text" placeholder="例如：决心 · 3天">
+
+            <label class="muted">口径说明（可选，展示在卡片右侧的小字）</label>
+            <input id="ff-caption" type="text" placeholder="例如：开桶到售罄">
+
+            <label class="muted">内部备注（可选，仅后台可见，不上电视）</label>
+            <textarea id="ff-internal-note" rows="3" placeholder="完整口径：数据周期 / 统计对象 / 去重规则 / 最低样本量…，供店员应对顾客提问时查阅"></textarea>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div>
+                <label class="muted">排序</label>
+                <input id="ff-sort" type="number" value="1">
+              </div>
+              <div>
+                <label class="muted">启用</label>
+                <select id="ff-enabled">
+                  <option value="true">启用</option>
+                  <option value="false">停用</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+              <button onclick="resetFunFactForm()">清空</button>
+              <button class="primary" onclick="saveFunFactItem()">保存条目</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="box-shadow:none">
+          <div class="toolbar" style="border-bottom:1px solid var(--line)">
+            <div>
+              <h4 style="margin:0;font-size:13px;font-weight:900">当前榜单</h4>
+              <div class="muted" style="margin-top:4px">按排序从上到下展示；启用条数上限 12 条。</div>
+            </div>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr><th>排序</th><th>类别</th><th>标题</th><th>结果</th><th>状态</th><th>操作</th></tr>
+              </thead>
+              <tbody id="ff-tbody">
+                <tr><td colspan="6" style="text-align:center;color:var(--sub);padding:20px">点击刷新加载</td></tr>
               </tbody>
             </table>
           </div>
@@ -1014,6 +1100,10 @@
     if(no && mk){
       if(!menuState[no]) menuState[no] = {};
       menuState[no][mk] = t.type === "checkbox" ? !!t.checked : t.value;
+      if (mk === "show_tap_day" && t.checked && !menuState[no].tap_date) {
+        menuState[no].tap_date = new Date().toISOString().slice(0, 10);
+        renderMenu();
+      }
       markDirty();
     }
   });
@@ -1205,6 +1295,7 @@
   const MENU_FIELDS = [
     { k: "brewery",     cls: "w-brewery", ph: "时光酿造所" },
     { k: "flag",        cls: "w-flag",    type: "select" },
+    { k: "city",        cls: "w-city",    ph: "杭州（仅中国产地）" },
     { k: "name",        cls: "w-name",    ph: "港岛妹妹" },
     { k: "name_en",     cls: "w-name",    ph: "Hong Kong Girl" },
     { k: "style",       cls: "w-style",   ph: "HAZY IPA" },
@@ -1213,6 +1304,8 @@
     { k: "tag2",        cls: "w-tag",     ph: "2025香港家酿第三名" },
     { k: "abv",         cls: "w-abv",     ph: "6.5" },
     { k: "ibu",         cls: "w-abv",     ph: "35" },
+    { k: "show_tap_day",cls: "w-tapday",  type: "checkbox" },
+    { k: "tap_date",    cls: "w-tapdate", type: "date" },
     { k: "large_price", cls: "w-price",   ph: "68" },
     { k: "large_size",  cls: "w-size",    ph: "500ml" },
     { k: "small_price", cls: "w-price",   ph: "45" },
@@ -1259,6 +1352,15 @@
         `<option value="${o.v}" ${curVal === o.v ? "selected" : ""}>${o.label}</option>`
       ).join("");
       return `<td><select class="color-sel ${f.cls}" data-menu-no="${i}" data-menu-k="${f.k}">${opts}</select></td>`;
+    }
+    if (f.type === "checkbox") {
+      return `<td style="text-align:center"><input type="checkbox" class="${f.cls}"
+        data-menu-no="${i}" data-menu-k="${f.k}" ${row[f.k] ? "checked" : ""}/></td>`;
+    }
+    if (f.type === "date") {
+      const val = escapeHtml(String(row[f.k] || ""));
+      return `<td><input class="${f.cls}" type="date"
+        data-menu-no="${i}" data-menu-k="${f.k}" value="${val}"/></td>`;
     }
     const val = escapeHtml(String(row[f.k] || ""));
     return `<td><input class="${f.cls}" type="text" placeholder="${f.ph}"
@@ -1852,6 +1954,119 @@
       const json = await res.json();
       toast(json.code === 0 ? "已删除" : `删除失败：${json.message}`, json.code === 0);
       if (json.code === 0) loadPosterItems();
+    } catch (err) {
+      toast(`删除失败：${err.message}`, false);
+    }
+  }
+
+  // ====== 本店趣味数据榜（右电视最右侧，镜像左电视海报区）
+  let funFactItemsState = [];
+  const FUN_FACT_CATEGORY_LABELS = { sales: "销售数据", member: "会员数据", keg: "清桶记录", staff: "店员观察" };
+
+  function resetFunFactForm() {
+    document.getElementById("ff-id").value = "";
+    document.getElementById("ff-category").value = "sales";
+    document.getElementById("ff-title").value = "";
+    document.getElementById("ff-value").value = "";
+    document.getElementById("ff-caption").value = "";
+    document.getElementById("ff-internal-note").value = "";
+    document.getElementById("ff-sort").value = "1";
+    document.getElementById("ff-enabled").value = "true";
+  }
+
+  function editFunFactItem(id) {
+    const item = funFactItemsState.find(x => x.id === id);
+    if (!item) return;
+    document.getElementById("ff-id").value = item.id || "";
+    document.getElementById("ff-category").value = item.category || "sales";
+    document.getElementById("ff-title").value = item.title || "";
+    document.getElementById("ff-value").value = item.value || "";
+    document.getElementById("ff-caption").value = item.caption || "";
+    document.getElementById("ff-internal-note").value = item.internal_note || "";
+    document.getElementById("ff-sort").value = item.sort_order ?? 0;
+    document.getElementById("ff-enabled").value = item.enabled ? "true" : "false";
+  }
+
+  async function loadFunFacts() {
+    if (!ADMIN_PASS) { toast("未登录", false); return; }
+    const tbody = document.getElementById("ff-tbody");
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--sub);padding:20px">加载中…</td></tr>';
+    try {
+      const res = await fetch('/api/admin?op=funfacts-list', { headers: { 'x-admin-pass': ADMIN_PASS } });
+      const json = await res.json();
+      if (json.code !== 0) {
+        toast(`加载失败：${json.message || res.status}`, false);
+        return;
+      }
+      funFactItemsState = json.data || [];
+      renderFunFactsTable();
+    } catch (err) {
+      toast(`加载失败：${err.message}`, false);
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--sub);padding:20px">加载失败</td></tr>';
+    }
+  }
+
+  function renderFunFactsTable() {
+    const tbody = document.getElementById("ff-tbody");
+    const enabledCount = funFactItemsState.filter(x => x.enabled).length;
+    tbody.innerHTML = funFactItemsState.length === 0
+      ? '<tr><td colspan="6" style="text-align:center;color:var(--sub);padding:20px">暂无条目</td></tr>'
+      : funFactItemsState.map(item => `
+          <tr>
+            <td>${item.sort_order ?? 0}</td>
+            <td>${FUN_FACT_CATEGORY_LABELS[item.category] || item.category}</td>
+            <td>${escapeHtml(item.title || "")}</td>
+            <td>${escapeHtml(item.value || "")}</td>
+            <td><span class="status-dot ${item.enabled ? "on" : "off"}">${item.enabled ? "启用" : "停用"}</span></td>
+            <td><div class="rowActions">
+              <button class="mini" onclick="editFunFactItem('${item.id}')">编辑</button>
+              <button class="mini danger" onclick="deleteFunFactItem('${item.id}')">删除</button>
+            </div></td>
+          </tr>`).join("")
+        + `<tr><td colspan="6" style="text-align:right;color:var(--sub);padding:8px 4px">已启用 ${enabledCount} / 12 条</td></tr>`;
+  }
+
+  async function saveFunFactItem() {
+    if (!ADMIN_PASS) { toast("未登录", false); return; }
+    const payload = {
+      id: document.getElementById("ff-id").value || undefined,
+      category: document.getElementById("ff-category").value,
+      title: document.getElementById("ff-title").value.trim(),
+      value: document.getElementById("ff-value").value.trim(),
+      caption: document.getElementById("ff-caption").value.trim(),
+      internalNote: document.getElementById("ff-internal-note").value.trim(),
+      sortOrder: Number(document.getElementById("ff-sort").value) || 0,
+      enabled: document.getElementById("ff-enabled").value === "true",
+    };
+    if (!payload.title || !payload.value) { toast("标题和结果不能为空", false); return; }
+    try {
+      const res = await fetch('/api/admin?op=funfacts-upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      toast(json.code === 0 ? "已保存" : `保存失败：${json.message}`, json.code === 0);
+      if (json.code === 0) {
+        resetFunFactForm();
+        loadFunFacts();
+      }
+    } catch (err) {
+      toast(`保存失败：${err.message}`, false);
+    }
+  }
+
+  async function deleteFunFactItem(id) {
+    if (!confirm("确认删除这条榜单内容？")) return;
+    try {
+      const res = await fetch('/api/admin?op=funfacts-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': ADMIN_PASS },
+        body: JSON.stringify({ id }),
+      });
+      const json = await res.json();
+      toast(json.code === 0 ? "已删除" : `删除失败：${json.message}`, json.code === 0);
+      if (json.code === 0) loadFunFacts();
     } catch (err) {
       toast(`删除失败：${err.message}`, false);
     }

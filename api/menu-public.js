@@ -22,6 +22,53 @@ function safe(v, fb = "") {
   return String(v);
 }
 
+const COUNTRY_NAMES = {
+  "🇨🇳": "中国",
+  "🇧🇪": "比利时",
+  "🇩🇪": "德国",
+  "🇺🇸": "美国",
+  "🇬🇧": "英国",
+  "🇨🇿": "捷克",
+  "🇯🇵": "日本",
+  "🇰🇷": "韩国",
+  "🇦🇺": "澳大利亚",
+  "🇨🇦": "加拿大",
+  "🇫🇷": "法国",
+  "🇳🇱": "荷兰",
+  "🇮🇪": "爱尔兰",
+  "🇩🇰": "丹麦",
+  "🇸🇪": "瑞典",
+  "🇳🇴": "挪威",
+  "🇮🇹": "意大利",
+};
+
+function computeOrigin(row) {
+  const flag = row.flag === undefined ? "🇨🇳" : row.flag;
+  if (flag === "") return "";
+  if (flag === "🇨🇳") return safe(row.city).trim() || "中国";
+  return COUNTRY_NAMES[flag] || "";
+}
+
+function shanghaiTodayParts() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function computeTapDay(row) {
+  if (!row.show_tap_day || !row.tap_date) return null;
+  const tapMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(row.tap_date));
+  const todayMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(shanghaiTodayParts());
+  if (!tapMatch || !todayMatch) return null;
+  const tapUTC = Date.UTC(+tapMatch[1], +tapMatch[2] - 1, +tapMatch[3]);
+  const todayUTC = Date.UTC(+todayMatch[1], +todayMatch[2] - 1, +todayMatch[3]);
+  const diffDays = Math.round((todayUTC - tapUTC) / 86400000);
+  return diffDays >= 0 ? diffDays : 0;
+}
+
 function isActivePosterNow(item, now) {
   if (!item.enabled) return false;
   if (item.starts_at && new Date(item.starts_at) > now) return false;
@@ -69,6 +116,33 @@ async function loadPosterItems() {
   }
 }
 
+function normalizeFunFactItem(row) {
+  return {
+    id: row.id,
+    category: row.category,
+    title: row.title || "",
+    value: row.value || "",
+    caption: row.caption || "",
+  };
+}
+
+async function loadFunFactItems() {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("fun_fact_items")
+      .select("id,category,title,value,caption,enabled,sort_order")
+      .eq("enabled", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+    return (data || []).map(normalizeFunFactItem);
+  } catch (_) {
+    return [];
+  }
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
@@ -77,6 +151,11 @@ module.exports = async (req, res) => {
     if (req.query && req.query.poster === "1") {
       const posterItems = await loadPosterItems();
       return res.status(200).end(JSON.stringify({ ok: true, items: posterItems }));
+    }
+
+    if (req.query && req.query.funfacts === "1") {
+      const funFactItems = await loadFunFactItems();
+      return res.status(200).end(JSON.stringify({ ok: true, items: funFactItems }));
     }
 
     const r = getRedis();
@@ -106,7 +185,8 @@ module.exports = async (req, res) => {
         small_price: safe(row.small_price),
         small_size:  safe(row.small_size),
         color:       safe(row.color, "dark"),
-        flag:        safe(row.flag),
+        origin:      computeOrigin(row),
+        tapDay:      computeTapDay(row),
         sold_out:    !!row.sold_out,
         special:     !!row.special,
         sponsor_name: safe(row.sponsor_name),

@@ -45,6 +45,7 @@
     }
 
     #posterZone { display: none; }
+    #funFactZone { display: none; }
 
     #root.dual-preview {
       width: calc(var(--tv-base-width) * 2);
@@ -76,10 +77,16 @@
     }
 
     #root.dual-preview .grid {
-      grid-column: 2 / span 5;
+      grid-column: 2 / span 4;
       grid-row: 1;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-preview #funFactZone {
+      display: block;
+      grid-column: 6;
+      grid-row: 1;
     }
 
     #root.dual-screen-left {
@@ -105,10 +112,22 @@
 
     #root.dual-screen-right {
       padding: var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap)) 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr;   /* 让唯一行撑满全高，fun-fact-zone height:100% 才能正确解析 */
+      gap: var(--dual-gap, var(--gap));
+    }
+
+    #root.dual-screen-right #funFactZone {
+      display: block;
+      grid-column: 3;
+      grid-row: 1;
     }
 
     #root.dual-screen-right .grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-column: 1 / span 2;
+      grid-row: 1;
+      grid-template-columns: repeat(2, 1fr);
       gap: var(--dual-gap, var(--gap));
     }
 
@@ -201,6 +220,14 @@
       overflow: hidden;
       text-overflow: ellipsis;
       color: #000;
+    }
+    #root.dual-preview .tap-day,
+    #root.dual-screen-left .tap-day,
+    #root.dual-screen-right .tap-day {
+      margin-top: calc(4px * var(--rs));
+      font-size: calc(14px * var(--rs));
+      line-height: 1.08;
+      color: #8a5f00;
     }
     #root.dual-preview .price-block,
     #root.dual-screen-left .price-block,
@@ -300,6 +327,7 @@
     #root.dual-preview .card.sold-out .brewery-tag,
     #root.dual-preview .card.sold-out .beer-name,
     #root.dual-preview .card.sold-out .beer-style,
+    #root.dual-preview .card.sold-out .tap-day,
     #root.dual-preview .card.sold-out .en-name,
     #root.dual-preview .card.sold-out .en-style,
     #root.dual-preview .card.sold-out .price-line,
@@ -307,6 +335,7 @@
     #root.dual-screen-left .card.sold-out .brewery-tag,
     #root.dual-screen-left .card.sold-out .beer-name,
     #root.dual-screen-left .card.sold-out .beer-style,
+    #root.dual-screen-left .card.sold-out .tap-day,
     #root.dual-screen-left .card.sold-out .en-name,
     #root.dual-screen-left .card.sold-out .en-style,
     #root.dual-screen-left .card.sold-out .price-line,
@@ -314,6 +343,7 @@
     #root.dual-screen-right .card.sold-out .brewery-tag,
     #root.dual-screen-right .card.sold-out .beer-name,
     #root.dual-screen-right .card.sold-out .beer-style,
+    #root.dual-screen-right .card.sold-out .tap-day,
     #root.dual-screen-right .card.sold-out .en-name,
     #root.dual-screen-right .card.sold-out .en-style,
     #root.dual-screen-right .card.sold-out .price-line,
@@ -466,6 +496,9 @@
       margin-right: 0;
       font-style: normal;
     }
+    .brewery-tag .flag::before {
+      content: "· ";
+    }
     .brewery-tag {
       font-family: 'Barlow Condensed', sans-serif;
       font-weight: 500;
@@ -497,6 +530,14 @@
       letter-spacing: 0.5px;
       white-space: nowrap;
       margin-top: calc(8px * var(--rs));
+    }
+    .tap-day {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 500;
+      font-size: calc(18px * var(--rs));
+      color: #b07d00;
+      white-space: nowrap;
+      margin-top: calc(4px * var(--rs));
     }
 
     /* 特色标签（酒名右侧，横排一行） */
@@ -795,6 +836,109 @@
         linear-gradient(135deg, #101722, #173725 55%, #101722);
     }
 
+    /* ── 本店趣味数据榜：右屏最右侧，镜像左屏海报区，不轮播 ── */
+    .fun-fact-zone {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #101722 0%, #173725 58%, #0b1118 100%);
+      color: #fff;
+    }
+    .ff-header {
+      flex: 0 0 auto;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 14px;
+    }
+    .ff-list {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ff-item {
+      display: flex;
+      background: rgba(255,255,255,.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .ff-item-bar { width: 4px; flex: 0 0 auto; }
+    .cat-sales  { background: #5DCAA5; }
+    .cat-member { background: #D4537E; }
+    .cat-keg    { background: #EF9F27; }
+    .cat-staff  { background: #7F77DD; }
+    .ff-item-body {
+      flex: 1;
+      min-width: 0;
+      padding: 9px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .ff-item-main { min-width: 0; }
+    .ff-item-title {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 15px;
+      color: rgba(255,255,255,.7);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ff-item-value {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 500;
+      font-size: 25px;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ff-item-caption {
+      flex: 0 0 auto;
+      max-width: 35%;
+      font-size: 12px;
+      line-height: 1.3;
+      color: rgba(255,255,255,.35);
+      text-align: right;
+    }
+    .ff-legend {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: rgba(255,255,255,.4);
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 10px;
+      margin-top: 12px;
+    }
+    .ff-legend-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      margin-right: 5px;
+    }
+    .ff-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,.4);
+      font-size: 18px;
+      text-align: center;
+    }
+
     /* ── 精选 special：只改底色和文字颜色，不显示徽章 ── */
     .card.special { background: #fdf8f0; }
     .card.special .beer-name  { color: #8a5f00; }
@@ -812,6 +956,7 @@
 <div id="root">
   <div class="grid" id="grid"></div>
   <div class="poster-zone" id="posterZone"></div>
+  <div class="fun-fact-zone" id="funFactZone"></div>
 </div>
 
 <div class="preview-nav" id="previewNav">
@@ -823,6 +968,7 @@
 <script>
 const API     = "/api/menu-public";
 const POSTER_API = "/api/menu-public?poster=1";
+const FUN_FACTS_API = "/api/menu-public?funfacts=1";
 const REFRESH = 5000;
 
 const STYLE_COLORS = [
@@ -907,7 +1053,7 @@ const LOCAL_PREVIEW_ITEMS = [
   large_size: row[10],
   small_price: row[11],
   small_size: row[12],
-  flag: "🇨🇳",
+  origin: "杭州",
   color: "dark",
   sold_out: false,
   special: false,
@@ -1113,11 +1259,63 @@ async function loadPosterItems(menuItems) {
   }
 }
 
+const FUN_FACT_CATEGORY_LABELS = { sales: "销售数据", member: "会员数据", keg: "清桶记录", staff: "店员观察" };
+let funFactSignature = "";
+
+function renderFunFactZone(items) {
+  const zone = document.getElementById("funFactZone");
+  if (!zone) return;
+
+  if (!items.length) {
+    zone.innerHTML = `<div class="ff-header">本店趣味数据榜</div><div class="ff-empty">敬请期待</div>`;
+    return;
+  }
+
+  const usedCategories = new Set(items.map(it => it.category));
+  const list = items.map(it => `
+    <div class="ff-item">
+      <div class="ff-item-bar cat-${esc(it.category)}"></div>
+      <div class="ff-item-body">
+        <div class="ff-item-main">
+          <div class="ff-item-title">${esc(it.title)}</div>
+          <div class="ff-item-value">${esc(it.value)}</div>
+        </div>
+        ${it.caption ? `<div class="ff-item-caption">${esc(it.caption)}</div>` : ""}
+      </div>
+    </div>`).join("");
+
+  const legend = Object.keys(FUN_FACT_CATEGORY_LABELS)
+    .filter(cat => usedCategories.has(cat))
+    .map(cat => `<span><span class="ff-legend-dot cat-${cat}"></span>${esc(FUN_FACT_CATEGORY_LABELS[cat])}</span>`)
+    .join("");
+
+  zone.innerHTML = `
+    <div class="ff-header">本店趣味数据榜</div>
+    <div class="ff-list">${list}</div>
+    <div class="ff-legend">${legend}</div>`;
+}
+
+async function loadFunFacts() {
+  if (!(TV_SCREEN === "right" || IS_DUAL_PREVIEW)) return;
+
+  try {
+    const res = await fetch(FUN_FACTS_API, { cache: "no-store" });
+    const data = await res.json();
+    const items = data.ok && Array.isArray(data.items) ? data.items : [];
+    const signature = JSON.stringify(items);
+    if (signature === funFactSignature) return;
+    funFactSignature = signature;
+    renderFunFactZone(items);
+  } catch {
+    renderFunFactZone([]);
+  }
+}
+
 function renderDualLayout(items, tapCount) {
-  // 左屏：1/3 海报 + 2/3 酒牌（2列）；右屏：全幅酒牌（3列）
+  // 左屏：活动区 1 列 + 酒牌 2 列；右屏：酒牌 2 列 + 趣味数据榜 1 列
   const LEFT_COLS  = 2;
-  const RIGHT_COLS = 3;
-  const TOTAL_COLS = LEFT_COLS + RIGHT_COLS; // 5 列酒牌
+  const RIGHT_COLS = 2;
+  const TOTAL_COLS = LEFT_COLS + RIGHT_COLS; // 4 列酒牌
 
   const rows = Math.min(7, Math.max(3, Math.ceil(tapCount / TOTAL_COLS)));
   const root = document.getElementById("root");
@@ -1140,9 +1338,11 @@ function renderDualLayout(items, tapCount) {
 
   root.style.setProperty("--dual-gap", `${screenPad}px`);
   root.style.setProperty("--rs", Math.min(1.1, Math.max(0.52, cardH / refH)));
-  // TV 浏览器 height:100% 不能从 grid 1fr 行继承，显式设置 posterZone 高度
+  // TV 浏览器 height:100% 不能从 grid 1fr 行继承，显式设置 posterZone / funFactZone 高度
   const posterZone = document.getElementById("posterZone");
   if (posterZone) posterZone.style.height = `${availH}px`;
+  const funFactZone = document.getElementById("funFactZone");
+  if (funFactZone) funFactZone.style.height = `${availH}px`;
   grid.style.gridTemplateRows = `repeat(${rows}, ${cardH}px)`;
   grid.style.gap              = `${cardGap}px`;
   grid.style.alignContent     = "center";  // 行数不足时垂直居中，余量留黑
@@ -1191,7 +1391,8 @@ function makeCard(item) {
 
   const abvIbu = [
     item.abv ? `ALC ${esc(item.abv)}%` : "",
-    item.ibu ? `IBU ${esc(item.ibu)}` : ""
+    item.ibu ? `IBU ${esc(item.ibu)}` : "",
+    (item.tapDay !== null && item.tapDay !== undefined) ? `On Tap Day ${item.tapDay}` : ""
   ].filter(Boolean).join("  ·  ");
 
   // 标签分流：💬 评语 → 下栏换行展示；其余 → 酒名右侧
@@ -1234,11 +1435,12 @@ function makeCard(item) {
   <div class="card-body">
     <div class="row-top">
       <div class="info-left">
-        <div class="brewery-tag">${esc(item.brewery)}<span class="flag">${esc(item.flag || "🇨🇳")}</span></div>
+        <div class="brewery-tag">${esc(item.brewery)}${item.origin ? `<span class="flag">${esc(item.origin)}</span>` : ""}</div>
         <div class="beer-name-row">
           <div class="beer-name">${esc(item.name || item.name_en || "待上新")}</div>
         </div>
         <div class="beer-style">${esc(item.style)}</div>
+        ${(item.tapDay !== null && item.tapDay !== undefined) ? `<div class="tap-day">上枪时间 Day ${item.tapDay}</div>` : ""}
       </div>
       ${inlineTagsHtml ? `<div class="beer-tags">${inlineTagsHtml}</div>` : ""}
       <div class="price-block${singlePrice ? " single" : ""}">${priceL}${priceS}</div>
@@ -1269,14 +1471,15 @@ async function load() {
     if (!data.ok) return;
     const tapCount = Math.max(4, Math.min(64, Number(data.tapCount) || 16));
 
-    // 新双屏模式：
-    // 总画布 6 列：1-2 活动区，3-6 酒单
-    // left  屏：活动 2 列 + 酒单第 1 列
-    // right 屏：酒单第 2-4 列
+    // 双屏模式：
+    // 总画布 6 列：1 活动区，2-3 左屏酒单，4-5 右屏酒单，6 趣味数据榜
+    // left  屏：活动区 1 列 + 酒单 2 列
+    // right 屏：酒单 2 列 + 趣味数据榜 1 列
     if (IS_DUAL_SCREEN || IS_DUAL_PREVIEW) {
       allItems = (data.items || []).filter(it => it.name || it.name_en);
       renderDualLayout(allItems, tapCount);
       await loadPosterItems(allItems);
+      await loadFunFacts();
       return;
     }
 
@@ -1316,6 +1519,7 @@ async function load() {
     if (IS_DUAL_SCREEN || IS_DUAL_PREVIEW) {
       renderDualLayout(allItems, tapCount);
       if (TV_SCREEN === "left" || IS_DUAL_PREVIEW) renderPosterItem(null, allItems);
+      if (TV_SCREEN === "right" || IS_DUAL_PREVIEW) renderFunFactZone([]);
       return;
     }
     screenCount = 2;

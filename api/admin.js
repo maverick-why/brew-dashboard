@@ -9,6 +9,8 @@ const MENU_KEY = 'brew_dash_menu_v1';
 const POSTER_BUCKET = process.env.POSTER_BUCKET || 'poster-assets';
 const POSTER_TYPES = ['image', 'beer_recommend', 'info_card'];
 const POSTER_BG_TYPES = ['auto_blur', 'solid', 'gradient', 'theme'];
+const FUN_FACT_CATEGORIES = ['sales', 'member', 'keg', 'staff'];
+const FUN_FACT_MAX_ENABLED = 12;
 const POSTER_IMAGE_TYPES = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
@@ -126,6 +128,32 @@ function normalizePosterPayload(body) {
   return payload;
 }
 
+function normalizeFunFactPayload(body) {
+  const category = body.category;
+  if (!FUN_FACT_CATEGORIES.includes(category)) {
+    const err = new Error('无效的类别');
+    err.status = 400;
+    throw err;
+  }
+  const title = String(body.title || '').trim();
+  const value = String(body.value || '').trim();
+  if (!title || !value) {
+    const err = new Error('标题和结果不能为空');
+    err.status = 400;
+    throw err;
+  }
+
+  return {
+    category,
+    title,
+    value,
+    caption: body.caption ? String(body.caption).trim() : null,
+    internal_note: body.internalNote || body.internal_note ? String(body.internalNote ?? body.internal_note).trim() : null,
+    enabled: body.enabled !== false,
+    sort_order: Number(body.sortOrder ?? body.sort_order ?? 0) || 0,
+  };
+}
+
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
 
@@ -138,6 +166,16 @@ module.exports = async function handler(req, res) {
       if (op === 'poster-list') {
         const { data, error: dbError } = await supabase
           .from('poster_items')
+          .select('*')
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true });
+        if (dbError) throw dbError;
+        return ok(res, data || []);
+      }
+
+      if (op === 'funfacts-list') {
+        const { data, error: dbError } = await supabase
+          .from('fun_fact_items')
           .select('*')
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: true });
@@ -308,6 +346,51 @@ module.exports = async function handler(req, res) {
         if (!id) return error(res, 400, '缺少 id');
         const { error: dbError } = await supabase
           .from('poster_items')
+          .delete()
+          .eq('id', id);
+        if (dbError) throw dbError;
+        return ok(res, { deleted: true });
+      }
+
+      if (op === 'funfacts-upsert') {
+        const payload = normalizeFunFactPayload(body);
+        if (payload.enabled) {
+          let countQuery = supabase
+            .from('fun_fact_items')
+            .select('id', { count: 'exact', head: true })
+            .eq('enabled', true);
+          if (body.id) countQuery = countQuery.neq('id', body.id);
+          const { count, error: countError } = await countQuery;
+          if (countError) throw countError;
+          if ((count || 0) >= FUN_FACT_MAX_ENABLED) {
+            return error(res, 400, `已启用条数达到上限（${FUN_FACT_MAX_ENABLED} 条），请先精简`);
+          }
+        }
+        let query;
+        if (body.id) {
+          query = supabase
+            .from('fun_fact_items')
+            .update(payload)
+            .eq('id', body.id)
+            .select('*')
+            .single();
+        } else {
+          query = supabase
+            .from('fun_fact_items')
+            .insert(payload)
+            .select('*')
+            .single();
+        }
+        const { data, error: dbError } = await query;
+        if (dbError) throw dbError;
+        return ok(res, data);
+      }
+
+      if (op === 'funfacts-delete') {
+        const { id } = body;
+        if (!id) return error(res, 400, '缺少 id');
+        const { error: dbError } = await supabase
+          .from('fun_fact_items')
           .delete()
           .eq('id', id);
         if (dbError) throw dbError;
