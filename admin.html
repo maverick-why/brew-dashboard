@@ -545,6 +545,10 @@
             <input type="number" id="tapCountInput" min="4" max="64" step="1" value="16"
               style="width:62px;text-align:center;padding:6px 4px"/>
           </label>
+          <label style="display:flex;align-items:center;gap:6px;margin-left:4px">
+            <input type="checkbox" id="zonesSwappedInput"/>
+            <span style="font-size:12px;color:rgba(234,240,255,.65);white-space:nowrap">活动区/趣味榜 一键互换屏幕</span>
+          </label>
         </div>
         <div class="muted">编号动态（取决于总酒头数），支持拖动整行调整顺序并自动重排编号；留空的格子在前台显示「待上新」。Ctrl+S 快捷保存。</div>
         <div class="muted" style="margin-top:6px;line-height:1.7">
@@ -1457,6 +1461,8 @@
     // 同步输入框
     const tcInput = document.getElementById("tapCountInput");
     if (tcInput) tcInput.value = tapCount;
+    const zsInput = document.getElementById("zonesSwappedInput");
+    if (zsInput) zsInput.checked = !!menuState._zonesSwapped;
 
     const tbody = document.getElementById("menuTbody");
     tbody.innerHTML = "";
@@ -1593,6 +1599,11 @@
     e.target.value = n;
     menuState._tapCount = n;
     renderMenu();
+    markDirty();
+  });
+
+  document.getElementById("zonesSwappedInput").addEventListener("change", e => {
+    menuState._zonesSwapped = !!e.target.checked;
     markDirty();
   });
 

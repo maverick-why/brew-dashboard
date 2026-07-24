@@ -164,6 +164,8 @@ module.exports = async (req, res) => {
 
     // 读取酒头数（管理员设置的 _tapCount，默认 16，范围 4–64）
     const tapCount = Math.max(4, Math.min(64, Number(raw._tapCount) || 16));
+    // 活动海报区 / 趣味数据榜 一键互换所在屏幕
+    const zonesSwapped = !!raw._zonesSwapped;
 
     // 整理成有序数组，编号 1-tapCount
     const items = [];
@@ -211,7 +213,7 @@ module.exports = async (req, res) => {
       // Supabase 不可用时不影响主菜单数据
     }
 
-    return res.status(200).end(JSON.stringify({ ok: true, tapCount, items }));
+    return res.status(200).end(JSON.stringify({ ok: true, tapCount, zonesSwapped, items }));
   } catch (e) {
     return res.status(500).end(JSON.stringify({ ok: false, error: String(e.message || e) }));
   }

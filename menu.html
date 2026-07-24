@@ -89,6 +89,14 @@
       grid-row: 1;
     }
 
+    /* 一键换位：活动海报区 ↔ 趣味数据榜，互换所在屏幕 */
+    #root.dual-preview.zones-swapped #posterZone {
+      grid-column: 6;
+    }
+    #root.dual-preview.zones-swapped #funFactZone {
+      grid-column: 1 / span 1;
+    }
+
     #root.dual-screen-left {
       padding: var(--dual-gap, var(--gap)) 0 var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap));
       display: grid;
@@ -110,6 +118,16 @@
       gap: var(--dual-gap, var(--gap));
     }
 
+    /* 一键换位：左屏改放趣味数据榜，隐藏活动海报区 */
+    #root.dual-screen-left.zones-swapped #posterZone {
+      display: none;
+    }
+    #root.dual-screen-left.zones-swapped #funFactZone {
+      display: block;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
     #root.dual-screen-right {
       padding: var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap)) var(--dual-gap, var(--gap)) 0;
       display: grid;
@@ -129,6 +147,16 @@
       grid-row: 1;
       grid-template-columns: repeat(2, 1fr);
       gap: var(--dual-gap, var(--gap));
+    }
+
+    /* 一键换位：右屏改放活动海报区，隐藏趣味数据榜 */
+    #root.dual-screen-right.zones-swapped #funFactZone {
+      display: none;
+    }
+    #root.dual-screen-right.zones-swapped #posterZone {
+      display: block;
+      grid-column: 3;
+      grid-row: 1;
     }
 
     /* ── 双屏卡片样式：适用于管理预览与实机TV双屏模式 ── */
@@ -1096,7 +1124,7 @@ function localPreviewData() {
   for (let i = 0; i < 27; i++) {
     items.push({ ...LOCAL_PREVIEW_ITEMS[i % LOCAL_PREVIEW_ITEMS.length], no: i + 1 });
   }
-  return { ok: true, tapCount: 27, items };
+  return { ok: true, tapCount: 27, zonesSwapped: false, items };
 }
 
 // TV 模式：给 root 加边框 class（具体屏幕位置在 load() 里确认 screenCount 后再微调）
@@ -1270,8 +1298,9 @@ function startPosterLoop(menuItems) {
   }, delay);
 }
 
-async function loadPosterItems(menuItems) {
-  if (!(TV_SCREEN === "left" || IS_DUAL_PREVIEW)) return;
+async function loadPosterItems(menuItems, zonesSwapped) {
+  const showsPoster = IS_DUAL_PREVIEW || (zonesSwapped ? TV_SCREEN === "right" : TV_SCREEN === "left");
+  if (!showsPoster) return;
 
   try {
     const res = await fetch(POSTER_API, { cache: "no-store" });
@@ -1328,8 +1357,9 @@ function renderFunFactZone(rawItems) {
     <div class="ff-legend">${legend}</div>`;
 }
 
-async function loadFunFacts() {
-  if (!(TV_SCREEN === "right" || IS_DUAL_PREVIEW)) return;
+async function loadFunFacts(zonesSwapped) {
+  const showsFunFacts = IS_DUAL_PREVIEW || (zonesSwapped ? TV_SCREEN === "left" : TV_SCREEN === "right");
+  if (!showsFunFacts) return;
 
   try {
     const res = await fetch(FUN_FACTS_API, { cache: "no-store" });
@@ -1511,11 +1541,14 @@ async function load() {
     // 总画布 6 列：1 活动区，2-3 左屏酒单，4-5 右屏酒单，6 趣味数据榜
     // left  屏：活动区 1 列 + 酒单 2 列
     // right 屏：酒单 2 列 + 趣味数据榜 1 列
+    // 后台开关可一键互换活动区 / 趣味数据榜所在屏幕（zonesSwapped）
     if (IS_DUAL_SCREEN || IS_DUAL_PREVIEW) {
+      const zonesSwapped = !!data.zonesSwapped;
+      document.getElementById("root").classList.toggle("zones-swapped", zonesSwapped);
       allItems = (data.items || []).filter(it => it.name || it.name_en);
       renderDualLayout(allItems, tapCount);
-      await loadPosterItems(allItems);
-      await loadFunFacts();
+      await loadPosterItems(allItems, zonesSwapped);
+      await loadFunFacts(zonesSwapped);
       return;
     }
 
@@ -1553,6 +1586,7 @@ async function load() {
     const tapCount = data.tapCount;
     allItems = data.items;
     if (IS_DUAL_SCREEN || IS_DUAL_PREVIEW) {
+      document.getElementById("root").classList.remove("zones-swapped");
       renderDualLayout(allItems, tapCount);
       if (TV_SCREEN === "left" || IS_DUAL_PREVIEW) renderPosterItem(null, allItems);
       if (TV_SCREEN === "right" || IS_DUAL_PREVIEW) renderFunFactZone([]);
