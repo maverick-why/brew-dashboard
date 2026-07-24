@@ -711,7 +711,7 @@
           <button onclick="loadFunFacts()">刷新</button>
         </div>
         <div class="muted" style="line-height:1.7">
-          镜像左电视的海报区，固定展示一份清单，不轮播。最多同时启用 12 条，超出会提示精简。内容全部手动填写，系统不做实时统计。
+          镜像左电视的海报区，固定展示一份清单，不轮播。为保证远距离可读性，最多同时启用 7 条，超出会提示精简。内容全部手动填写，系统不做实时统计。
         </div>
       </div>
       <div class="tv-layout">
@@ -770,7 +770,7 @@
           <div class="toolbar" style="border-bottom:1px solid var(--line)">
             <div>
               <h4 style="margin:0;font-size:13px;font-weight:900">当前榜单</h4>
-              <div class="muted" style="margin-top:4px">按排序从上到下展示；启用条数上限 12 条。</div>
+              <div class="muted" style="margin-top:4px">按排序从上到下展示；启用条数上限 7 条（字号更大，保证远距离可读）。</div>
             </div>
           </div>
           <div class="tableWrap">
@@ -2023,7 +2023,7 @@
               <button class="mini danger" onclick="deleteFunFactItem('${item.id}')">删除</button>
             </div></td>
           </tr>`).join("")
-        + `<tr><td colspan="6" style="text-align:right;color:var(--sub);padding:8px 4px">已启用 ${enabledCount} / 12 条</td></tr>`;
+        + `<tr><td colspan="6" style="text-align:right;color:var(--sub);padding:8px 4px">已启用 ${enabledCount} / 7 条</td></tr>`;
   }
 
   async function saveFunFactItem() {

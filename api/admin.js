@@ -10,7 +10,7 @@ const POSTER_BUCKET = process.env.POSTER_BUCKET || 'poster-assets';
 const POSTER_TYPES = ['image', 'beer_recommend', 'info_card'];
 const POSTER_BG_TYPES = ['auto_blur', 'solid', 'gradient', 'theme'];
 const FUN_FACT_CATEGORIES = ['sales', 'member', 'keg', 'staff'];
-const FUN_FACT_MAX_ENABLED = 12;
+const FUN_FACT_MAX_ENABLED = 7;
 const POSTER_IMAGE_TYPES = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
