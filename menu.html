@@ -1403,6 +1403,7 @@ async function loadFunFacts(zonesSwapped) {
     funFactSignature = signature;
     renderFunFactZone(items);
   } catch {
+    funFactSignature = "";
     renderFunFactZone([]);
   }
 }
