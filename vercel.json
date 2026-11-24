@@ -10,6 +10,7 @@
     { "source": "/claimyourtap",         "destination": "/claimyourtap.html" },
     { "source": "/class",                "destination": "/class.html" },
     { "source": "/db",                   "destination": "/db-invite.html" },
+    { "source": "/2026",                 "destination": "/2026.html" }
     { "source": "/brewops/assets/:file*","destination": "/assets/:file*" },
     { "source": "/brewops",              "destination": "/index.html" },
     { "source": "/brewops/",             "destination": "/index.html" },
