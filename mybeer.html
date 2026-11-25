@@ -223,7 +223,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   .mgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:22px 6px;margin-top:26px}
   .mcell{grid-column:span 2;display:grid;justify-items:center;gap:2px;text-decoration:none;color:var(--ink);text-align:center}
   .mcell:nth-child(4){grid-column:2/span 2}
-  .mcell img{height:150px;width:100%;object-fit:contain;filter:drop-shadow(0 12px 8px #5b3a2230);margin-bottom:8px}
+  .mcell img{height:160px;width:100%;object-fit:contain;filter:drop-shadow(0 12px 8px #5b3a2230);margin-bottom:8px}
   .mcell b{font-weight:600;font-size:15px;letter-spacing:.06em;white-space:nowrap}
   .mcell>span{font:500 13px var(--latin);color:var(--soft)}
   .cases .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px}
@@ -263,14 +263,10 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   .step p br{display:none}
 }
 /* ---------- owner-uploaded lineup ---------- */
-html.custom-lineup .chips{grid-template-columns:repeat(5,minmax(0,1fr));column-gap:12px;margin-left:0}
 @media (max-width:860px){
   html.custom-lineup .lineup-wrap{display:block!important;overflow:visible;margin-inline:0}
   html.custom-lineup .lineup-inner{width:auto!important;padding:0}
-  html.custom-lineup .chips{display:none}
-  html.custom-lineup .mgrid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:16px}
-  html.custom-lineup .mcell{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 4px}
-  html.custom-lineup .mcell img{display:none}
+  html.custom-lineup .mgrid{display:none!important}
 }
 
 </style>
@@ -319,20 +315,13 @@ html.custom-lineup .chips{grid-template-columns:repeat(5,minmax(0,1fr));column-g
 
   <div class="lineup-wrap" id="types"><div class="lineup-inner">
     <img id="lineup-img" src="/mybeer-lineup.webp" width="3150" height="820" alt="DB BREW custom cans: Peninsula Still Water and Full Ahead, birthday, wedding, Christmas, Peninsula football Ignite, and Sideline Hero for CEIBS Football Club">
-    <div class="chips">
-      <a class="chip" href="#contact"><svg class="i"><use href="#i-corp"/></svg><span class="ct"><b lang="zh-Hant">企業定制</b><b lang="en">Corporate</b><span lang="zh-Hant">Corporate</span><span lang="en">Company events &amp; gifts</span></span></a>
-      <a class="chip" href="#make" data-pick="bday"><svg class="i"><use href="#i-cake"/></svg><span class="ct"><b lang="zh-Hant">生日定制</b><b lang="en">Birthday</b><span lang="zh-Hant">Birthday</span><span lang="en">Name &amp; message</span></span></a>
-      <a class="chip" href="#make" data-pick="wed"><svg class="i"><use href="#i-rings"/></svg><span class="ct"><b lang="zh-Hant">婚慶定制</b><b lang="en">Wedding</b><span lang="zh-Hant">Wedding</span><span lang="en">Names &amp; date</span></span></a>
-      <a class="chip" href="#make" data-pick="xmas"><svg class="i"><use href="#i-cheers"/></svg><span class="ct"><b lang="zh-Hant">Party 定制</b><b lang="en">Party</b><span lang="zh-Hant">Party</span><span lang="en">Christmas &amp; more</span></span></a>
-      <a class="chip" href="#contact"><svg class="i"><use href="#i-ball"/></svg><span class="ct"><b lang="zh-Hant">球隊定制</b><b lang="en">Sports teams</b><span lang="zh-Hant">Sports Teams</span><span lang="en">Clubs &amp; academies</span></span></a>
-    </div>
   </div></div>
   <div class="mgrid">
-    <a class="mcell" href="#contact"><img src="/mybeer-m-corp.webp" width="324" height="420" alt="Peninsula Still Water and Full Ahead cans"><b><span lang="zh-Hant">企業定制</span><span lang="en">Corporate</span></b><span><span lang="zh-Hant">Corporate</span><span lang="en">企業</span></span></a>
-    <a class="mcell" href="#make" data-pick="bday"><img src="/mybeer-m-bday.webp" width="245" height="420" alt="Birthday can"><b><span lang="zh-Hant">生日定制</span><span lang="en">Birthday</span></b><span><span lang="zh-Hant">Birthday</span><span lang="en">生日</span></span></a>
-    <a class="mcell" href="#make" data-pick="wed"><img src="/mybeer-m-wed.webp" width="245" height="420" alt="Wedding can"><b><span lang="zh-Hant">婚慶定制</span><span lang="en">Wedding</span></b><span><span lang="zh-Hant">Wedding</span><span lang="en">婚慶</span></span></a>
-    <a class="mcell" href="#make" data-pick="xmas"><img src="/mybeer-m-party.webp" width="245" height="420" alt="Christmas party can"><b><span lang="zh-Hant">Party 定制</span><span lang="en">Party</span></b><span><span lang="zh-Hant">Party</span><span lang="en">派對</span></span></a>
-    <a class="mcell" href="#contact"><img src="/mybeer-m-team.webp" width="422" height="420" alt="Peninsula football Ignite can and Sideline Hero can for CEIBS Football Club"><b><span lang="zh-Hant">球隊定制</span><span lang="en">Sports teams</span></b><span><span lang="zh-Hant">Sports Teams</span><span lang="en">球隊</span></span></a>
+    <div class="mcell"><img src="/mybeer-m-corp.webp" width="324" height="420" alt="Peninsula Still Water and Full Ahead cans"></div>
+    <div class="mcell"><img src="/mybeer-m-bday.webp" width="245" height="420" alt="Birthday can"></div>
+    <div class="mcell"><img src="/mybeer-m-wed.webp" width="245" height="420" alt="Wedding can"></div>
+    <div class="mcell"><img src="/mybeer-m-party.webp" width="245" height="420" alt="Christmas party can"></div>
+    <div class="mcell"><img src="/mybeer-m-team.webp" width="422" height="420" alt="Peninsula football Ignite can and Sideline Hero can for CEIBS Football Club"></div>
   </div>
   <p class="swipe"><span lang="zh-Hant">← 左右滑動查看全部 →</span><span lang="en">← Swipe to see all →</span></p>
   <p class="claim"><span lang="zh-Hant">從企業週年、生日慶祝、婚禮喜宴、派對聚會到運動球隊，<br>DB BREW 提供專屬的客製啤酒包裝服務。</span><span lang="en">From company anniversaries, birthdays and weddings to parties and sports teams,<br>DB BREW makes beer that carries your name.</span></p>
