@@ -132,3 +132,20 @@ test('handler: upload returns a signed url in the mybeer folder', async () => {
   assert.strictEqual(res.statusCode, 200);
   assert.match(res.body.data.url, /\/poster-assets\/mybeer\/.+\.webp$/);
 });
+
+// ---- review fixes ----
+test('public settings: a redis that never answers gives defaults quickly', async () => {
+  const redis = { get: () => new Promise(() => {}) };
+  const t0 = Date.now();
+  const s = await m.getPublicSettings(redis, SB, 50);
+  assert.deepStrictEqual(s, { font: 'classic', lineupUrl: '' });
+  assert.ok(Date.now() - t0 < 1000, 'took ' + (Date.now() - t0) + 'ms');
+});
+
+test('handler: admin get with a failing redis gives a friendly 503', async () => {
+  const redis = { get: async () => { throw new Error('Connection is closed'); } };
+  const res = fakeRes();
+  await handler({ getRedis: () => redis })({ method: 'GET', url: '/api/mybeer?op=get', headers: {} }, res);
+  assert.strictEqual(res.statusCode, 503);
+  assert.strictEqual(res.body.message, '暂时读不到设置，请稍后再试');
+});

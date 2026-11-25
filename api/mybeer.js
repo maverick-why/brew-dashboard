@@ -16,6 +16,8 @@ function getRedis() {
       maxRetriesPerRequest: 1,
       enableReadyCheck: false,
       lazyConnect: true,
+      connectTimeout: 1500,
+      commandTimeout: 1500,
     });
   }
   return redis;

@@ -30,12 +30,21 @@ function mybeerUploadPath(mimeType, now = new Date()) {
   return `mybeer/${now.toISOString().slice(0, 10)}/${now.getTime()}-${id}.${ext}`;
 }
 
-// Never rejects: the public page falls back to the default look on any failure.
-async function getPublicSettings(redis, supabaseUrl) {
+const MYBEER_READ_TIMEOUT_MS = 1500;
+
+// Resolves the stored value, or rejects if Redis has not answered within ms.
+function readWithTimeout(redis, ms) {
+  let timer;
+  const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Redis timeout')), ms); });
+  return Promise.race([redis.get(MYBEER_KEY), timeout]).finally(() => clearTimeout(timer));
+}
+
+// Never rejects: the public page falls back to the default look on any failure or slow Redis.
+async function getPublicSettings(redis, supabaseUrl, timeoutMs = MYBEER_READ_TIMEOUT_MS) {
   let stored = null;
   try {
     if (redis) {
-      const raw = await redis.get(MYBEER_KEY);
+      const raw = await readWithTimeout(redis, timeoutMs);
       stored = raw ? JSON.parse(raw) : null;
     }
   } catch (_) {
@@ -70,8 +79,14 @@ function createMybeerHandler(deps) {
 
       if (req.method === 'GET' && op === 'get') {
         const r = redisOrNull();
-        const raw = r ? await r.get(MYBEER_KEY) : null;
-        return ok(res, normalizeMybeerSettings(raw ? JSON.parse(raw) : null, deps.supabaseUrl));
+        let stored = null;
+        try {
+          const raw = r ? await readWithTimeout(r, MYBEER_READ_TIMEOUT_MS) : null;
+          stored = raw ? JSON.parse(raw) : null;
+        } catch (_) {
+          return error(res, 503, '暂时读不到设置，请稍后再试');
+        }
+        return ok(res, normalizeMybeerSettings(stored, deps.supabaseUrl));
       }
 
       if (req.method === 'POST' && op === 'upload') {
