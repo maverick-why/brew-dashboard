@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="zh-Hant" data-lang="zh">
 <head>
@@ -15,11 +16,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:wght@800&display=swap" rel="stylesheet">
 <link id="font-preset" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout follows the owner's reference: warm cream page, serif caps headline, can lineup with category chips,
-   four-step flow, pricing row, then the live label maker and the bespoke enquiry. Single light look. */
 :root{
-  --bg:#f6eee3; --bg-2:#efe3d3; --card:#fcf7f0; --line:#e4d3bd; --ink:#3a2618; --brown:#5b3a22; --soft:#86705e;
-  --accent:#7d4f27; --accent-2:#94612f; --gold:#b48a55;
+  --bg:#f6eee3;--bg-2:#efe3d3;--card:#fcf7f0;--line:#e4d3bd;--ink:#3a2618;--brown:#5b3a22;--soft:#86705e;
+  --accent:#7d4f27;--accent-2:#94612f;--gold:#b48a55;
   --cap:"Cinzel","Noto Serif TC",Georgia,serif;
   --serif:"Noto Serif TC","Cormorant Garamond",Georgia,serif;
   --latin:"Cormorant Garamond","Noto Serif TC",Georgia,serif;
@@ -27,7 +26,7 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 var(--serif);-webkit-font-smoothing:antialiased}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -39,7 +38,7 @@ h1,h2,h3,p{margin:0}
 .sub{display:block;font:600 12px/1.4 var(--cap);letter-spacing:.28em;color:var(--soft);margin-top:4px}
 svg.i{width:28px;height:28px;stroke:var(--accent);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-/* nav */
+/* Navigation */
 .nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid #ead9c4}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:12px}
@@ -54,11 +53,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--accent);box-shadow:none}
 .btn.ghost:hover{background:var(--card)}
 .btn .en{font-size:15px}
-@media (max-width:1180px){.links a:not(.btn){display:none}}
+@media(max-width:1180px){.links a:not(.btn){display:none}}
 .logo{min-width:0}
 .logo small{white-space:nowrap}
 
-/* hero */
+/* Hero */
 .hero{background:radial-gradient(90% 60% at 50% 30%,#fbf5ec,transparent 70%),linear-gradient(#f7efe4,#f1e5d5);padding-block:38px 46px;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:90px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 90' preserveAspectRatio='none'%3E%3Cpath d='M0 70 C120 40 200 55 300 35 S480 20 560 45 720 60 820 30 1000 15 1200 50 V90 H0Z' fill='%23e9d8c2' opacity='.55'/%3E%3Cpath d='M0 80 C160 60 260 75 380 58 S620 50 720 68 940 72 1200 62 V90 H0Z' fill='%23e3cfb6' opacity='.5'/%3E%3C/svg%3E") bottom/100% 100% no-repeat;pointer-events:none}
 .hero .wrap{position:relative;z-index:1;text-align:center}
@@ -70,7 +69,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .intro p{font-size:clamp(14.5px,1.7vw,18px);line-height:1.75;color:var(--ink);letter-spacing:.06em;max-width:40em}
 .laurel{width:42px;height:58px;flex:none;color:var(--gold)}
 .laurel.r{transform:scaleX(-1)}
-
 .lineup-wrap{margin-top:30px}
 .lineup-inner{position:relative}
 .lineup-inner img{width:100%}
@@ -82,7 +80,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .chip span{font:500 14px var(--latin);color:var(--soft);letter-spacing:.04em}
 .claim{display:flex;align-items:center;gap:22px;justify-content:center;margin-top:34px;font-size:clamp(15px,1.8vw,19.5px);letter-spacing:.12em;line-height:1.6;text-align:center}
 .claim::before,.claim::after{content:"";flex:1;max-width:120px;height:1px;background:var(--brown);opacity:.5}
-@media (max-width:860px){
+@media(max-width:860px){
   .lineup-wrap{overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(18px,env(safe-area-inset-left,0px)));scroll-snap-type:x proximity}
   .lineup-wrap::-webkit-scrollbar{display:none}
   .lineup-inner{width:900px;padding-inline:18px}
@@ -91,14 +89,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 }
 .swipe{display:none;font-size:12.5px;color:var(--soft);margin-top:10px}
 
-/* section heads */
+/* Section headings */
 section{padding-block:64px;scroll-margin-top:70px}
 #types{scroll-margin-top:80px}
 .head{text-align:center;margin-bottom:34px}
 .head h2{font-weight:600;font-size:clamp(24px,3vw,32px);letter-spacing:.14em;color:var(--brown)}
 .head p{color:var(--soft);margin-top:10px;font-size:15px}
 
-/* how it works */
+/* Steps */
 .how{background:var(--bg-2)}
 .steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;position:relative;max-width:980px;margin:0 auto}
 .steps::before{content:"";position:absolute;left:12.5%;right:12.5%;top:17px;height:1px;background:var(--gold);opacity:.6}
@@ -109,7 +107,7 @@ section{padding-block:64px;scroll-margin-top:70px}
 .step p{font-size:13.5px;color:var(--soft);line-height:1.55;letter-spacing:.03em}
 .how{padding-block:48px}
 
-/* pricing */
+/* Pricing */
 .pricing .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) minmax(0,1fr);gap:34px;align-items:center}
 .pack{position:relative;background:linear-gradient(#fcf6ec,#f4e8d6);border:1px solid #dcc3a0;border-radius:10px;padding:26px 24px 30px;text-align:center;box-shadow:0 18px 36px -24px #5b3a2266}
 .pack::before{content:"";position:absolute;inset:7px;border:1px solid #e3cfb1;border-radius:7px;pointer-events:none}
@@ -123,7 +121,7 @@ section{padding-block:64px;scroll-margin-top:70px}
 .opt p{font-size:14.5px;color:var(--soft);letter-spacing:.04em}
 .opt .btn{justify-self:start;margin-top:6px}
 
-/* cases */
+/* Cases */
 .cases .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .cases .grid>.wide{grid-column:1/-1}
 .cases .side{display:contents}
@@ -134,8 +132,7 @@ section{padding-block:64px;scroll-margin-top:70px}
 .case h3{font-weight:600;font-size:18px;letter-spacing:.06em}
 .case p{font-size:14px;color:var(--soft);margin-top:2px}
 
-
-/* maker */
+/* Maker */
 .maker{background:var(--bg-2)}
 .tabs{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 .tabs button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 20px;font-size:15px;letter-spacing:.08em}
@@ -145,9 +142,16 @@ section{padding-block:64px;scroll-margin-top:70px}
 .make{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1fr) minmax(0,1.15fr);gap:30px;margin-top:30px;align-items:center}
 .label{position:relative;width:100%;aspect-ratio:1055/389;background-size:100% 100%;container-type:inline-size;overflow:hidden;border-radius:3px;box-shadow:0 26px 50px -28px #3b2a1c88}
 .t{position:absolute;left:18%;width:58%;text-align:center;white-space:nowrap;font-family:"Cormorant Garamond","Noto Serif TC",Georgia,serif}
-.bday{color:#f3e6cf}.bday .name{top:67%;font-size:7.2cqw;font-weight:500;line-height:1}.bday .msg{top:86%;font-size:3.3cqw}
-.wed{color:#2a221c}.wed .name{top:49%;font-family:"Great Vibes","Snell Roundhand","Noto Serif TC",cursive;font-size:8.4cqw;line-height:1.1}.wed .date{top:79%;font-size:3.2cqw;letter-spacing:.32em;font-weight:500}
-.xmas{color:#f6e6cc}.xmas .tree{top:56%;line-height:1;display:flex;align-items:center;justify-content:center;gap:2.4cqw}.xmas .tree i{display:block;width:11cqw;height:1px;background:currentColor;opacity:.8}.xmas .name{top:73%;font-size:5.6cqw;font-weight:500}
+.bday{color:#f3e6cf}
+.bday .name{top:67%;font-size:7.2cqw;font-weight:500;line-height:1}
+.bday .msg{top:86%;font-size:3.3cqw}
+.wed{color:#2a221c}
+.wed .name{top:49%;font-family:"Great Vibes","Snell Roundhand","Noto Serif TC",cursive;font-size:8.4cqw;line-height:1.1}
+.wed .date{top:79%;font-size:3.2cqw;letter-spacing:.32em;font-weight:500}
+.xmas{color:#f6e6cc}
+.xmas .tree{top:56%;line-height:1;display:flex;align-items:center;justify-content:center;gap:2.4cqw}
+.xmas .tree i{display:block;width:11cqw;height:1px;background:currentColor;opacity:.8}
+.xmas .name{top:73%;font-size:5.6cqw;font-weight:500}
 .note{font-size:13px;color:var(--soft);margin-top:12px;text-align:center}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px;display:grid;gap:14px}
 .f{display:grid;gap:5px}
@@ -168,7 +172,7 @@ section{padding-block:64px;scroll-margin-top:70px}
 .copybox{display:none;width:100%;font:12px/1.5 ui-monospace,Menlo,monospace;background:#fffdf9;border:1px solid var(--line);border-radius:5px;padding:10px;min-height:150px}
 .copybox.show{display:block}
 
-/* bespoke */
+/* Bespoke */
 .bespoke .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:start}
 .bespoke h2{font-weight:600;font-size:clamp(24px,3vw,32px);letter-spacing:.12em;color:var(--brown)}
 .bespoke .lead{color:var(--soft);margin-top:14px;max-width:30em}
@@ -176,7 +180,7 @@ section{padding-block:64px;scroll-margin-top:70px}
 .bespoke li{display:flex;gap:10px;align-items:center}
 .bespoke li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
 
-/* category strip + footer */
+/* Footer */
 .strip{border-top:1px solid var(--line);background:linear-gradient(#f3e8da,#ecdcc8);position:relative;overflow:hidden}
 .strip .wrap{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding-block:34px 70px}
 .strip a{display:grid;justify-items:center;gap:4px;text-decoration:none;color:var(--ink);text-align:center;padding-inline:6px}
@@ -188,19 +192,19 @@ section{padding-block:64px;scroll-margin-top:70px}
 footer{background:var(--brown);color:#e8d8c3;font-size:13px}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding-block:22px}
 
-@media (max-width:900px){
+@media(max-width:900px){
   .pricing .wrap,.cases .grid,.make,.bespoke .wrap{grid-template-columns:minmax(0,1fr)}
   .opt,.opt:first-of-type{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:20px}
   .strip .wrap{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:26px}
   .strip a:nth-child(4){border-left:0}
 }
-@media (max-width:520px){
+@media(max-width:520px){
   .row2{grid-template-columns:minmax(0,1fr)}
   .strip b{font-size:16px}
   .strip span{font-size:14px}
 }
 
-/* language switch */
+/* Language switch */
 html[data-lang="en"] [lang="zh-Hant"]{display:none!important}
 html[data-lang="zh"] [lang="en"]{display:none!important}
 .lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
@@ -212,13 +216,13 @@ html[data-lang="en"] .chip b{font-family:var(--latin);font-size:18px;letter-spac
 html[data-lang="en"] .hero .intro p,html[data-lang="en"] .claim{letter-spacing:.02em;font-family:var(--latin);font-size:clamp(16px,1.9vw,20px)}
 html[data-lang="en"] h2,html[data-lang="en"] h3{font-family:var(--latin);letter-spacing:.04em}
 html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(--cap);letter-spacing:.06em}
-@media (max-width:860px){.lineup-inner{width:1040px!important}.links{gap:10px}}
+@media(max-width:860px){.lineup-inner{width:1040px!important}.links{gap:10px}}
 .links .btn{white-space:nowrap}
-@media (max-width:520px){.logo b{font-size:21px}.logo small{display:none}.links .btn{padding:8px 14px!important;font-size:13.5px}.lang button{padding:5px 9px}}
+@media(max-width:520px){.logo b{font-size:21px}.logo small{display:none}.links .btn{padding:8px 14px!important;font-size:13.5px}.lang button{padding:5px 9px}}
 
-/* ---------- phone layout ---------- */
+/* Phone layout */
 .mgrid{display:none}
-@media (max-width:860px){
+@media(max-width:860px){
   .lineup-wrap,.swipe{display:none!important}
   .mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 8px;margin:26px auto 0;max-width:420px}
   .mcell{display:flex;justify-content:center;min-width:0}
@@ -233,7 +237,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   .make .stage-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:5;background:var(--bg-2);padding-block:8px 4px}
   .make .note{font-size:12px;margin-top:6px}
 }
-@media (max-width:640px){
+@media(max-width:640px){
   .hero{padding-block:26px 34px}
   .intro p br,.claim br{display:none}
   .claim{margin-top:28px;font-size:15px;letter-spacing:.06em}
@@ -248,8 +252,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   .maker .tabs button{padding:8px 14px;font-size:14px}
   .panel{padding:16px}
 }
-
-@media (max-width:760px){
+@media(max-width:760px){
   .how{padding-block:36px}
   .how .head{margin-bottom:18px}
   .steps{grid-template-columns:minmax(0,1fr);row-gap:14px;max-width:420px}
@@ -260,19 +263,20 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   .step p{font-size:13px;line-height:1.45}
   .step p br{display:none}
 }
-/* ---------- owner-uploaded lineup ---------- */
-@media (max-width:860px){
+
+/* Owner-uploaded lineup */
+@media(max-width:860px){
   html.custom-lineup .lineup-wrap{display:block!important;overflow:visible;margin-inline:0}
   html.custom-lineup .lineup-inner{width:auto!important;padding:0}
   html.custom-lineup .mgrid{display:none!important}
 }
 
-/* ---------- v2 hero ---------- */
+/* Hero layout */
 .hero{padding-block:30px 40px}
 .hero .wrap.hero-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:24px;align-items:center;text-align:left}
 .hero .kick{font:600 13px/1.4 var(--cap);letter-spacing:.32em;color:var(--brown);margin:0 0 14px}
-.hero h1{font:800 clamp(42px,5.8vw,78px)/1.02 "Playfair Display",Georgia,serif;letter-spacing:-.015em;color:var(--ink)}
-html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfair Display",Georgia,serif;letter-spacing:-.015em}
+.hero h1{font:800 clamp(42px,5.8vw,78px)/1.02 var(--cap);letter-spacing:-.015em;color:var(--ink)}
+html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:var(--cap);letter-spacing:-.015em}
 .hero-sub{margin-top:22px;font-size:clamp(16px,1.6vw,19px);line-height:1.75;letter-spacing:.06em;color:var(--ink)}
 .hero-sub::before{content:"";display:block;width:36px;height:2px;background:var(--brown);opacity:.6;margin-bottom:14px}
 .usp{list-style:none;margin:28px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:14px 28px}
@@ -281,7 +285,7 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
 .usp div>span{font-size:12px;color:var(--soft)}
 .hero-art img{width:100%;height:auto;filter:drop-shadow(0 24px 30px #5b3a2226)}
 
-/* ---------- v2 entry cards ---------- */
+/* Entry cards */
 .hero .wrap.entry,.entry{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px;position:relative;z-index:1;text-align:left}
 .entry-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;padding:18px 22px;border-radius:12px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);box-shadow:0 14px 30px -22px #5b3a2288;transition:transform .15s,box-shadow .15s}
 .entry-card:hover{transform:translateY(-2px);box-shadow:0 18px 34px -20px #5b3a2299}
@@ -296,13 +300,13 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
 .entry-card.dark{background:linear-gradient(135deg,#5b3a22,#46301f);border-color:#5b3a22;color:#f8efe3}
 .entry-card.dark .sub,.entry-card.dark p{color:#e3d2bd}
 .entry-card.dark .go{background:#fff;color:var(--brown)}
-@media (prefers-reduced-motion:reduce){.entry-card{transition:none}}
+@media(prefers-reduced-motion:reduce){.entry-card{transition:none}}
 
-/* ---------- v2 case row ---------- */
+/* Cases */
 .case-row{margin-bottom:26px}
 .case-row .claim{margin-top:18px}
 
-/* ---------- v2 maker ---------- */
+/* Live label maker */
 .make-points{list-style:none;margin:0;padding:0;display:grid;gap:16px}
 .make-points li{display:flex;align-items:center;gap:12px;font-size:16px;letter-spacing:.06em}
 .make-points li::before{content:"✓";flex:none;width:26px;height:26px;border-radius:50%;background:var(--brown);color:#fff;display:grid;place-items:center;font-size:14px}
@@ -325,11 +329,11 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
 .view-toggle{border:0;background:none;color:var(--accent);font-size:13.5px;text-decoration:underline;text-underline-offset:4px;padding:4px}
 #stage{width:100%;display:grid;justify-items:center}
 
-@media (max-width:980px){
+@media(max-width:980px){
   .make{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
   .make-points{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 }
-@media (max-width:860px){
+@media(max-width:860px){
   .hero .wrap.hero-grid{grid-template-columns:minmax(0,1fr);text-align:center}
   .hero-sub::before{margin-inline:auto}
   .usp{justify-content:center;gap:12px 18px}
@@ -347,13 +351,14 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
   .stage-col{gap:2px}
   .stage-col .note{display:none}
 }
-@media (max-width:520px){
+@media(max-width:520px){
   .hero h1{font-size:clamp(40px,12vw,56px)}
   .usp div>span{display:none}
 }
 </style>
 </head>
 <body>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-corp" viewBox="0 0 32 32"><path d="M5 28V9l9-4v23M14 28V12h13v16M3 28h26M8 12h2M8 16h2M8 20h2M8 24h2M18 16h2M22 16h2M18 20h2M22 20h2M18 24h2M22 24h2"/></symbol>
@@ -372,7 +377,7 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
 </svg>
 
 <header class="nav" id="top"><div class="wrap">
-  <a class="logo" href="#top" style="text-decoration:none"><b>DB BREW<sup>®</sup></b><small>DISCOVERY BAY'S OWN CRAFT BEER BRAND</small></a>
+  <a class="logo" href="#top" style="text-decoration:none"><b><span lang="zh-Hant">時光釀造所</span><span lang="en">DB BREW<sup>®</sup></span></b><small><span lang="zh-Hant">CHRONOBREWERY</span><span lang="en">DISCOVERY BAY'S OWN CRAFT BEER BRAND</span></small></a>
   <nav class="links">
     <a href="#top"><span lang="zh-Hant">首頁</span><span lang="en">Home</span></a>
     <a href="#types"><span lang="zh-Hant">客製包裝</span><span lang="en">Packaging</span></a>
@@ -394,13 +399,14 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
     <h1>Your Beer.<br>Your Story.</h1>
     <p class="hero-sub"><span lang="zh-Hant">讓每一個值得紀念的時刻，<br>都有一款屬於自己的啤酒。</span><span lang="en">Every moment worth remembering<br>deserves a beer of its own.</span></p>
     <ul class="usp">
-      <li><svg class="i"><use href="#i-beer"/></svg><div><b><span lang="zh-Hant">精釀好酒</span><span lang="en">Real craft beer</span></b><span><span lang="zh-Hant">愉景灣自家釀造</span><span lang="en">Brewed in Discovery Bay</span></span></div></li>
+      <li><svg class="i"><use href="#i-beer"/></svg><div><b><span lang="zh-Hant">精釀好酒</span><span lang="en">Real craft beer</span></b><span><span lang="zh-Hant">精釀啤酒品牌</span><span lang="en">Craft beer brand</span></span></div></li>
       <li><svg class="i"><use href="#i-pen"/></svg><div><b><span lang="zh-Hant">專屬設計</span><span lang="en">Your own label</span></b><span><span lang="zh-Hant">為你的故事定制</span><span lang="en">Designed around your story</span></span></div></li>
       <li><svg class="i"><use href="#i-gift"/></svg><div><b><span lang="zh-Hant">重要時刻</span><span lang="en">Big moments</span></b><span><span lang="zh-Hant">生日・婚禮・企業・派對・球隊</span><span lang="en">Birthdays, weddings, teams</span></span></div></li>
     </ul>
   </div>
   <div class="hero-art"><img src="/mybeer-hero-cans.webp" width="1159" height="810" alt="DB BREW custom cans: a birthday can, Reunion Tales for CEIBS FMBA 2020, and Peninsula's Ignite football can"></div>
 </div>
+
 <div class="wrap entry" id="pricing">
   <a class="entry-card" href="#make">
     <img src="/mybeer-m-bday.webp" width="245" height="420" alt="">
@@ -436,21 +442,21 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
 <section class="cases" id="cases" style="padding-top:20px"><div class="wrap">
   <div class="head"><h2><span lang="zh-Hant">案例展示</span><span lang="en">Our work</span></h2><span class="sub">OUR WORK</span></div>
   <div class="case-row" id="types">
-  <div class="lineup-wrap"><div class="lineup-inner">
-    <img id="lineup-img" src="/mybeer-lineup.webp" width="3826" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
-  </div></div>
-  <div class="mgrid">
-    <div class="mcell"><img src="/mybeer-m-jing.webp" height="420" alt="Peninsula Still Water can"></div>
-    <div class="mcell"><img src="/mybeer-m-hang.webp" height="420" alt="Peninsula Full Ahead can"></div>
-    <div class="mcell"><img src="/mybeer-m-bday.webp" height="420" alt="Birthday can"></div>
-    <div class="mcell"><img src="/mybeer-m-wed.webp" height="420" alt="Wedding can"></div>
-    <div class="mcell"><img src="/mybeer-m-party.webp" height="420" alt="Christmas party can"></div>
-    <div class="mcell"><img src="/mybeer-m-reunion.webp" height="420" alt="Reunion Tales can for CEIBS FMBA Class of 2020"></div>
-    <div class="mcell"><img src="/mybeer-m-ran.webp" height="420" alt="Peninsula football Ignite can"></div>
-    <div class="mcell"><img src="/mybeer-m-side.webp" height="420" alt="Sideline Hero can for CEIBS Football Club"></div>
+    <div class="lineup-wrap"><div class="lineup-inner">
+      <img id="lineup-img" src="/mybeer-lineup.webp" width="3826" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
+    </div></div>
+    <div class="mgrid">
+      <div class="mcell"><img src="/mybeer-m-jing.webp" height="420" alt="Peninsula Still Water can"></div>
+      <div class="mcell"><img src="/mybeer-m-hang.webp" height="420" alt="Peninsula Full Ahead can"></div>
+      <div class="mcell"><img src="/mybeer-m-bday.webp" height="420" alt="Birthday can"></div>
+      <div class="mcell"><img src="/mybeer-m-wed.webp" height="420" alt="Wedding can"></div>
+      <div class="mcell"><img src="/mybeer-m-party.webp" height="420" alt="Christmas party can"></div>
+      <div class="mcell"><img src="/mybeer-m-reunion.webp" height="420" alt="Reunion Tales can for CEIBS FMBA Class of 2020"></div>
+      <div class="mcell"><img src="/mybeer-m-ran.webp" height="420" alt="Peninsula football Ignite can"></div>
+      <div class="mcell"><img src="/mybeer-m-side.webp" height="420" alt="Sideline Hero can for CEIBS Football Club"></div>
+    </div>
   </div>
-  </div>
-  <p class="claim"><span lang="zh-Hant">從企業週年、生日慶祝、婚禮喜宴、派對聚會到運動球隊，<br>DB BREW 提供專屬的客製啤酒包裝服務。</span><span lang="en">From company anniversaries, birthdays and weddings to parties and sports teams,<br>DB BREW makes beer that carries your name.</span></p>
+  <p class="claim"><span lang="zh-Hant">從企業週年、生日慶祝、婚禮喜宴、派對聚會到運動球隊，<br>時光釀造所提供專屬的客製啤酒包裝服務。</span><span lang="en">From company anniversaries, birthdays and weddings to parties and sports teams,<br>DB BREW makes beer that carries your name.</span></p>
   <div class="grid">
     <figure class="case wide" style="margin:0">
       <img src="/mybeer-case-football.webp" width="1800" height="587" alt="Six DB BREW × Peninsula football cans">
@@ -458,7 +464,7 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
     </figure>
     <figure class="case" style="margin:0">
       <img src="/mybeer-case-sideline.webp" width="1200" height="900" alt="Sideline Hero can, DB BREW × CEIBS Football Club">
-      <figcaption class="meta"><h3><span lang="zh-Hant">Sideline Hero · 中歐足球隊</span><span lang="en">Sideline Hero · CEIBS Football Club</span></h3><p><span lang="zh-Hant">球隊定制 · DB BREW × CEIBS Football Club</span><span lang="en">Sports team can · Session IPA 4.5%</span></p></figcaption>
+      <figcaption class="meta"><h3><span lang="zh-Hant">Sideline Hero · 中歐足球隊</span><span lang="en">Sideline Hero · CEIBS Football Club</span></h3><p><span lang="zh-Hant">球隊定制 · 時光釀造所 × CEIBS Football Club</span><span lang="en">Sports team can · Session IPA 4.5%</span></p></figcaption>
     </figure>
     <figure class="case" style="margin:0">
       <img src="/mybeer-case-reunion.webp" width="1200" height="900" alt="Reunion Tales can for CEIBS FMBA Class of 2020">
@@ -505,9 +511,9 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
 <section class="bespoke" id="contact"><div class="wrap">
   <div>
     <h2><span lang="zh-Hant">專屬設計諮詢</span><span lang="en">Bespoke design</span></h2><span class="sub">BESPOKE CONSULTATION</span>
-    <p class="lead"><span lang="zh-Hant">企業週年、客戶禮品、球隊、品牌活動……我們圍繞你的品牌和故事設計酒標，在愉景灣釀造入罐。每個項目單獨報價。</span><span lang="en">Company anniversaries, client gifts, sports teams, brand events. We design the label around your brand and your story, then brew and can it in Discovery Bay. Every project is quoted individually.</span></p>
+    <p class="lead"><span lang="zh-Hant">企業週年、客戶禮品、球隊、品牌活動……我們圍繞你的品牌和故事設計酒標，由合作酒廠釀造與灌裝。每個項目單獨報價。</span><span lang="en">Company anniversaries, client gifts, sports teams, brand events. We design the label around your brand and your story, with brewing and canning by our production partner. Every project is quoted individually.</span></p>
     <ul>
-      <li><span lang="zh-Hant">與 DB BREW 聯名的品牌設計</span><span lang="en">Co-branded with DB BREW</span></li>
+      <li><span lang="zh-Hant">與時光釀造所聯名的品牌設計</span><span lang="en">Co-branded with DB BREW</span></li>
       <li><span lang="zh-Hant">單款或整個系列（如半島石油足球六罐）</span><span lang="en">One design or a whole series, like Peninsula's six football cans</span></li>
       <li><span lang="zh-Hant">中英文名稱、口號、大字</span><span lang="en">Names, slogans and characters in Chinese or English</span></li>
       <li><span lang="zh-Hant">Pilsner、IPA 等酒款可選</span><span lang="en">Pilsner, IPA or another DB BREW style</span></li>
@@ -534,10 +540,13 @@ html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfai
   <a href="#make" data-pick="xmas"><svg class="i"><use href="#i-cheers"/></svg><b><span lang="zh-Hant">Party 定制</span><span lang="en">Party</span></b><span><span lang="zh-Hant">Party</span><span lang="en">派對</span></span></a>
   <a href="#contact"><svg class="i"><use href="#i-ball"/></svg><b><span lang="zh-Hant">球隊定制</span><span lang="en">Sports teams</span></b><span><span lang="zh-Hant">Sports Teams</span><span lang="en">球隊</span></span></a>
 </div></div>
-<footer><div class="wrap"><span>DB BREW · Discovery Bay, Hong Kong</span><span><span lang="zh-Hant">酒精飲品只供 18 歲或以上人士飲用，請理性飲酒。</span><span lang="en">For adults 18 and over. Please drink responsibly.</span></span></div></footer>
+
+<footer><div class="wrap">
+  <span><span lang="zh-Hant">時光釀造所 · CHRONOBREWERY</span><span lang="en">DB BREW · Discovery Bay, Hong Kong</span></span>
+  <span><span lang="zh-Hant">酒精飲品只供 18 歲或以上人士飲用，請理性飲酒。</span><span lang="en">For adults 18 and over. Please drink responsibly.</span></span>
+</div></footer>
 
 <script>
-// DB BREW's WhatsApp number, digits only with country code (e.g. "85291234567"). Empty = copy enquiry only.
 const WHATSAPP = "85254801597";
 
 const O={
@@ -546,20 +555,32 @@ const O={
   xmas:{zh:'聖誕派對',en:'Christmas',img:'/mybeer-blank-xmas.webp',f:[['name','收禮人或家庭名稱','Recipient or family name','The Chan Family',24]]}
 };
 let cur='bday',lang='zh',view='can';
-const T={};for(const k in O){T[k]={};O[k].f.forEach(f=>T[k][f[0]]=f[3])}
+const T={};
+for(const k in O){
+  T[k]={};
+  O[k].f.forEach(f=>T[k][f[0]]=f[3]);
+}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const both=(zh,en)=>`<span lang="zh-Hant">${zh}</span><span lang="en">${en}</span>`;
 const msg=(zh,en)=>lang==='zh'?zh:en;
+const brandName=()=>lang==='zh'?'時光釀造所':'DB BREW';
 
 function setLang(l){
-  lang=l;const r=document.documentElement;r.dataset.lang=l;r.lang=l==='zh'?'zh-Hant':'en';
-  $('lang-zh').setAttribute('aria-pressed',l==='zh');$('lang-en').setAttribute('aria-pressed',l==='en');
+  lang=l;
+  const r=document.documentElement;
+  r.dataset.lang=l;
+  r.lang=l==='zh'?'zh-Hant':'en';
+  document.title=l==='zh'?'時光釀造所 · 客製啤酒包裝':'DB BREW · Custom Beer Packaging';
+  $('lang-zh').setAttribute('aria-pressed',l==='zh');
+  $('lang-en').setAttribute('aria-pressed',l==='en');
   try{localStorage.setItem('dbbrew-lang',l)}catch(e){}
   fit();
 }
+
 function draw(){
-  const t=T[cur];let h='';
+  const t=T[cur];
+  let h='';
   if(cur==='bday')h=`<div class="t name">${esc(t.name)}</div><div class="t msg">${esc(t.msg)}</div>`;
   if(cur==='wed')h=`<div class="t name">${esc(t.name)}</div><div class="t date">${esc(t.date)}</div>`;
   if(cur==='xmas')h=`<div class="t tree"><i></i><svg viewBox="0 0 10 12" aria-hidden="true"><path d="M5 0 8 4H6.5L9 7.5H6.8L10 11H5.8V12H4.2V11H0L3.2 7.5H1L3.5 4H2Z"/></svg><i></i></div><div class="t name">${esc(t.name)}</div>`;
@@ -569,310 +590,181 @@ function draw(){
   $('view-toggle').innerHTML=view==='can'?both('查看完整酒標','See the full label'):both('返回罐身預覽','Back to the can');
   fit();
 }
-function fit(){document.querySelectorAll('#stage .t').forEach(e=>{e.style.fontSize='';if(e.scrollWidth>e.clientWidth)e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)*e.clientWidth/e.scrollWidth*.97)+'px'})}
+
+function fit(){
+  document.querySelectorAll('#stage .t').forEach(e=>{
+    e.style.fontSize='';
+    if(e.scrollWidth>e.clientWidth){
+      e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)*e.clientWidth/e.scrollWidth*.97)+'px';
+    }
+  });
+}
+
 function render(){
   $('tabs').innerHTML=Object.keys(O).map(k=>`<button type="button" data-k="${k}" aria-pressed="${k===cur}">${both(O[k].zh,O[k].en)}</button>`).join('');
   $('fields').innerHTML=O[cur].f.map(f=>`<div class="f"><label for="f-${f[0]}">${both(f[1],f[2])}</label><input id="f-${f[0]}" data-key="${f[0]}" maxlength="${f[4]}" value="${esc(T[cur][f[0]])}"></div>`).join('');
   draw();
 }
-$('view-toggle').addEventListener('click',()=>{view=view==='can'?'flat':'can';draw()});
-$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){cur=b.dataset.k;render()}});
-$('fields').addEventListener('input',e=>{const i=e.target;if(i.dataset.key){T[cur][i.dataset.key]=i.value;draw()}});
-document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{cur=a.dataset.pick;render()}));
-$('lang-zh').onclick=()=>setLang('zh');$('lang-en').onclick=()=>setLang('en');
-let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(fit,120)});
+
+$('view-toggle').addEventListener('click',()=>{
+  view=view==='can'?'flat':'can';
+  draw();
+});
+$('tabs').addEventListener('click',e=>{
+  const b=e.target.closest('button');
+  if(b){cur=b.dataset.k;render();}
+});
+$('fields').addEventListener('input',e=>{
+  const i=e.target;
+  if(i.dataset.key){T[cur][i.dataset.key]=i.value;draw();}
+});
+document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{
+  cur=a.dataset.pick;
+  render();
+}));
+$('lang-zh').onclick=()=>setLang('zh');
+$('lang-en').onclick=()=>setLang('en');
+let rz;
+addEventListener('resize',()=>{
+  clearTimeout(rz);
+  rz=setTimeout(fit,120);
+});
 
 const sendBtns=p=>(WHATSAPP?`<button type="button" class="btn" data-act="wa" data-p="${p}">${both('用 WhatsApp 發送','Send on WhatsApp')}</button>`:'')+
   `<button type="button" class="btn ${WHATSAPP?'ghost':''}" data-act="copy" data-p="${p}">${both('複製查詢內容','Copy enquiry')}</button>`;
-$('p-actions').innerHTML=sendBtns('p');$('b-actions').innerHTML=sendBtns('b');
-${lang === 'zh' ? '時光釀造所 CHRONOBREWERY' : 'DB BREW'} · CUSTOM LABEL\nOccasion 場合: ${O[cur].en} ${O[cur].zh}\n${O[cur].f.map(f=>f[2]+': '+T[cur][f[0]]).join('\n')}\n12 cans · HK$499\nName: ${$('p-name').value.trim()}\nContact: ${$('p-phone').value.trim()}\nDate / delivery: ${$('p-notes').value.trim()}`;
-${lang === 'zh' ? '時光釀造所 CHRONOBREWERY' : 'DB BREW'} · BESPOKE\nCompany / team: ${$('b-company').value.trim()}\nContact: ${$('b-name').value.trim()}\nWhatsApp / phone: ${$('b-phone').value.trim()}\nIdea: ${$('b-idea').value.trim()}`;
+$('p-actions').innerHTML=sendBtns('p');
+$('b-actions').innerHTML=sendBtns('b');
+
+const pText=()=>`${brandName()} 客製啤酒查詢 · CUSTOM LABEL\nOccasion 場合: ${O[cur].en} ${O[cur].zh}\n${O[cur].f.map(f=>f[2]+': '+T[cur][f[0]]).join('\n')}\n12 cans · HK$499\nName: ${$('p-name').value.trim()}\nContact: ${$('p-phone').value.trim()}\nDate / delivery: ${$('p-notes').value.trim()}`;
+const bText=()=>`${brandName()} 專屬設計諮詢 · BESPOKE\nCompany / team: ${$('b-company').value.trim()}\nContact: ${$('b-name').value.trim()}\nWhatsApp / phone: ${$('b-phone').value.trim()}\nIdea: ${$('b-idea').value.trim()}`;
+
 function ok(p){
-  const s=$(p+'-status');s.className='status';
+  const s=$(p+'-status');
+  s.className='status';
   const need=p==='p'?['p-name','p-phone']:['b-company','b-name','b-phone'];
-  if(need.some(id=>!$(id).value.trim())){s.textContent=msg('請填寫名字及 WhatsApp／電話。','Please add your name and a WhatsApp or phone number.');return false}
-  if(!$(p+'-adult').checked){s.textContent=msg('請確認你已年滿 18 歲。','Please confirm you are 18 or older.');return false}
+  if(need.some(id=>!$(id).value.trim())){
+    s.textContent=msg('請填寫名字及 WhatsApp／電話。','Please add your name and a WhatsApp or phone number.');
+    return false;
+  }
+  if(!$(p+'-adult').checked){
+    s.textContent=msg('請確認你已年滿 18 歲。','Please confirm you are 18 or older.');
+    return false;
+  }
   return true;
 }
+
 document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-act]');if(!b)return;const p=b.dataset.p;if(!ok(p))return;
-  const text=p==='p'?pText():bText(),s=$(p+'-status'),box=$(p+'-copy');
-  if(b.dataset.act==='wa'){const a=document.createElement('a');a.href='https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent(text);a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
-    s.className='status ok';s.textContent=msg('WhatsApp 已打開並填好內容，請在 WhatsApp 按發送。','WhatsApp opens with your enquiry filled in. Tap send there.');return}
-  const show=good=>{box.value=text;box.classList.add('show');s.className='status'+(good?' ok':'');s.textContent=good?msg('已複製，請貼上並發送給 DB BREW。','Copied. Paste it into a message to DB BREW.'):msg('請複製下面的文字，發送給 DB BREW。','Copy the text below and send it to DB BREW.');if(!good){box.focus();box.select()}};
-  try{navigator.clipboard.writeText(text).then(()=>show(true)).catch(()=>show(false))}catch(err){show(false)}
+  const b=e.target.closest('[data-act]');
+  if(!b)return;
+  const p=b.dataset.p;
+  if(!ok(p))return;
+  const text=p==='p'?pText():bText();
+  const s=$(p+'-status');
+  const box=$(p+'-copy');
+  if(b.dataset.act==='wa'){
+    const a=document.createElement('a');
+    a.href='https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent(text);
+    a.target='_blank';
+    a.rel='noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    s.className='status ok';
+    s.textContent=msg('WhatsApp 已打開並填好內容，請在 WhatsApp 按發送。','WhatsApp opens with your enquiry filled in. Tap send there.');
+    return;
+  }
+  const show=good=>{
+    box.value=text;
+    box.classList.add('show');
+    s.className='status'+(good?' ok':'');
+    s.textContent=good?msg('已複製，請貼上並發送給時光釀造所。','Copied. Paste it into a message to DB BREW.'):msg('請複製下面的文字，發送給時光釀造所。','Copy the text below and send it to DB BREW.');
+    if(!good){box.focus();box.select();}
+  };
+  try{
+    navigator.clipboard.writeText(text).then(()=>show(true)).catch(()=>show(false));
+  }catch(err){
+    show(false);
+  }
 });
 document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
 
-let saved=null;try{saved=localStorage.getItem('dbbrew-lang')}catch(e){}
-setLang(saved==='en'?'en':'zh');render();
+let saved=null;
+try{saved=localStorage.getItem('dbbrew-lang');}catch(e){}
+setLang(saved==='en'?'en':'zh');
+render();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 
-// ---------- owner settings from the admin page (/mybeer-admin.html) ----------
+/* Owner settings — four font presets */
 const FONTS={
-  classic:{cap:'"Cinzel","Noto Serif TC",Georgia,serif',serif:'"Noto Serif TC","Cormorant Garamond",Georgia,serif',latin:'"Cormorant Garamond","Noto Serif TC",Georgia,serif',url:'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap'},
-  modern:{cap:'"Montserrat","Noto Sans TC",system-ui,sans-serif',serif:'"Noto Sans TC","Inter",system-ui,sans-serif',latin:'"Inter","Noto Sans TC",system-ui,sans-serif',url:'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap'},
-  elegant:{cap:'"Playfair Display","Noto Serif TC",Georgia,serif',serif:'"Noto Serif TC","Lora",Georgia,serif',latin:'"Lora","Noto Serif TC",Georgia,serif',url:'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lora:wght@400;500;600&display=swap'},
-  sport:{cap:'"Oswald","Noto Sans TC",system-ui,sans-serif',serif:'"Noto Sans TC","Barlow",system-ui,sans-serif',latin:'"Barlow","Noto Sans TC",system-ui,sans-serif',url:'https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap'}
+  classic:{
+    cap:'"Cinzel","Noto Serif TC",Georgia,serif',
+    serif:'"Noto Serif TC","Cormorant Garamond",Georgia,serif',
+    latin:'"Cormorant Garamond","Noto Serif TC",Georgia,serif',
+    url:'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap'
+  },
+  modern:{
+    cap:'"Montserrat","Noto Sans TC",system-ui,sans-serif',
+    serif:'"Noto Sans TC","Inter",system-ui,sans-serif',
+    latin:'"Inter","Noto Sans TC",system-ui,sans-serif',
+    url:'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap'
+  },
+  elegant:{
+    cap:'"Playfair Display","Noto Serif TC",Georgia,serif',
+    serif:'"Noto Serif TC","Lora",Georgia,serif',
+    latin:'"Lora","Noto Serif TC",Georgia,serif',
+    url:'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lora:wght@400;500;600&display=swap'
+  },
+  sport:{
+    cap:'"Oswald","Noto Sans TC",system-ui,sans-serif',
+    serif:'"Noto Sans TC","Barlow",system-ui,sans-serif',
+    latin:'"Barlow","Noto Sans TC",system-ui,sans-serif',
+    url:'https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap'
+  }
 };
+
 function applyFont(key){
-  const f=FONTS[key];if(!f)return;
-  const r=document.documentElement.style;r.setProperty('--cap',f.cap);r.setProperty('--serif',f.serif);r.setProperty('--latin',f.latin);
-  const l=document.getElementById('font-preset');if(l&&l.getAttribute('href')!==f.url)l.setAttribute('href',f.url);
+  const f=FONTS[key];
+  if(!f)return;
+  const r=document.documentElement.style;
+  r.setProperty('--cap',f.cap);
+  r.setProperty('--serif',f.serif);
+  r.setProperty('--latin',f.latin);
+  const l=document.getElementById('font-preset');
+  if(l&&l.getAttribute('href')!==f.url){
+    l.setAttribute('href',f.url);
+  }
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 }
+
+/* Load admin settings */
 (async function loadSiteSettings(){
   try{
-    const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),3000);
-    const res=await fetch('/api/menu-public?mybeer=1',{signal:ctl.signal});clearTimeout(timer);
-    if(!res.ok)return;
+    const ctl=new AbortController();
+    const timer=setTimeout(()=>ctl.abort(),8000);
+    const res=await fetch('/api/menu-public?mybeer=1&_t='+Date.now(),{
+      signal:ctl.signal,
+      cache:'no-store'
+    });
+    clearTimeout(timer);
+    if(!res.ok){
+      console.warn('[DB BREW font] Settings request failed',location.origin,res.status);
+      return;
+    }
     const s=await res.json();
-    if(s.font&&s.font!=='classic')applyFont(s.font);
+    if(s.font&&FONTS[s.font]){
+      applyFont(s.font);
+      console.info('[DB BREW font] Applied:',s.font,'from',location.origin);
+    }else{
+      console.warn('[DB BREW font] Unknown font:',s.font);
+    }
     if(typeof s.lineupUrl==='string'&&/^https:\/\//.test(s.lineupUrl)){
-      $('lineup-img').src=s.lineupUrl;document.documentElement.classList.add('custom-lineup');
+      $('lineup-img').src=s.lineupUrl;
+      document.documentElement.classList.add('custom-lineup');
     }
-  }catch(_){/* keep the default look */}
+  }catch(err){
+    console.error('[DB BREW font] Settings request error:',err);
+  }
 })();
 </script>
-   
-<script>
-/* DB BREW / 时光酿造所
-   中英文品牌自动切换
-   放在原有 </body> 标签之前
-*/
-
-(function () {
-  const BRAND = {
-    zh: {
-      name: "时光酿造所",
-      subtitle: "CHRONOBREWERY",
-      title: "时光酿造所 · 定制啤酒包装",
-      footer: "时光酿造所 · CHRONOBREWERY"
-    },
-    en: {
-      name: "DB BREW",
-      subtitle: "DISCOVERY BAY'S OWN CRAFT BEER BRAND",
-      title: "DB BREW · Custom Beer Packaging",
-      footer: "DB BREW · Discovery Bay, Hong Kong"
-    }
-  };
-
-  // 更新顶部 Logo、页面标题和页脚
-  function updateBrand(lang) {
-    const b = BRAND[lang] || BRAND.zh;
-
-    const logo = document.querySelector(".logo b");
-    const subtitle = document.querySelector(".logo small");
-    const footer = document.querySelector("footer .wrap > span:first-child");
-
-    if (logo) {
-      logo.textContent = b.name;
-
-      if (lang === "en") {
-        const sup = document.createElement("sup");
-        sup.textContent = "®";
-        logo.appendChild(sup);
-      }
-    }
-
-    if (subtitle) subtitle.textContent = b.subtitle;
-    if (footer) footer.textContent = b.footer;
-
-    document.title = b.title;
-
-    const ogTitle = document.querySelector(
-      'meta[property="og:title"]'
-    );
-
-    if (ogTitle) {
-      ogTitle.setAttribute("content", b.title);
-    }
-  }
-
-  // 保留原来的语言切换逻辑
-  const originalSetLang = window.setLang;
-
-  window.setLang = function (lang) {
-    if (typeof originalSetLang === "function") {
-      originalSetLang(lang);
-    }
-
-    updateBrand(lang);
-  };
-
-  // 页面首次打开时同步品牌
-  const currentLang =
-    document.documentElement.dataset.lang === "en"
-      ? "en"
-      : "zh";
-
-  updateBrand(currentLang);
-
-  // 监听中英文切换按钮
-  document.getElementById("lang-zh")
-    ?.addEventListener("click", () => updateBrand("zh"));
-
-  document.getElementById("lang-en")
-    ?.addEventListener("click", () => updateBrand("en"));
-})();
-</script>
-
-<script>
-/* ==========================================
-   DB BREW / 時光釀造所
-   品牌名称中英文统一切换
-   ========================================== */
-
-(function () {
-  const BRAND = {
-    zh: {
-      name: "時光釀造所",
-      subtitle: "CHRONOBREWERY",
-      title: "時光釀造所 · 客製啤酒包裝",
-      footer: "時光釀造所 · CHRONOBREWERY"
-    },
-    en: {
-      name: "DB BREW",
-      subtitle: "DISCOVERY BAY'S OWN CRAFT BEER BRAND",
-      title: "DB BREW · Custom Beer Packaging",
-      footer: "DB BREW · Discovery Bay, Hong Kong"
-    }
-  };
-
-  // 保存原始文字，确保切换英文后可以还原
-  const originals = new WeakMap();
-
-  function replaceBrandText(lang) {
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT
-    );
-
-    let node;
-
-    while ((node = walker.nextNode())) {
-      const parent = node.parentElement;
-
-      if (!parent) continue;
-
-      if (
-        parent.closest(
-          "script, style, textarea, input"
-        )
-      ) {
-        continue;
-      }
-
-      if (!originals.has(node)) {
-        originals.set(node, node.nodeValue);
-      }
-
-      const original = originals.get(node);
-
-      const updated = lang === "zh"
-        ? original.replace(
-            /DB\s+BREW/gi,
-            "時光釀造所"
-          )
-        : original;
-
-      if (node.nodeValue !== updated) {
-        node.nodeValue = updated;
-      }
-    }
-  }
-
-  function updateBrand() {
-    const lang =
-      document.documentElement.dataset.lang === "en"
-        ? "en"
-        : "zh";
-
-    const brand = BRAND[lang];
-
-    // 1. 顶部品牌
-    const logo = document.querySelector(".logo b");
-
-    if (logo) {
-      logo.textContent = brand.name;
-
-      if (lang === "en") {
-        const sup = document.createElement("sup");
-        sup.textContent = "®";
-        logo.appendChild(sup);
-      }
-    }
-
-    // 2. 品牌副标题
-    const subtitle = document.querySelector(
-      ".logo small"
-    );
-
-    if (subtitle) {
-      subtitle.textContent = brand.subtitle;
-    }
-
-    // 3. 页脚
-    const footer = document.querySelector(
-      "footer .wrap > span:first-child"
-    );
-
-    if (footer) {
-      footer.textContent = brand.footer;
-    }
-
-    // 4. 浏览器标题
-    document.title = brand.title;
-
-    // 5. SEO 标题
-    const ogTitle = document.querySelector(
-      'meta[property="og:title"]'
-    );
-
-    if (ogTitle) {
-      ogTitle.setAttribute(
-        "content",
-        brand.title
-      );
-    }
-
-    // 6. 全网页文字统一切换
-    replaceBrandText(lang);
-  }
-
-  // 监听原有语言切换
-  const observer = new MutationObserver(
-    mutations => {
-      if (
-        mutations.some(
-          m => m.attributeName === "data-lang"
-        )
-      ) {
-        updateBrand();
-      }
-    }
-  );
-
-  observer.observe(
-    document.documentElement,
-    {
-      attributes: true,
-      attributeFilter: ["data-lang"]
-    }
-  );
-
-  // 首次加载同步
-  updateBrand();
-
-  // 兼容原有中英文按钮
-  document.getElementById("lang-zh")
-    ?.addEventListener("click", updateBrand);
-
-  document.getElementById("lang-en")
-    ?.addEventListener("click", updateBrand);
-
-})();
-</script>
-
 </body>
 </html>
