@@ -634,5 +634,88 @@ function applyFont(key){
   }catch(_){/* keep the default look */}
 })();
 </script>
+   
+<script>
+/* DB BREW / 时光酿造所
+   中英文品牌自动切换
+   放在原有 </body> 标签之前
+*/
+
+(function () {
+  const BRAND = {
+    zh: {
+      name: "时光酿造所",
+      subtitle: "CHRONOBREWERY",
+      title: "时光酿造所 · 定制啤酒包装",
+      footer: "时光酿造所 · CHRONOBREWERY"
+    },
+    en: {
+      name: "DB BREW",
+      subtitle: "DISCOVERY BAY'S OWN CRAFT BEER BRAND",
+      title: "DB BREW · Custom Beer Packaging",
+      footer: "DB BREW · Discovery Bay, Hong Kong"
+    }
+  };
+
+  // 更新顶部 Logo、页面标题和页脚
+  function updateBrand(lang) {
+    const b = BRAND[lang] || BRAND.zh;
+
+    const logo = document.querySelector(".logo b");
+    const subtitle = document.querySelector(".logo small");
+    const footer = document.querySelector("footer .wrap > span:first-child");
+
+    if (logo) {
+      logo.textContent = b.name;
+
+      if (lang === "en") {
+        const sup = document.createElement("sup");
+        sup.textContent = "®";
+        logo.appendChild(sup);
+      }
+    }
+
+    if (subtitle) subtitle.textContent = b.subtitle;
+    if (footer) footer.textContent = b.footer;
+
+    document.title = b.title;
+
+    const ogTitle = document.querySelector(
+      'meta[property="og:title"]'
+    );
+
+    if (ogTitle) {
+      ogTitle.setAttribute("content", b.title);
+    }
+  }
+
+  // 保留原来的语言切换逻辑
+  const originalSetLang = window.setLang;
+
+  window.setLang = function (lang) {
+    if (typeof originalSetLang === "function") {
+      originalSetLang(lang);
+    }
+
+    updateBrand(lang);
+  };
+
+  // 页面首次打开时同步品牌
+  const currentLang =
+    document.documentElement.dataset.lang === "en"
+      ? "en"
+      : "zh";
+
+  updateBrand(currentLang);
+
+  // 监听中英文切换按钮
+  document.getElementById("lang-zh")
+    ?.addEventListener("click", () => updateBrand("zh"));
+
+  document.getElementById("lang-en")
+    ?.addEventListener("click", () => updateBrand("en"));
+})();
+</script>
+
 </body>
 </html>
