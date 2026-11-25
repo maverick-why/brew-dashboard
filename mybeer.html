@@ -585,8 +585,8 @@ let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(fit,120)});
 const sendBtns=p=>(WHATSAPP?`<button type="button" class="btn" data-act="wa" data-p="${p}">${both('用 WhatsApp 發送','Send on WhatsApp')}</button>`:'')+
   `<button type="button" class="btn ${WHATSAPP?'ghost':''}" data-act="copy" data-p="${p}">${both('複製查詢內容','Copy enquiry')}</button>`;
 $('p-actions').innerHTML=sendBtns('p');$('b-actions').innerHTML=sendBtns('b');
-const pText=()=>`DB BREW 客製啤酒查詢 · CUSTOM LABEL\nOccasion 場合: ${O[cur].en} ${O[cur].zh}\n${O[cur].f.map(f=>f[2]+': '+T[cur][f[0]]).join('\n')}\n12 cans · HK$499\nName: ${$('p-name').value.trim()}\nContact: ${$('p-phone').value.trim()}\nDate / delivery: ${$('p-notes').value.trim()}`;
-const bText=()=>`DB BREW 專屬設計諮詢 · BESPOKE\nCompany / team: ${$('b-company').value.trim()}\nContact: ${$('b-name').value.trim()}\nWhatsApp / phone: ${$('b-phone').value.trim()}\nIdea: ${$('b-idea').value.trim()}`;
+${lang === 'zh' ? '時光釀造所' : 'DB BREW'} · CUSTOM LABEL\nOccasion 場合: ${O[cur].en} ${O[cur].zh}\n${O[cur].f.map(f=>f[2]+': '+T[cur][f[0]]).join('\n')}\n12 cans · HK$499\nName: ${$('p-name').value.trim()}\nContact: ${$('p-phone').value.trim()}\nDate / delivery: ${$('p-notes').value.trim()}`;
+${lang === 'zh' ? '時光釀造所' : 'DB BREW'} · BESPOKE\nCompany / team: ${$('b-company').value.trim()}\nContact: ${$('b-name').value.trim()}\nWhatsApp / phone: ${$('b-phone').value.trim()}\nIdea: ${$('b-idea').value.trim()}`;
 function ok(p){
   const s=$(p+'-status');s.className='status';
   const need=p==='p'?['p-name','p-phone']:['b-company','b-name','b-phone'];
