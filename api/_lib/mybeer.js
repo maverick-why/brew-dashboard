@@ -30,7 +30,81 @@ function mybeerUploadPath(mimeType, now = new Date()) {
   return `mybeer/${now.toISOString().slice(0, 10)}/${now.getTime()}-${id}.${ext}`;
 }
 
+// Never rejects: the public page falls back to the default look on any failure.
+async function getPublicSettings(redis, supabaseUrl) {
+  let stored = null;
+  try {
+    if (redis) {
+      const raw = await redis.get(MYBEER_KEY);
+      stored = raw ? JSON.parse(raw) : null;
+    }
+  } catch (_) {
+    stored = null;
+  }
+  const { font, lineupUrl } = normalizeMybeerSettings(stored, supabaseUrl);
+  return { font, lineupUrl };
+}
+
+const MYBEER_MAX_BYTES = 5 * 1024 * 1024;
+
+// Builds the /api/mybeer handler. deps: { getRedis, getSupabase, verifyAdmin, supabaseUrl }
+// getRedis may throw or return null; the public read still answers with defaults.
+function createMybeerHandler(deps) {
+  const { handleOptions, getQuery, readJsonBody } = require('./http');
+  const { ok, error } = require('./response');
+  const redisOrNull = () => { try { return deps.getRedis() || null; } catch (_) { return null; } };
+
+  return async function handler(req, res) {
+    if (handleOptions(req, res)) return;
+    const { op } = getQuery(req);
+
+    if (!op && req.method === 'GET') {
+      const settings = await getPublicSettings(redisOrNull(), deps.supabaseUrl);
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=60');
+      return res.status(200).end(JSON.stringify({ ok: true, ...settings }));
+    }
+
+    try {
+      deps.verifyAdmin(req);
+
+      if (req.method === 'GET' && op === 'get') {
+        const r = redisOrNull();
+        const raw = r ? await r.get(MYBEER_KEY) : null;
+        return ok(res, normalizeMybeerSettings(raw ? JSON.parse(raw) : null, deps.supabaseUrl));
+      }
+
+      if (req.method === 'POST' && op === 'upload') {
+        const body = await readJsonBody(req);
+        const size = Number(body.size || 0);
+        if (!Number.isFinite(size) || size <= 0 || size > MYBEER_MAX_BYTES) return error(res, 400, '图片不能超过 5MB');
+        const path = mybeerUploadPath(body.mimeType);
+        const bucket = deps.getSupabase().storage.from(MYBEER_BUCKET);
+        const { data: signed, error: signedError } = await bucket.createSignedUploadUrl(path);
+        if (signedError) throw signedError;
+        const { data: pub } = bucket.getPublicUrl(path);
+        return ok(res, { signedUrl: signed.signedUrl, token: signed.token, url: pub.publicUrl, path });
+      }
+
+      if (req.method === 'POST' && op === 'save') {
+        const body = await readJsonBody(req);
+        const r = redisOrNull();
+        if (!r) return error(res, 500, '服务器未配置 Redis，无法保存');
+        const saved = { ...normalizeMybeerSettings(body, deps.supabaseUrl), updatedAt: new Date().toISOString() };
+        await r.set(MYBEER_KEY, JSON.stringify(saved));
+        return ok(res, saved);
+      }
+
+      return error(res, 400, '未知操作');
+    } catch (err) {
+      return error(res, err.status || 500, err.message || '服务器错误');
+    }
+  };
+}
+
 module.exports = {
+  createMybeerHandler,
+  getPublicSettings,
   MYBEER_KEY,
   MYBEER_FONTS,
   MYBEER_IMAGE_TYPES,
