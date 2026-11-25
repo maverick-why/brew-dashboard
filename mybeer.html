@@ -220,9 +220,9 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
 .mgrid{display:none}
 @media (max-width:860px){
   .lineup-wrap,.swipe{display:none!important}
-  .mgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:18px 14px;margin:26px auto 0;max-width:420px}
-  .mcell{flex:0 0 auto}
-  .mcell img{height:clamp(112px,34vw,150px);width:auto;filter:drop-shadow(0 12px 8px #5b3a2230);margin-bottom:8px}
+  .mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 8px;margin:26px auto 0;max-width:420px}
+  .mcell{display:flex;justify-content:center;min-width:0}
+  .mcell img{height:clamp(100px,30vw,140px);width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 12px 8px #5b3a2230);margin-bottom:8px}
   .mcell b{font-weight:600;font-size:15px;letter-spacing:.06em;white-space:nowrap}
   .mcell>span{font:500 13px var(--latin);color:var(--soft)}
   .cases .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px}
@@ -312,7 +312,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   </div>
 
   <div class="lineup-wrap" id="types"><div class="lineup-inner">
-    <img id="lineup-img" src="/mybeer-lineup.webp" width="3350" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
+    <img id="lineup-img" src="/mybeer-lineup.webp" width="3826" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
   </div></div>
   <div class="mgrid">
     <div class="mcell"><img src="/mybeer-m-jing.webp" height="420" alt="Peninsula Still Water can"></div>
@@ -320,6 +320,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
     <div class="mcell"><img src="/mybeer-m-bday.webp" height="420" alt="Birthday can"></div>
     <div class="mcell"><img src="/mybeer-m-wed.webp" height="420" alt="Wedding can"></div>
     <div class="mcell"><img src="/mybeer-m-party.webp" height="420" alt="Christmas party can"></div>
+    <div class="mcell"><img src="/mybeer-m-reunion.webp" height="420" alt="Reunion Tales can for CEIBS FMBA Class of 2020"></div>
     <div class="mcell"><img src="/mybeer-m-ran.webp" height="420" alt="Peninsula football Ignite can"></div>
     <div class="mcell"><img src="/mybeer-m-side.webp" height="420" alt="Sideline Hero can for CEIBS Football Club"></div>
   </div>
@@ -437,7 +438,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
 
 <script>
 // DB BREW's WhatsApp number, digits only with country code (e.g. "85291234567"). Empty = copy enquiry only.
-const WHATSAPP = "";
+const WHATSAPP = "85254801597";
 
 const O={
   bday:{zh:'生日',en:'Birthday',img:'/mybeer-blank-bday.webp',f:[['name','名字','Name','Alex',20],['msg','祝福語','Message','Cheers to another great year!',40]]},
