@@ -88,7 +88,7 @@ header a{color:var(--accent);font-size:14px}
 </div>
 
 <script>
-const API = '/api/mybeer';
+const API = '/api/menu-public?mybeer=1';
 const DEFAULT_LINEUP = '/mybeer-lineup.webp';
 const MAX_BYTES = 5 * 1024 * 1024;
 const FONTS = [
@@ -108,7 +108,7 @@ function dirty() { return !!saved && (draft.font !== saved.font || draft.lineupU
 function refreshSave() { $('save').disabled = busy || !dirty(); }
 
 async function api(op, body) {
-  const res = await fetch(API + '?op=' + op, {
+  const res = await fetch(API + '&op=' + op, {
     method: body ? 'POST' : 'GET',
     cache: 'no-store',
     headers: Object.assign({ 'x-admin-pass': PASS }, body ? { 'Content-Type': 'application/json' } : {}),

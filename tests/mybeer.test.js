@@ -149,3 +149,22 @@ test('handler: admin get with a failing redis gives a friendly 503', async () =>
   assert.strictEqual(res.statusCode, 503);
   assert.strictEqual(res.body.message, '暂时读不到设置，请稍后再试');
 });
+
+// ---- routing through the existing api/menu-public.js (stays within Vercel's function limit) ----
+test('menu-public: ?mybeer=1 answers with site settings, not the menu', async () => {
+  const saved = process.env.REDIS_URL; delete process.env.REDIS_URL;
+  try {
+    const menuPublic = require('../api/menu-public.js');
+    const res = fakeRes();
+    await menuPublic({ method: 'GET', url: '/api/menu-public?mybeer=1', query: { mybeer: '1' }, headers: {} }, res);
+    assert.strictEqual(res.statusCode, 200);
+    assert.deepStrictEqual(res.body, { ok: true, font: 'classic', lineupUrl: '' });
+  } finally { if (saved !== undefined) process.env.REDIS_URL = saved; }
+});
+
+test('menu-public: ?mybeer=1&op=save without password is 401', async () => {
+  const menuPublic = require('../api/menu-public.js');
+  const res = fakeRes();
+  await menuPublic({ method: 'POST', url: '/api/menu-public?mybeer=1&op=save', query: { mybeer: '1', op: 'save' }, headers: {}, body: { font: 'sport' } }, res);
+  assert.strictEqual(res.statusCode, 401);
+});

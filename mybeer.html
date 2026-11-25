@@ -528,7 +528,7 @@ function applyFont(key){
 (async function loadSiteSettings(){
   try{
     const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),3000);
-    const res=await fetch('/api/mybeer',{signal:ctl.signal});clearTimeout(timer);
+    const res=await fetch('/api/menu-public?mybeer=1',{signal:ctl.signal});clearTimeout(timer);
     if(!res.ok)return;
     const s=await res.json();
     if(s.font&&s.font!=='classic')applyFont(s.font);

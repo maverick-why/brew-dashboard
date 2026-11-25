@@ -1,6 +1,7 @@
 // /api/menu-public.js  —  public read, no auth
 const Redis = require("ioredis");
 const { getSupabase } = require("./_lib/supabase");
+const mybeerHandler = require("./_lib/mybeer-handler");
 
 const KEY = "brew_dash_menu_v1";
 
@@ -144,6 +145,7 @@ async function loadFunFactItems() {
 }
 
 module.exports = async (req, res) => {
+  if (req.query && req.query.mybeer === "1") return mybeerHandler(req, res);
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
 
