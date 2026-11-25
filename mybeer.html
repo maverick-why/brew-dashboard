@@ -12,7 +12,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:wght@800&display=swap" rel="stylesheet">
 <link id="font-preset" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Layout follows the owner's reference: warm cream page, serif caps headline, can lineup with category chips,
@@ -142,7 +142,7 @@ section{padding-block:64px;scroll-margin-top:70px}
 .tabs button .en{color:var(--soft);margin-left:6px}
 .tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .tabs button[aria-pressed="true"] .en{color:#f2e2cd}
-.make{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:30px;margin-top:30px;align-items:start}
+.make{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1fr) minmax(0,1.15fr);gap:30px;margin-top:30px;align-items:center}
 .label{position:relative;width:100%;aspect-ratio:1055/389;background-size:100% 100%;container-type:inline-size;overflow:hidden;border-radius:3px;box-shadow:0 26px 50px -28px #3b2a1c88}
 .t{position:absolute;left:18%;width:58%;text-align:center;white-space:nowrap;font-family:"Cormorant Garamond","Noto Serif TC",Georgia,serif}
 .bday{color:#f3e6cf}.bday .name{top:67%;font-size:7.2cqw;font-weight:500;line-height:1}.bday .msg{top:86%;font-size:3.3cqw}
@@ -230,7 +230,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   .case .meta{padding:10px 12px 12px}
   .case h3{font-size:15px}
   .case p{font-size:12.5px}
-  .make>div:first-child{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:5;background:var(--bg-2);padding-block:8px 4px}
+  .make .stage-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:5;background:var(--bg-2);padding-block:8px 4px}
   .make .note{font-size:12px;margin-top:6px}
 }
 @media (max-width:640px){
@@ -267,6 +267,90 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   html.custom-lineup .mgrid{display:none!important}
 }
 
+/* ---------- v2 hero ---------- */
+.hero{padding-block:30px 40px}
+.hero .wrap.hero-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:24px;align-items:center;text-align:left}
+.hero .kick{font:600 13px/1.4 var(--cap);letter-spacing:.32em;color:var(--brown);margin:0 0 14px}
+.hero h1{font:800 clamp(42px,5.8vw,78px)/1.02 "Playfair Display",Georgia,serif;letter-spacing:-.015em;color:var(--ink)}
+html[data-lang="zh"] .hero h1,html[data-lang="en"] .hero h1{font-family:"Playfair Display",Georgia,serif;letter-spacing:-.015em}
+.hero-sub{margin-top:22px;font-size:clamp(16px,1.6vw,19px);line-height:1.75;letter-spacing:.06em;color:var(--ink)}
+.hero-sub::before{content:"";display:block;width:36px;height:2px;background:var(--brown);opacity:.6;margin-bottom:14px}
+.usp{list-style:none;margin:28px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:14px 28px}
+.usp li{display:flex;align-items:center;gap:10px}
+.usp b{display:block;font-weight:600;font-size:15px;letter-spacing:.06em}
+.usp div>span{font-size:12px;color:var(--soft)}
+.hero-art img{width:100%;height:auto;filter:drop-shadow(0 24px 30px #5b3a2226)}
+
+/* ---------- v2 entry cards ---------- */
+.hero .wrap.entry,.entry{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px;position:relative;z-index:1;text-align:left}
+.entry-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;padding:18px 22px;border-radius:12px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);box-shadow:0 14px 30px -22px #5b3a2288;transition:transform .15s,box-shadow .15s}
+.entry-card:hover{transform:translateY(-2px);box-shadow:0 18px 34px -20px #5b3a2299}
+.entry-card img{height:118px;width:auto}
+.entry-card .pair{display:flex;gap:2px}
+.entry-card .pair img{height:118px}
+.ec-text b{display:block;font-weight:700;font-size:21px;letter-spacing:.1em}
+.ec-text .sub{margin-top:2px}
+.ec-text strong{display:block;font:700 clamp(24px,2.6vw,32px)/1.1 var(--latin);margin-top:8px;white-space:nowrap}
+.ec-text p{font-size:13.5px;color:var(--soft);margin-top:6px;letter-spacing:.04em}
+.entry-card .go{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--brown);color:#fff;font-size:19px}
+.entry-card.dark{background:linear-gradient(135deg,#5b3a22,#46301f);border-color:#5b3a22;color:#f8efe3}
+.entry-card.dark .sub,.entry-card.dark p{color:#e3d2bd}
+.entry-card.dark .go{background:#fff;color:var(--brown)}
+@media (prefers-reduced-motion:reduce){.entry-card{transition:none}}
+
+/* ---------- v2 case row ---------- */
+.case-row{margin-bottom:26px}
+.case-row .claim{margin-top:18px}
+
+/* ---------- v2 maker ---------- */
+.make-points{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.make-points li{display:flex;align-items:center;gap:12px;font-size:16px;letter-spacing:.06em}
+.make-points li::before{content:"✓";flex:none;width:26px;height:26px;border-radius:50%;background:var(--brown);color:#fff;display:grid;place-items:center;font-size:14px}
+.stage-col{display:grid;justify-items:center;gap:10px}
+.canprev{position:relative;width:min(100%,280px)}
+.canprev img{display:block;width:100%;height:auto;filter:drop-shadow(0 24px 22px #3b2a1c40)}
+.canband{position:absolute;left:1%;top:19.56%;width:97.76%;height:66.18%;container-type:inline-size;pointer-events:none}
+.canband .lab{position:absolute;inset:0}
+.canband .t{left:10%;width:80%}
+.canband .bday .name{font-size:16.6cqw}
+.canband .bday .msg{font-size:7.6cqw}
+.canband .wed .name{font-size:19.4cqw}
+.canband .wed .date{font-size:7.4cqw}
+.canband .xmas .name{font-size:12.9cqw}
+.canband .xmas .tree{gap:5.5cqw}
+.canband .xmas .tree i{width:25cqw}
+.canband .xmas .tree svg{width:6cqw}
+.label .tree svg{width:2.6cqw;fill:currentColor}
+.canband .tree svg{fill:currentColor}
+.view-toggle{border:0;background:none;color:var(--accent);font-size:13.5px;text-decoration:underline;text-underline-offset:4px;padding:4px}
+#stage{width:100%;display:grid;justify-items:center}
+
+@media (max-width:980px){
+  .make{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+  .make-points{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
+@media (max-width:860px){
+  .hero .wrap.hero-grid{grid-template-columns:minmax(0,1fr);text-align:center}
+  .hero-sub::before{margin-inline:auto}
+  .usp{justify-content:center;gap:12px 18px}
+  .usp li{flex-direction:column;gap:4px;text-align:center}
+  .hero-art{max-width:520px;margin:0 auto}
+  .entry{grid-template-columns:minmax(0,1fr);gap:12px}
+  .entry-card{padding:14px 16px;gap:14px}
+  .entry-card img,.entry-card .pair img{height:88px}
+  .ec-text b{font-size:18px}
+  .ec-text .sub{letter-spacing:.14em;font-size:10.5px}
+  .hero .wrap.entry{grid-template-columns:minmax(0,1fr)}
+  .make{grid-template-columns:minmax(0,1fr)}
+  .make-points{display:none}
+  .canprev{width:min(40%,150px)}
+  .stage-col{gap:2px}
+  .stage-col .note{display:none}
+}
+@media (max-width:520px){
+  .hero h1{font-size:clamp(40px,12vw,56px)}
+  .usp div>span{display:none}
+}
 </style>
 </head>
 <body>
@@ -282,6 +366,8 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
     <symbol id="i-pen" viewBox="0 0 32 32"><path d="M21 5l6 6-15 15H6v-6zM18 8l6 6M6 28h20"/></symbol>
     <symbol id="i-eye" viewBox="0 0 32 32"><rect x="4" y="5" width="24" height="17" rx="2"/><path d="M12 27h8M16 22v5M9 13.5s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><circle cx="16" cy="13.5" r="1.8"/></symbol>
     <symbol id="laurel" viewBox="0 0 40 60"><path d="M30 58C14 48 8 32 12 6" fill="none" stroke="currentColor" stroke-width="1.6"/><g fill="currentColor"><ellipse cx="9" cy="14" rx="2.6" ry="6" transform="rotate(-25 9 14)"/><ellipse cx="16" cy="12" rx="2.4" ry="5.5" transform="rotate(35 16 12)"/><ellipse cx="8" cy="25" rx="2.6" ry="6" transform="rotate(-40 8 25)"/><ellipse cx="16" cy="23" rx="2.4" ry="5.5" transform="rotate(25 16 23)"/><ellipse cx="10" cy="36" rx="2.6" ry="6" transform="rotate(-55 10 36)"/><ellipse cx="19" cy="34" rx="2.4" ry="5.5" transform="rotate(15 19 34)"/><ellipse cx="15" cy="46" rx="2.6" ry="6" transform="rotate(-65 15 46)"/><ellipse cx="24" cy="44" rx="2.4" ry="5.5" transform="rotate(5 24 44)"/></g></symbol>
+    <symbol id="i-beer" viewBox="0 0 32 32"><path d="M8 10h13v16a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2zM21 13h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-3M8 10c0-3 2-5 4-5 1-2 4-2 5 0 2-1 5 1 4 5M12 15v8M17 15v8"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 32 32"><rect x="5" y="12" width="22" height="6" rx="1"/><path d="M7 18v9h18v-9M16 12v15M16 12c-2-5-8-6-8-2s6 2 8 2zM16 12c2-5 8-6 8-2s-6 2-8 2z"/></symbol>
   </defs>
 </svg>
 
@@ -302,30 +388,39 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   </nav>
 </div></header>
 
-<div class="hero"><div class="wrap">
-  <h1>CUSTOM BEER<span class="l2">PACKAGING</span></h1>
-  <p class="tag">CREATE YOUR OWN CUSTOM BEER FOR LIFE'S SPECIAL OCCASIONS</p>
-  <div class="intro">
-    <svg class="laurel"><use href="#laurel"/></svg>
-    <p><span lang="zh-Hant">客製啤酒包裝是 DB BREW 的專業服務之一，<br>我們已為眾多個人及機構打造專屬的紀念啤酒，留下重要時刻的獨特回憶。</span><span lang="en">Custom beer packaging is one of DB BREW's core services.<br>We have created keepsake beers for many people and organisations, so their big moments are remembered.</span></p>
-    <svg class="laurel r"><use href="#laurel"/></svg>
+<div class="hero" id="top-hero"><div class="wrap hero-grid">
+  <div class="hero-copy">
+    <p class="kick">CUSTOM BEER PACKAGING</p>
+    <h1>Your Beer.<br>Your Story.</h1>
+    <p class="hero-sub"><span lang="zh-Hant">讓每一個值得紀念的時刻，<br>都有一款屬於自己的啤酒。</span><span lang="en">Every moment worth remembering<br>deserves a beer of its own.</span></p>
+    <ul class="usp">
+      <li><svg class="i"><use href="#i-beer"/></svg><div><b><span lang="zh-Hant">精釀好酒</span><span lang="en">Real craft beer</span></b><span><span lang="zh-Hant">愉景灣自家釀造</span><span lang="en">Brewed in Discovery Bay</span></span></div></li>
+      <li><svg class="i"><use href="#i-pen"/></svg><div><b><span lang="zh-Hant">專屬設計</span><span lang="en">Your own label</span></b><span><span lang="zh-Hant">為你的故事定制</span><span lang="en">Designed around your story</span></span></div></li>
+      <li><svg class="i"><use href="#i-gift"/></svg><div><b><span lang="zh-Hant">重要時刻</span><span lang="en">Big moments</span></b><span><span lang="zh-Hant">生日・婚禮・企業・派對・球隊</span><span lang="en">Birthdays, weddings, teams</span></span></div></li>
+    </ul>
   </div>
-
-  <div class="lineup-wrap" id="types"><div class="lineup-inner">
-    <img id="lineup-img" src="/mybeer-lineup.webp" width="3826" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
-  </div></div>
-  <div class="mgrid">
-    <div class="mcell"><img src="/mybeer-m-jing.webp" height="420" alt="Peninsula Still Water can"></div>
-    <div class="mcell"><img src="/mybeer-m-hang.webp" height="420" alt="Peninsula Full Ahead can"></div>
-    <div class="mcell"><img src="/mybeer-m-bday.webp" height="420" alt="Birthday can"></div>
-    <div class="mcell"><img src="/mybeer-m-wed.webp" height="420" alt="Wedding can"></div>
-    <div class="mcell"><img src="/mybeer-m-party.webp" height="420" alt="Christmas party can"></div>
-    <div class="mcell"><img src="/mybeer-m-reunion.webp" height="420" alt="Reunion Tales can for CEIBS FMBA Class of 2020"></div>
-    <div class="mcell"><img src="/mybeer-m-ran.webp" height="420" alt="Peninsula football Ignite can"></div>
-    <div class="mcell"><img src="/mybeer-m-side.webp" height="420" alt="Sideline Hero can for CEIBS Football Club"></div>
-  </div>
-  <p class="swipe"><span lang="zh-Hant">← 左右滑動查看全部 →</span><span lang="en">← Swipe to see all →</span></p>
-  <p class="claim"><span lang="zh-Hant">從企業週年、生日慶祝、婚禮喜宴、派對聚會到運動球隊，<br>DB BREW 提供專屬的客製啤酒包裝服務。</span><span lang="en">From company anniversaries, birthdays and weddings to parties and sports teams,<br>DB BREW makes beer that carries your name.</span></p>
+  <div class="hero-art"><img src="/mybeer-hero-cans.webp" width="1159" height="810" alt="DB BREW custom cans: a birthday can, Reunion Tales for CEIBS FMBA 2020, and Peninsula's Ignite football can"></div>
+</div>
+<div class="wrap entry" id="pricing">
+  <a class="entry-card" href="#make">
+    <img src="/mybeer-m-bday.webp" width="245" height="420" alt="">
+    <div class="ec-text">
+      <b><span lang="zh-Hant">標準自助定制</span><span lang="en">Design it yourself</span></b>
+      <span class="sub">STANDARD CUSTOMIZATION</span>
+      <strong>12 CANS · HK$499</strong>
+      <p><span lang="zh-Hant">選擇模板・輸入文字・在線預覽・輕鬆下單</span><span lang="en">Pick a template, type your words, preview, order</span></p>
+    </div>
+    <span class="go" aria-hidden="true">→</span>
+  </a>
+  <a class="entry-card dark" href="#contact">
+    <span class="pair"><img src="/mybeer-m-jing.webp" width="210" height="420" alt=""><img src="/mybeer-m-hang.webp" width="210" height="420" alt=""></span>
+    <div class="ec-text">
+      <b><span lang="zh-Hant">專屬設計定制</span><span lang="en">Bespoke design</span></b>
+      <span class="sub">BESPOKE CUSTOMIZATION</span>
+      <p><span lang="zh-Hant">企業、品牌、球隊及大型活動<br>獨立設計・專業報價・專人服務</span><span lang="en">Companies, brands, teams and events<br>Your own design, quoted per project</span></p>
+    </div>
+    <span class="go" aria-hidden="true">→</span>
+  </a>
 </div></div>
 
 <section class="how" id="how"><div class="wrap">
@@ -338,26 +433,24 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   </div>
 </div></section>
 
-<section class="pricing" id="pricing"><div class="wrap">
-  <div class="pack">
-    <h3><span lang="zh-Hant">標準套餐</span><span lang="en">Standard package</span></h3><span class="sub">STANDARD PACKAGE</span>
-    <div class="big"><svg class="laurel"><use href="#laurel"/></svg>12 CANS · HK$499<svg class="laurel r"><use href="#laurel"/></svg></div>
-    <p><span lang="zh-Hant">一款精釀啤酒 · 一款專屬酒標設計 · 運費另計</span><span lang="en">One craft beer · one personal label · delivery quoted separately</span></p>
-  </div>
-  <div class="opt">
-    <div><h3><span lang="zh-Hant">標準自助定制</span><span lang="en">Design it yourself</span></h3><span class="sub">STANDARD CUSTOMIZATION</span></div>
-    <p><span lang="zh-Hant">選擇模板、輸入內容，<br>快速完成專屬設計。</span><span lang="en">Pick a template, type your words,<br>and your label is ready.</span></p>
-    <a class="btn" href="#make"><span lang="zh-Hant">立即訂製 ›</span><span lang="en">Create your beer ›</span></a>
-  </div>
-  <div class="opt">
-    <div><h3><span lang="zh-Hant">專屬設計諮詢</span><span lang="en">Bespoke design</span></h3><span class="sub">BESPOKE CONSULTATION</span></div>
-    <p><span lang="zh-Hant">如需更個性化的設計、品牌風格<br>或特別需求，歡迎與我們聯絡。</span><span lang="en">For your own brand style, a series of cans<br>or anything special, talk to us.</span></p>
-    <a class="btn ghost" href="#contact"><span lang="zh-Hant">聯絡我們 ›</span><span lang="en">Custom enquiry ›</span></a>
-  </div>
-</div></section>
-
 <section class="cases" id="cases" style="padding-top:20px"><div class="wrap">
   <div class="head"><h2><span lang="zh-Hant">案例展示</span><span lang="en">Our work</span></h2><span class="sub">OUR WORK</span></div>
+  <div class="case-row" id="types">
+  <div class="lineup-wrap"><div class="lineup-inner">
+    <img id="lineup-img" src="/mybeer-lineup.webp" width="3826" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
+  </div></div>
+  <div class="mgrid">
+    <div class="mcell"><img src="/mybeer-m-jing.webp" height="420" alt="Peninsula Still Water can"></div>
+    <div class="mcell"><img src="/mybeer-m-hang.webp" height="420" alt="Peninsula Full Ahead can"></div>
+    <div class="mcell"><img src="/mybeer-m-bday.webp" height="420" alt="Birthday can"></div>
+    <div class="mcell"><img src="/mybeer-m-wed.webp" height="420" alt="Wedding can"></div>
+    <div class="mcell"><img src="/mybeer-m-party.webp" height="420" alt="Christmas party can"></div>
+    <div class="mcell"><img src="/mybeer-m-reunion.webp" height="420" alt="Reunion Tales can for CEIBS FMBA Class of 2020"></div>
+    <div class="mcell"><img src="/mybeer-m-ran.webp" height="420" alt="Peninsula football Ignite can"></div>
+    <div class="mcell"><img src="/mybeer-m-side.webp" height="420" alt="Sideline Hero can for CEIBS Football Club"></div>
+  </div>
+  </div>
+  <p class="claim"><span lang="zh-Hant">從企業週年、生日慶祝、婚禮喜宴、派對聚會到運動球隊，<br>DB BREW 提供專屬的客製啤酒包裝服務。</span><span lang="en">From company anniversaries, birthdays and weddings to parties and sports teams,<br>DB BREW makes beer that carries your name.</span></p>
   <div class="grid">
     <figure class="case wide" style="margin:0">
       <img src="/mybeer-case-football.webp" width="1800" height="587" alt="Six DB BREW × Peninsula football cans">
@@ -382,8 +475,15 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   <div class="head"><h2><span lang="zh-Hant">標準自助定制 · 立即訂製</span><span lang="en">Create your beer</span></h2><span class="sub">CREATE YOUR BEER</span><p><span lang="zh-Hant">選擇場合，輸入文字，馬上預覽你的專屬酒標。</span><span lang="en">Choose an occasion, type your words, and see your label straight away.</span></p></div>
   <div class="tabs" id="tabs" role="group"></div>
   <div class="make">
-    <div>
+    <ul class="make-points">
+      <li><span lang="zh-Hant">3 款精選模板</span><span lang="en">3 ready-made designs</span></li>
+      <li><span lang="zh-Hant">自訂姓名／祝福／日期</span><span lang="en">Your names, message or date</span></li>
+      <li><span lang="zh-Hant">即時預覽罐身效果</span><span lang="en">See it on the can as you type</span></li>
+      <li><span lang="zh-Hant">12 罐 HK$499</span><span lang="en">12 cans · HK$499</span></li>
+    </ul>
+    <div class="stage-col">
       <div id="stage"></div>
+      <button type="button" class="view-toggle" id="view-toggle"></button>
       <p class="note"><span lang="zh-Hant">螢幕預覽 · 正式印刷前，我們會先發印刷稿給你確認。</span><span lang="en">Screen preview. We send you a print proof to approve before printing.</span></p>
     </div>
     <form class="panel" id="p-form" novalidate>
@@ -445,7 +545,7 @@ const O={
   wed:{zh:'婚慶',en:'Wedding',img:'/mybeer-blank-wed.webp',f:[['name','新人名字','Couple names','Emma & Michael',24],['date','婚禮日期','Wedding date','10 MAY 2027',16]]},
   xmas:{zh:'聖誕派對',en:'Christmas',img:'/mybeer-blank-xmas.webp',f:[['name','收禮人或家庭名稱','Recipient or family name','The Chan Family',24]]}
 };
-let cur='bday',lang='zh';
+let cur='bday',lang='zh',view='can';
 const T={};for(const k in O){T[k]={};O[k].f.forEach(f=>T[k][f[0]]=f[3])}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -462,8 +562,11 @@ function draw(){
   const t=T[cur];let h='';
   if(cur==='bday')h=`<div class="t name">${esc(t.name)}</div><div class="t msg">${esc(t.msg)}</div>`;
   if(cur==='wed')h=`<div class="t name">${esc(t.name)}</div><div class="t date">${esc(t.date)}</div>`;
-  if(cur==='xmas')h=`<div class="t tree"><i></i><svg viewBox="0 0 10 12" style="width:2.6cqw;fill:currentColor" aria-hidden="true"><path d="M5 0 8 4H6.5L9 7.5H6.8L10 11H5.8V12H4.2V11H0L3.2 7.5H1L3.5 4H2Z"/></svg><i></i></div><div class="t name">${esc(t.name)}</div>`;
-  $('stage').innerHTML=`<div class="label ${cur}" role="img" aria-label="${O[cur].en} label preview" style="background-image:url('${O[cur].img}')">${h}</div>`;
+  if(cur==='xmas')h=`<div class="t tree"><i></i><svg viewBox="0 0 10 12" aria-hidden="true"><path d="M5 0 8 4H6.5L9 7.5H6.8L10 11H5.8V12H4.2V11H0L3.2 7.5H1L3.5 4H2Z"/></svg><i></i></div><div class="t name">${esc(t.name)}</div>`;
+  $('stage').innerHTML=view==='can'
+    ?`<div class="canprev" role="img" aria-label="${O[cur].en} can preview"><img src="/mybeer-can-${cur}.webp" width="401" height="680" alt=""><div class="canband"><div class="lab ${cur}">${h}</div></div></div>`
+    :`<div class="label ${cur}" role="img" aria-label="${O[cur].en} label preview" style="background-image:url('${O[cur].img}')">${h}</div>`;
+  $('view-toggle').innerHTML=view==='can'?both('查看完整酒標','See the full label'):both('返回罐身預覽','Back to the can');
   fit();
 }
 function fit(){document.querySelectorAll('#stage .t').forEach(e=>{e.style.fontSize='';if(e.scrollWidth>e.clientWidth)e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)*e.clientWidth/e.scrollWidth*.97)+'px'})}
@@ -472,6 +575,7 @@ function render(){
   $('fields').innerHTML=O[cur].f.map(f=>`<div class="f"><label for="f-${f[0]}">${both(f[1],f[2])}</label><input id="f-${f[0]}" data-key="${f[0]}" maxlength="${f[4]}" value="${esc(T[cur][f[0]])}"></div>`).join('');
   draw();
 }
+$('view-toggle').addEventListener('click',()=>{view=view==='can'?'flat':'can';draw()});
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){cur=b.dataset.k;render()}});
 $('fields').addEventListener('input',e=>{const i=e.target;if(i.dataset.key){T[cur][i.dataset.key]=i.value;draw()}});
 document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{cur=a.dataset.pick;render()}));
