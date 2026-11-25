@@ -12,6 +12,13 @@
 
 **Page source to port:** `/private/tmp/claude-501/-Users-maverick-projects-brew-dashboard/08816fd2-b7ad-4b77-bc77-933035ec43b4/scratchpad/db-custom-site/db-brew-custom.html` (version 8, approved) and its `img/` folder.
 
+## Revision (owner: "must not affect current project code")
+
+Additive only. Do not modify any existing file. Task 2 becomes a new `api/mybeer.js` (handler built by `createMybeerHandler(deps)` in `api/_lib/mybeer.js`):
+`GET /api/mybeer` public `{ok,font,lineupUrl}` (Cache-Control `public, max-age=60`); `GET ?op=get`, `POST ?op=upload`, `POST ?op=save` require `x-admin-pass` via `verifyAdmin`.
+Task 4 does not touch `vercel.json`; page URL is `/mybeer.html`. Task 5 is a new standalone `mybeer-admin.html`, not a tab in `admin.html`.
+Work happens in an isolated worktree based on `origin/main`.
+
 ## Global Constraints
 
 - Work on branch `feat/mybeer`. Never commit to or push `main`; `main` auto-deploys to the bar TVs. Pushing the branch and opening a PR need the owner's go-ahead.

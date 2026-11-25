@@ -4,6 +4,11 @@ _日期：2026-11-25 · 項目：brew-dashboard_
 
 ---
 
+> **2026-11-25 修訂（老闆要求：不能影響現有項目代碼）**：只新增檔案，不修改任何現有檔案
+> （`admin.html`、`api/admin.js`、`api/menu-public.js`、`vercel.json` 都不動）。
+> 後台改為獨立頁面 `mybeer-admin.html`（同一個後台密碼）；接口改為新檔 `api/mybeer.js`；
+> 網址先用 `/mybeer.html`，`/mybeer` 短網址需老闆另外同意在 `vercel.json` 加一行。以下各節以此修訂為準。
+
 ## 一、目的
 
 把 DB BREW 的「客製啤酒包裝」服務做成一個可以直接發給潛在客戶的網站：
