@@ -220,10 +220,9 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
 .mgrid{display:none}
 @media (max-width:860px){
   .lineup-wrap,.swipe{display:none!important}
-  .mgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:22px 6px;margin-top:26px}
-  .mcell{grid-column:span 2;display:grid;justify-items:center;gap:2px;text-decoration:none;color:var(--ink);text-align:center}
-  .mcell:nth-child(4){grid-column:2/span 2}
-  .mcell img{height:160px;width:100%;object-fit:contain;filter:drop-shadow(0 12px 8px #5b3a2230);margin-bottom:8px}
+  .mgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:18px 14px;margin:26px auto 0;max-width:420px}
+  .mcell{flex:0 0 auto}
+  .mcell img{height:clamp(112px,34vw,150px);width:auto;filter:drop-shadow(0 12px 8px #5b3a2230);margin-bottom:8px}
   .mcell b{font-weight:600;font-size:15px;letter-spacing:.06em;white-space:nowrap}
   .mcell>span{font:500 13px var(--latin);color:var(--soft)}
   .cases .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px}
@@ -314,14 +313,16 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   </div>
 
   <div class="lineup-wrap" id="types"><div class="lineup-inner">
-    <img id="lineup-img" src="/mybeer-lineup.webp" width="3150" height="820" alt="DB BREW custom cans: Peninsula Still Water and Full Ahead, birthday, wedding, Christmas, Peninsula football Ignite, and Sideline Hero for CEIBS Football Club">
+    <img id="lineup-img" src="/mybeer-lineup.webp" width="3350" height="820" alt="DB BREW custom cans for companies, birthdays, weddings, parties and sports teams">
   </div></div>
   <div class="mgrid">
-    <div class="mcell"><img src="/mybeer-m-corp.webp" width="324" height="420" alt="Peninsula Still Water and Full Ahead cans"></div>
-    <div class="mcell"><img src="/mybeer-m-bday.webp" width="245" height="420" alt="Birthday can"></div>
-    <div class="mcell"><img src="/mybeer-m-wed.webp" width="245" height="420" alt="Wedding can"></div>
-    <div class="mcell"><img src="/mybeer-m-party.webp" width="245" height="420" alt="Christmas party can"></div>
-    <div class="mcell"><img src="/mybeer-m-team.webp" width="422" height="420" alt="Peninsula football Ignite can and Sideline Hero can for CEIBS Football Club"></div>
+    <div class="mcell"><img src="/mybeer-m-jing.webp" height="420" alt="Peninsula Still Water can"></div>
+    <div class="mcell"><img src="/mybeer-m-hang.webp" height="420" alt="Peninsula Full Ahead can"></div>
+    <div class="mcell"><img src="/mybeer-m-bday.webp" height="420" alt="Birthday can"></div>
+    <div class="mcell"><img src="/mybeer-m-wed.webp" height="420" alt="Wedding can"></div>
+    <div class="mcell"><img src="/mybeer-m-party.webp" height="420" alt="Christmas party can"></div>
+    <div class="mcell"><img src="/mybeer-m-ran.webp" height="420" alt="Peninsula football Ignite can"></div>
+    <div class="mcell"><img src="/mybeer-m-side.webp" height="420" alt="Sideline Hero can for CEIBS Football Club"></div>
   </div>
   <p class="swipe"><span lang="zh-Hant">← 左右滑動查看全部 →</span><span lang="en">← Swipe to see all →</span></p>
   <p class="claim"><span lang="zh-Hant">從企業週年、生日慶祝、婚禮喜宴、派對聚會到運動球隊，<br>DB BREW 提供專屬的客製啤酒包裝服務。</span><span lang="en">From company anniversaries, birthdays and weddings to parties and sports teams,<br>DB BREW makes beer that carries your name.</span></p>
@@ -359,7 +360,7 @@ html[data-lang="en"] .head h2,html[data-lang="en"] .bespoke h2{font-family:var(-
   <div class="head"><h2><span lang="zh-Hant">案例展示</span><span lang="en">Our work</span></h2><span class="sub">OUR WORK</span></div>
   <div class="grid">
     <figure class="case wide" style="margin:0">
-      <img src="/mybeer-case-football.webp" width="1816" height="744" alt="Six DB BREW × Peninsula football cans">
+      <img src="/mybeer-case-football.webp" width="1800" height="587" alt="Six DB BREW × Peninsula football cans">
       <figcaption class="meta"><h3><span lang="zh-Hant">半島石油 · 足球系列</span><span lang="en">Peninsula Petroleum · Football series</span></h3><p><span lang="zh-Hant">六款聯名罐：夯、頂、射、燃、破、爆</span><span lang="en">Six co-branded cans: Hammer Kick, Sky Header, Deadly Shot, Ignite, Break Through, Full Blast</span></p></figcaption>
     </figure>
     <figure class="case" style="margin:0">
