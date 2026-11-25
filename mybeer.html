@@ -717,5 +717,162 @@ function applyFont(key){
 })();
 </script>
 
+<script>
+/* ==========================================
+   DB BREW / 時光釀造所
+   品牌名称中英文统一切换
+   ========================================== */
+
+(function () {
+  const BRAND = {
+    zh: {
+      name: "時光釀造所",
+      subtitle: "CHRONOBREWERY",
+      title: "時光釀造所 · 客製啤酒包裝",
+      footer: "時光釀造所 · CHRONOBREWERY"
+    },
+    en: {
+      name: "DB BREW",
+      subtitle: "DISCOVERY BAY'S OWN CRAFT BEER BRAND",
+      title: "DB BREW · Custom Beer Packaging",
+      footer: "DB BREW · Discovery Bay, Hong Kong"
+    }
+  };
+
+  // 保存原始文字，确保切换英文后可以还原
+  const originals = new WeakMap();
+
+  function replaceBrandText(lang) {
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT
+    );
+
+    let node;
+
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+
+      if (!parent) continue;
+
+      if (
+        parent.closest(
+          "script, style, textarea, input"
+        )
+      ) {
+        continue;
+      }
+
+      if (!originals.has(node)) {
+        originals.set(node, node.nodeValue);
+      }
+
+      const original = originals.get(node);
+
+      const updated = lang === "zh"
+        ? original.replace(
+            /DB\s+BREW/gi,
+            "時光釀造所"
+          )
+        : original;
+
+      if (node.nodeValue !== updated) {
+        node.nodeValue = updated;
+      }
+    }
+  }
+
+  function updateBrand() {
+    const lang =
+      document.documentElement.dataset.lang === "en"
+        ? "en"
+        : "zh";
+
+    const brand = BRAND[lang];
+
+    // 1. 顶部品牌
+    const logo = document.querySelector(".logo b");
+
+    if (logo) {
+      logo.textContent = brand.name;
+
+      if (lang === "en") {
+        const sup = document.createElement("sup");
+        sup.textContent = "®";
+        logo.appendChild(sup);
+      }
+    }
+
+    // 2. 品牌副标题
+    const subtitle = document.querySelector(
+      ".logo small"
+    );
+
+    if (subtitle) {
+      subtitle.textContent = brand.subtitle;
+    }
+
+    // 3. 页脚
+    const footer = document.querySelector(
+      "footer .wrap > span:first-child"
+    );
+
+    if (footer) {
+      footer.textContent = brand.footer;
+    }
+
+    // 4. 浏览器标题
+    document.title = brand.title;
+
+    // 5. SEO 标题
+    const ogTitle = document.querySelector(
+      'meta[property="og:title"]'
+    );
+
+    if (ogTitle) {
+      ogTitle.setAttribute(
+        "content",
+        brand.title
+      );
+    }
+
+    // 6. 全网页文字统一切换
+    replaceBrandText(lang);
+  }
+
+  // 监听原有语言切换
+  const observer = new MutationObserver(
+    mutations => {
+      if (
+        mutations.some(
+          m => m.attributeName === "data-lang"
+        )
+      ) {
+        updateBrand();
+      }
+    }
+  );
+
+  observer.observe(
+    document.documentElement,
+    {
+      attributes: true,
+      attributeFilter: ["data-lang"]
+    }
+  );
+
+  // 首次加载同步
+  updateBrand();
+
+  // 兼容原有中英文按钮
+  document.getElementById("lang-zh")
+    ?.addEventListener("click", updateBrand);
+
+  document.getElementById("lang-en")
+    ?.addEventListener("click", updateBrand);
+
+})();
+</script>
+
 </body>
 </html>
